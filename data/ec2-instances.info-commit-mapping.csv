@@ -1,0 +1,104 @@
+join.entry,commit.hash,commit.date,commit.msg
+102,70b380e,2020-06-02,Rebuild
+101,0057391,2019-11-30,Rebuild
+100,a3506b3,2019-11-22,Rebuild
+99,aa49013,2019-11-08,Rebuild
+98,151366c,2019-11-04,Rebuild
+97,493ccbf,2019-10-21,"Rebuild. Adds m5n, m5dn, r5n, r5dn."
+96,8e8b016,2019-09-28,Rebuild
+95,d484d3c,2019-09-23,Rebuild
+94,be49c85,2019-07-26,Rebuild
+93,b56e2e3,2019-07-16,Rebuild
+92,2ab3aec,2019-07-10,Rebuild
+91,4de34e0,2019-06-28,Rebuild
+90,9bf3765,2019-06-19,Rebuild
+89,44cfb0a,2019-05-12,Rebuild
+88,967c408,2018-12-05,Rebuild
+87,e52d3be,2018-11-28,Rebuild after #389 for github-hosted json
+86,ad6f668,2018-10-20,Rebuild
+85,2f62b39,2018-10-12,Rebuild
+84,06073d9,2018-09-28,Rebuild for new high memory (u-*tb1.metal). Pricing not available yet.
+83,ab43445,2018-09-24,Rebuild
+82,acd9732,2018-08-22,Rebuild. Fix #367
+81,d2b46f6,2018-08-14,Rebuild. Fixes #361. Adds #364
+80,2e9fb2c,2018-08-01,Rebuild
+79,1978f76,2018-06-08,Rebuild
+78,a17bd79,2018-06-04,Rebuild w/m5d
+77,d5614a1,2018-06-04,Rebuild
+76,1ef9103,2018-05-13,Rebuild
+75,4fadbc4,2018-04-10,RDS pricing fix
+74,7f56b73,2018-03-13,Rebuild
+73,b634be0,2017-12-29,Rebuild
+72,5c5579d,2017-11-29,Rebuild
+71,94e1f00,2017-11-12,Rebuild. Fixes #298
+70,fe3b460,2017-10-26,Rebuild
+69,3f43017,2017-10-26,Rebuild. Includes new P3 instances. See #287
+68,96cb57e,2017-08-16,Rebuild
+67,12a6d38,2017-08-07,Rebuild
+66,13a93d6,2017-08-07,Rebuild
+65,8dbdc18,2017-07-20,Fix EC2 scraping after some AWS site changes
+64,fc22b98,2017-07-13,Rebuild
+63,56a07d4,2017-06-18,Rebuild
+62,5daf410,2017-05-19,Rebuild for GPU/FPGA data
+61,cc15a3b,2017-05-19,Rebuild
+60,1cb1e66,2017-04-23,Rebuild
+59,39eaa8d,2017-03-10,Rebuild
+58,76a0972,2017-03-02,"Add support for Placement Groups, fixes #219"
+57,d3d6bf3,2017-03-01,Rebuild to fix #232
+56,3a31155,2017-02-27,"Add EBS Optimized pricing, fixes #110"
+55,d81a061,2017-02-24,Rebuild for i3 VPC only status
+54,9611e64,2017-02-24,Rebuild for i3 instances
+53,f815d7e,2017-02-18,Rebuild
+52,45852ed,2017-01-31,Add base performance and burst duration for T2 instances
+51,6e6d8de,2017-01-23,Rebuild
+50,e655e36,2016-12-14,Rebuild
+49,d2250b8,2016-12-10,Add Canada region + rebuild.
+48,0ecf7b6,2016-11-30,Add new r4 and f1 instances
+47,f34075a,2016-10-26,Rebuild for new R3/D2 availability. Fixes #207
+46,ff72c2f,2016-10-19,Rebuild
+45,abb48f7,2016-10-11,Rebuild
+44,630e1a3,2016-09-27,Update for the new m4.16xlarge
+43,e424600,2016-08-13,Rebuild
+42,6ddf151,2016-06-29,Rebuild
+41,fa2f92f,2016-06-28,Add new region Mumbai
+40,d6fdf62,2016-06-23,Rebuild
+39,f6c403c,2016-06-03,Rebuild
+38,16b64c4,2016-05-20,EBS perf table column order changed. Fixes #173
+37,e1341f0,2016-05-19,Rebuild to include new X1 family
+36,d62d1be,2016-04-18,Rebuild with latest data
+35,bc0d2a7,2016-03-05,Rebuild
+34,a544495,2016-02-27,Rebuild
+33,65efaf4,2016-02-24,Added info about first generation PV instance types
+32,e65876e,2016-02-24,Rebuild with Windows SQL price drop (unannounced)
+31,a572356,2016-01-13,Rebuild for new pricing
+30,92387e2,2016-01-02,Rebuild
+29,85ee2dd,2015-12-17,More accurate handling of T2 variable-ECU instances
+28,585984c,2015-12-16,Updates to include t2.nano
+27,ab9904b,2015-12-12,Added option to display info if instances are in VPC only.
+26,ff90960,2015-11-07,Rebuild
+25,b3662c0,2015-08-02,Integrated reserved cost display/filtering
+24,310ac56,2015-08-02,Pull in and parse reserved instance pricing data
+23,af15809,2015-08-02,Rebuild
+22,a784359,2015-06-17,Scrape for t2.large instances
+21,48c0272,2015-06-12,"Run scrape to pick up the m4 instance types, looks like some pricing changes got picked up along the way."
+20,a97b564,2015-06-03,Run fab build
+19,c1eb9bd,2015-04-02, * Hide EBS cols by default  * Move sort order back to Linux cost col  * Rename IO perf to Network Performance
+18,2eea8a9,2015-04-01,Run scrape to pull in EBS optimization bandwidth and IOPs numbers
+17,cc6f0ec,2015-03-31,Include new D2 instances. Fixes #106
+16,35adbcd,2015-02-03,"since we have both current and previous generation instances in the json, need to identify the generation of a particular instance. thus, add generation name (current or previous) to instance types"
+15,bdbe6ac,2015-01-30,Rebuild
+14,157263c,2015-01-25,Latest updates
+13,ad12ba5,2015-01-13,network_performance and family_type for current generation instances
+12,078bc6b,2015-01-12,fab build
+11,c388e1e,2014-12-07,Rebuild with latest data
+10,b647b3f,2014-09-16,Adding Windows SQL Server costs
+9,87f9ca0,2014-07-27,Rebuild
+8,ac9932b,2014-07-06,Updated instance info
+7,55c23a7,2014-02-22,Latest generated data
+6,2f8d7cf,2014-02-01,Latest data
+5,0645408,2014-01-29,Add m3.medium and m3.xlarge.
+4,bf64b24,2014-01-16,Update.
+3,0aa3f80,2013-12-20,Update for i2 instances
+2,3c9b663,2013-12-09,Upload a re-render.
+1,d704ab5,2013-09-26,Add ENI information
+0,d6cc896,2013-09-26,Scrape data from Amazon and autogenerate table.
