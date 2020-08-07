@@ -22,7 +22,7 @@ ui.styles.color.palette1 <- c(
 )
 
 ui.scaling.def <- list(
-  formula = "$$w = W \\cdot ((1 - p) + \\frac{p}{s})$$",
+  formula = "$$t = T \\cdot ((1 - p) + \\frac{p}{n})$$",
   fn = model.make.scaling.fn,
   params = list(
     p = list(
@@ -30,13 +30,7 @@ ui.scaling.def <- list(
       max = 1,
       default = 0.98,
       step = 0.0001,
-      description = "Portion of the workload that can be parallelized. Note that \\(p = 1\\) equates to linear speedup over \\(\\eta\\)."
-    ),
-    eta = list(
-      min = 0.1,
-      max = 1,
-      default = 1,
-      description = "Factor that scales the speedup with number of instances: \\( \\eta \\cdot n = s \\) from Amdahls law."
+      description = "Portion of the workload that can be parallelized. \\(p = 1\\) is linear scaling."
     )
   )
 )
@@ -772,11 +766,10 @@ server <- function(input, output, session) {
       .step <- ifelse(is.null(.pdef$step), 0.01, .pdef$step)
       shiny::div(
                sliderInput(paste("scaling.efficiency.param.", pname),
-                           paste("Efficiency Parameter:", pname),
+                           paste("Scaling Parameter:", pname),
                            min=.min, max=.max, value=.value,
                            step=.step),
-               withMathJax(helpText(.pdef$description)),
-               hr()
+               withMathJax(helpText(.pdef$description))
              )
     })
     do.call(tagList, .inputs)
@@ -1040,30 +1033,47 @@ client <- function(request) {
                                         # QUERY CONFIGURATION #
         ## -------------------------------------------------------------------------- ##
         shiny::fluidRow(
-                 shiny::column(10, h2("Workload Parameters")),
+                 shiny::column(10, h3("M1: Base Workload")),
                  shiny::column(2, class="padded-col",
                                shiny::actionLink("config.options.show",
                                                  shiny::icon("cog", lib = "glyphicon"),
                                                  class="icon-action-btn"))
                ),
-        helpText("Configure the simulated workload that the optimal instance should be calculated for."),
+        helpText("Configure basic model parameters: CPU Time and Reads."),
         hr(),
         uiOutput("time.cpu.slider"),
         helpText("Amount of CPUh required to fulfill this query."),
-        hr(),
         uiOutput("data.read.slider"),
         helpText("Sum of Reads [GiB] required to fulfill this query (Mem/SSD/S3)."),
-        hr(),
         uiOutput("data.xchg.slider"),
         helpText("Exchange Data [GiB] between instances required to fulfill this query. Is 0 for single instances."),
         hr(),
+        ## --------------------
+        h3("M2: Caching"),
+        helpText("How is data cached on instances between queries?"),
+        hr(),
         sliderInput("locality", "Memory Access Distribution Factor", min=1e-8, max=1 - 1e-8, value=0.1),
         helpText("Zipf distribution factor for simulating read locality. Higher values produce higher locality."),
-        hr(),
         checkboxInput("distribution.load.first", "First Read is from S3", value = FALSE),
         helpText("Whether the first read in the access distribution is a read from S3 (vs an optimal read)"),
         hr(),
-        ##
+        ## --------------------
+        h3("M3: Materialization "),
+        helpText("How much data is materialized and exchanged between instances?"),
+        hr(),
+        helpText(),
+        ## --------------------
+        h3("M4: Scaling"),
+        helpText("How well do distributed workloads scale across multiple instances?"),
+        hr(),
+        helpText("T is the overall time, t is the time used per instance, and n is the number of instances."),
+        uiOutput("scaling.efficiency.formula"),
+        uiOutput("scaling.efficiency.sliders"),
+        hr(),
+        ## --------------------
+        h3("M5: Elasticity"),
+        helpText("How are queries distributed as part of a workload?"),
+        hr(),
         shiny::fluidRow(
                  shiny::column(8,
                                numericInput("time.period.num",
@@ -1085,18 +1095,10 @@ client <- function(request) {
                  shiny::span("recommended", style = "color:red;"),
                  "."),
         hr(),
-        ##
-        h2("Scaling Efficiency"),
-        helpText("With Ahmdals law, the overall formula for the scaling of cpu, reads and instance network data is"),
-        uiOutput("scaling.efficiency.formula"),
-        helpText("Where W is the overall workload, and w is the workload required per instance."),
-        helpText("Set the parameters with these sliders:"),
-        uiOutput("scaling.efficiency.sliders"),
-        hr(),
         ## -------------------------------------------------------------------------- ##
                                         # INSTANCE SELECTION CONFIGURATION #
         ## -------------------------------------------------------------------------- ##
-        h2("Instance Parameters"),
+        h3("Instance Parameters"),
         helpText("Configure how the optimal instance setup is to be determined."),
         hr(),
         sliderInput("instance.count.max", "Maximum Instance Count", min=1,

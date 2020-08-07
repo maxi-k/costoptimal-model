@@ -19,7 +19,7 @@ model.factors.bandwidth <- list(
 
 model.make.scaling.fn <- function(p) {
   function(n) {
-    (1 - p$p) + (p$p / (p$eta * n))
+    (1 - p$p) + (p$p / n)
   }
 }
 
@@ -128,15 +128,15 @@ model.calc.time.for.config <- function(.inst, .count, .query, .distr, .n.eff, .t
                      stat.read.noxchg = read.mem + read.sto + read.s3 + read.load,
                      stat.read.sum    = stat.read.noxchg + read.xchg,
 
-                     time.cpu         = .query$time.cpu * 3600 / calc.cpu.real,
-                     # time.mem         = read.mem   / calc.memory.speed,
-                     time.sto         = read.sto   / calc.storage.speed,
-                     time.s3          = read.s3    / calc.network.speed,
-                     time.xchg        = read.xchg  / calc.network.speed,
-                     time.load        = read.load  / calc.network.speed,
+                     time.cpu         = (.query$time.cpu * 3600 / calc.cpu.real) * .n.eff,
+                     # time.mem       = ( read.mem   / calc.memory.speed) * .n.eff,
+                     time.sto         = (read.sto   / calc.storage.speed) * .n.eff,
+                     time.s3          = (read.s3    / calc.network.speed) * .n.eff,
+                     time.xchg        = (read.xchg  / calc.network.speed) * .n.eff,
+                     time.load        = (read.load  / calc.network.speed) * .n.eff,
 
-                     stat.time.sum    = (time.s3 + time.sto + time.cpu + time.xchg + time.load) * .n.eff,
-                     stat.time.max    = pmax(time.s3, time.sto, time.cpu, time.xchg, time.load) * .n.eff,
+                     stat.time.sum    = time.s3 + time.sto + time.cpu + time.xchg + time.load,
+                     stat.time.max    = pmax(time.s3, time.sto, time.cpu, time.xchg, time.load),
                      stat.time.period = .time.period
                      )
 }
