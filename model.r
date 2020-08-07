@@ -104,9 +104,9 @@ model.distr.split.fn <- function(.split.first.read) {
 
 model.calc.time.for.config <- function(.inst, .count, .query, .distr, .n.eff, .time.period) {
     .bins <- list(
-        data.mem = list(size = round(.inst$memory.GiB),
+        data.mem = list(size = round(.inst$calc.memory.caching),
                         prio = .inst$calc.memory.speed),
-        data.sto = list(size = round(.inst$storage.GiB),
+        data.sto = list(size = round(.inst$calc.storage.caching),
                         prio = .inst$calc.storage.speed),
         data.s3  = list(size = rep(length(.distr$working), times = nrow(.inst)),
                         prio = .inst$calc.network.speed)
@@ -128,7 +128,7 @@ model.calc.time.for.config <- function(.inst, .count, .query, .distr, .n.eff, .t
                      stat.read.noxchg = read.mem + read.sto + read.s3 + read.load,
                      stat.read.sum    = stat.read.noxchg + read.xchg,
 
-                     time.cpu         = .query$time.cpu * 3600, # h -> s
+                     time.cpu         = .query$time.cpu * 3600 / calc.cpu.real,
                      # time.mem         = read.mem   / calc.memory.speed,
                      time.sto         = read.sto   / calc.storage.speed,
                      time.s3          = read.s3    / calc.network.speed,
@@ -171,14 +171,16 @@ model.calc.storage.speed <- function(.inst, network.speed) {
 }
 
 model.with.speeds <- function(inst) {
-  dplyr::filter(inst, complete.cases(inst)) %>%
-    dplyr::mutate(
+    dplyr::mutate(inst,
              ## TODO discount based on 'up-to' -> split fair based on slices
-             ##
-             calc.network.factor = 1 - (!network.is.steady) * 0.6,
-             calc.network.speed  = (network.Gbps / 8) * calc.network.factor,
-             calc.memory.speed   = model.factors.bandwidth$RAM,
-             calc.storage.speed  = model.calc.storage.speed(., calc.network.speed)
+             calc.network.factor  = 1 - (!network.is.steady) * 0.6,
+             calc.network.speed   = (network.Gbps / 8) * calc.network.factor,
+             calc.memory.speed    = model.factors.bandwidth$RAM,
+             calc.storage.speed   = model.calc.storage.speed(inst, calc.network.speed),
+             ## no hyperthreads, assume 2 threads/core
+             calc.cpu.real        = vcpu.count  / 2,
+             calc.memory.caching  = memory.GiB  / 2,
+             calc.storage.caching = storage.GiB / 2,
            )
 }
 
@@ -195,7 +197,7 @@ model.calc.costs <- function(query, inst, timing.fn) {
     })
     return(dplyr::group_by(results, queryIndex))
   }
-  .inst <- model.with.speeds(inst)
+  .inst <- inst %>% dplyr::filter(complete.cases(.)) %>% model.with.speeds()
   .times <- timing.fn(query, .inst)
   .stat.cols <- colnames(dplyr::select(.times, starts_with("stat.time.")))
   .times[, str_replace(.stat.cols, "stat.time", "stat.price")] <- .times[, .stat.cols] * .times$cost.usdph / 3600

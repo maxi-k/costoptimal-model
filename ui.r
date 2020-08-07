@@ -138,18 +138,18 @@ ui.as.dt.formatted <- function(df, signif = 4, ...) {
 ui.plot.distribution <- function(instance, dist) {
   initdata <- dist$initial %>% data.frame(y = ., x = 1:length(.), group = "S3 Initial Load")
   data <- dist$working %>% data.frame(y = . + initdata$y, x = 1:length(.))
-  data$group = if_else(data$x <= instance$memory.GiB, "Memory", "SSD/S3")
-  nudge.x <- 0.03 * max(c(max(instance$memory.GiB + instance$storage.GiB), nrow(data)))
+  data$group = if_else(data$x <= instance$calc.memory.caching, "Memory", "SSD/S3")
+  nudge.x <- 0.03 * max(c(max(instance$calc.memory.caching + instance$calc.storage.caching), nrow(data)))
   nudge.y <- max(data$y) / 4
   plot <- ggplot(instance) +
     scale_fill_manual(values=ui.styles.color.palette1) +
     geom_area(data=data, aes(y = y, x = x, fill = group), stat="identity") +
     geom_area(data=initdata, aes(y = y, x = x, fill = group), stat="identity") +
-    geom_vline(aes(xintercept=memory.GiB), colour="blue") +
-    geom_vline(aes(xintercept=memory.GiB + storage.GiB), colour="blue") +
-    geom_text(aes(x=memory.GiB, y=nudge.y * 2, label="Memory"), colour="blue", angle=90,
+    geom_vline(aes(xintercept=calc.memory.caching), colour="blue") +
+    geom_vline(aes(xintercept=calc.memory.caching + calc.storage.caching), colour="blue") +
+    geom_text(aes(x=calc.memory.caching, y=nudge.y * 2, label="Memory"), colour="blue", angle=90,
               nudge_x = nudge.x, nudge_y = -nudge.y) +
-    geom_text(aes(x=memory.GiB + storage.GiB, y=nudge.y * 2, label="Storage"), colour="blue", angle=90,
+    geom_text(aes(x=calc.memory.caching + calc.storage.caching, y=nudge.y * 2, label="Storage"), colour="blue", angle=90,
               nudge_x = nudge.x, nudge_y = nudge.y) +
     labs(x = "Data Read [GiB]",
          y = "Number of Accesses")
@@ -206,7 +206,8 @@ server <- function(input, output, session) {
     filterDef <- ui.instance.filter.fn.get(input$instanceFilter)
     instSet.all() %>%
       filterDef() %>%
-      dplyr::filter(complete.cases(.))
+      dplyr::filter(complete.cases(.)) %>%
+      model.with.speeds()
   })
 
   instSet <- reactive({
@@ -613,7 +614,13 @@ server <- function(input, output, session) {
 
   output$instances.specs <- renderDT({
     instances.specs.significant() %>%
-      dplyr::select(-starts_with("loading.")) %>%
+      dplyr::select(-starts_with("loading."), -starts_with("calc.")) %>%
+      ui.as.dt.formatted()
+  })
+
+  output$instances.specs.derived <- renderDT({
+    instances.specs.significant() %>%
+      dplyr::select(type, id, starts_with("calc.")) %>%
       ui.as.dt.formatted()
   })
 
@@ -1261,6 +1268,7 @@ client <- function(request) {
           ## ---------------------------------------------------------------------- ##
           tabPanel(
             "Tables",
+            h2("Instance Tables"),
             ##
             shiny::fluidRow(
                      shiny::column(4,
@@ -1274,10 +1282,16 @@ client <- function(request) {
             DTOutput("instances.specs"),
             hr(),
             ##
+            h3("Derived Specs"),
+            DTOutput("instances.specs.derived"),
+            hr(),
+            ##
             h3("Metadata"),
             helpText("Metadata fields (starting with meta.*) on the recommended and comparison instances."),
             DTOutput("instances.metadata"),
             hr(),
+            ##
+            h2("Timing & Pricing Tables"),
             ##
             h3("Calculated Read Operations"),
             helpText("Calculated GiB reads of the recommended and comparison instance."),
