@@ -121,22 +121,22 @@ model.calc.time.for.config <- function(.inst, .count, .query, .distr, .n.eff, .t
                      read.mem         = .pack$data.mem,
                      read.sto         = .pack$data.sto,
                      read.s3          = .pack$data.s3,
-                     read.xchg        = if_else(count == 1, 0, .query$data.xchg * .n.eff),
+                     read.xchg        = if_else(.count == 1, 0.0, .query$data.xchg * 1.0),
                      read.load        = sum(.distr$initial),
                      read.work        = sum(.distr$working),
 
                      stat.read.noxchg = read.mem + read.sto + read.s3 + read.load,
                      stat.read.sum    = stat.read.noxchg + read.xchg,
 
-                     time.cpu         = .query$time.cpu * .n.eff,
-                     time.mem         = read.mem   / calc.memory.speed,
+                     time.cpu         = .query$time.cpu * 3600, # h -> s
+                     # time.mem         = read.mem   / calc.memory.speed,
                      time.sto         = read.sto   / calc.storage.speed,
                      time.s3          = read.s3    / calc.network.speed,
                      time.xchg        = read.xchg  / calc.network.speed,
                      time.load        = read.load  / calc.network.speed,
 
-                     stat.time.sum    = time.s3 + time.sto + time.cpu + time.xchg + time.mem + time.load,
-                     stat.time.max    = pmax(time.s3, time.sto, time.cpu, time.xchg, time.mem, time.load),
+                     stat.time.sum    = (time.s3 + time.sto + time.cpu + time.xchg + time.load) * .n.eff,
+                     stat.time.max    = pmax(time.s3, time.sto, time.cpu, time.xchg, time.load) * .n.eff,
                      stat.time.period = .time.period
                      )
 }

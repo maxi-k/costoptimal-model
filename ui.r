@@ -138,7 +138,7 @@ ui.as.dt.formatted <- function(df, signif = 4, ...) {
 ui.plot.distribution <- function(instance, dist) {
   initdata <- dist$initial %>% data.frame(y = ., x = 1:length(.), group = "S3 Initial Load")
   data <- dist$working %>% data.frame(y = . + initdata$y, x = 1:length(.))
-  data$group = ifelse(data$x <= instance$memory.GiB, "Memory", "SSD/S3")
+  data$group = if_else(data$x <= instance$memory.GiB, "Memory", "SSD/S3")
   nudge.x <- 0.03 * max(c(max(instance$memory.GiB + instance$storage.GiB), nrow(data)))
   nudge.y <- max(data$y) / 4
   plot <- ggplot(instance) +
@@ -254,12 +254,12 @@ server <- function(input, output, session) {
     .scale.fn <- ui.scaling.def$fn(scaling.efficiency.params())
     .read <- input$data.read
     .distr.fn <- model.make.distr.fn(shape = input$locality)
-    res <- purrr::map(1:ui.instance.opts.count.max, function(count) .distr.fn(round(.read * .scale.fn(count))))
+    res <- purrr::map(1:ui.instance.opts.count.max, function(count) .distr.fn(.read))
     res
   })
 
   distribution.recommended <- reactive({
-    model.distr.split.fn(input$distribution.load.first)(distribution.precomputed()[[inst.recommendation()$count]])
+    model.distr.split.fn(input$distribution.load.first)(distribution.precomputed()[[head(inst.recommendation(), n = 1)$count]])
   })
 
   distribution.comparison <- reactive({
@@ -392,7 +392,7 @@ server <- function(input, output, session) {
   ## -------------------------------------------------------------------------------------- ##
 
   output$distributionPlotRecommended <- renderPlotly({
-    ui.plot.distribution(inst.recommended(), distribution.recommended())
+    ui.plot.distribution(head(inst.recommended(), n = 1), distribution.recommended())
   })
 
   output$distributionPlotComparison <- renderPlotly({
@@ -672,7 +672,7 @@ server <- function(input, output, session) {
     val.max <- max(times[[col.name]])
     length <- input$timings.plot.budget.step
     lim <- if(input$timings.plot.budget.limits.logarithmic) {
-             exp(seq(log(val.min), log(val.max), length.out = length))
+             exp(seq(if_else(val.min == 0, 0, log(val.min)), if_else(val.max == 0, 0, log(val.max)), length.out = length))
            } else {
              seq(val.min, val.max, length.out = length)
            }
@@ -776,10 +776,11 @@ server <- function(input, output, session) {
   })
 
   scaling.efficiency.plot.n.colors <- reactive({
-    t.comp <- inst.comparison.timings()
+    t.comp <- inst.comparison.timings() %>% head(n = 1)
     t.recm <- inst.recommended.timings()
     colors <- rep("black", ui.instance.opts.count.max)
     colors[t.comp$count] = "blue"
+    colors[input$comparison.count] = "blue"
     colors[t.recm$count] = "red"
     colors
   })
@@ -801,157 +802,33 @@ server <- function(input, output, session) {
     ggplotly(plot, dynamicTicks = TRUE)
   })
 
-  scaling.efficiency.plot.reads.colored <- reactive({
-    r <- inst.recommended.timings()
-    s <- inst.comparison.timings()
-    f <- inst.frontier.timings() %>%
-      dplyr::filter(!(id %in% r$id) & !(id %in% s$id)) %>%
-      dplyr::filter(!(count %in% r$count) & !(count %in% s$count))
-    reads <- rbind(
-      r %>% dplyr::mutate(x = count, y = stat.read.noxchg, group = "Reads", color = "red"),
-      s %>% dplyr::mutate(x = count, y = stat.read.noxchg, group = "Reads", color = "blue"),
-      f %>% dplyr::mutate(x = count, y = stat.read.noxchg, group = "Reads", color = "green")
-    )
-    xchg <- rbind(
-      r %>% dplyr::mutate(x = count, y = read.xchg, group = "Exchange Data", color = "red"),
-      s %>% dplyr::mutate(x = count, y = read.xchg, group = "Exchange Data", color = "blue"),
-      f %>% dplyr::mutate(x = count, y = read.xchg, group = "Exchange Data", color = "green")
-    )
-    sum <- rbind(
-      r %>% dplyr::mutate(x = count, y = stat.read.sum, group = "Sum", color = "red"),
-      s %>% dplyr::mutate(x = count, y = stat.read.sum, group = "Sum", color = "blue"),
-      f %>% dplyr::mutate(x = count, y = stat.read.sum, group = "Sum", color = "green")
-    )
-    rbind(reads, xchg, sum)
-  })
-
-  output$scaling.efficiency.plot.reads <- renderPlotly({
+  output$scaling.efficiency.plot.time <- renderPlotly({
     .scale.fn <- ui.scaling.def$fn(scaling.efficiency.params())
-    ns <- 2:ui.instance.opts.count.max
-
-    gibRead <- input$data.read
-    readDf <- data.frame(x = ns, y = gibRead * .scale.fn(ns)) %>%
-      rbind(data.frame(x = 1, y = gibRead), .) %>%
-      dplyr::mutate(group = "Reads")
-
-    xchgData <- input$data.xchg
-    xchgDf <- data.frame(x = ns, y = xchgData * .scale.fn(ns)) %>%
-      rbind(data.frame(x = 1, y = 0), .) %>%
-      dplyr::mutate(group = "Exchange Data")
-
-    df <- rbind(readDf, xchgDf, data.frame(
-                                  x = xchgDf$x,
-                                  y = xchgDf$y + readDf$y,
-                                  group = "Sum"))
-    colored <- scaling.efficiency.plot.reads.colored()
-
-    plot <- ggplot(df, aes(x = x, y = y, color = group)) +
-      scale_color_manual(values=ui.styles.color.palette1) +
-      geom_point() +
-      geom_line() +
-      suppressWarnings(geom_point(data = colored, color = colored$color, aes_all(colnames(colored)), inherit.aes = FALSE)) +
-      geom_vline(data = colored, aes(xintercept=x), colour=colored$color, alpha = 0.2) +
-      labs(
-        x = "Number of Instances Running",
-        y = "Sums of Reads per Instance",
-        group = "Data Type"
-      )
-    ggplotly(plot, dynamicTicks = TRUE)
-  })
-
-
-  output$scaling.efficiency.plot.reads.overall <- renderPlotly({
-    .scale.fn <- ui.scaling.def$fn(scaling.efficiency.params())
-    ns <- 2:ui.instance.opts.count.max
-
-    gibRead <- input$data.read
-    readDf <- data.frame(x = ns, y = ns * gibRead * .scale.fn(ns)) %>%
-      rbind(data.frame(x = 1, y = gibRead), .) %>%
-      dplyr::mutate(group = "Reads")
-
-    xchgData <- input$data.xchg
-    xchgDf <- data.frame(x = ns, y = ns * xchgData * .scale.fn(ns)) %>%
-      rbind(data.frame(x = 1, y = 0), .) %>%
-      dplyr::mutate(group = "Exchange Data")
-
-    df <- rbind(readDf, xchgDf, data.frame(
-                                  x = xchgDf$x,
-                                  y = xchgDf$y + readDf$y,
-                                  group = "Sum"))
-    colored <- scaling.efficiency.plot.reads.colored() %>% dplyr::mutate(y = count * y)
-
-    plot <- ggplot(df, aes(x = x, y = y, color = group)) +
-      scale_color_manual(values=ui.styles.color.palette1) +
-      geom_point() +
-      geom_line() +
-      suppressWarnings(geom_point(data = colored, color = colored$color, aes_all(colnames(colored)), inherit.aes = FALSE)) +
-      geom_vline(data = colored, aes(xintercept=x), colour=colored$color, alpha = 0.2) +
-      labs(
-        x = "Number of Instances Running",
-        y = "Overall Sums of Reads required",
-        group = "Data Type"
-      )
-    ggplotly(plot, dynamicTicks = TRUE)
-  })
-
-  output$scaling.efficiency.plot.cpu <- renderPlotly({
-    .scale.fn <- ui.scaling.def$fn(scaling.efficiency.params())
-    time.rec <- inst.recommended.timings()
-    time.comp <- inst.comparison.timings()
-    ns <- 2:ui.instance.opts.count.max
-
-
-    cpuTime <- input$time.cpu
-    df <- data.frame(x = ns, y = cpuTime * .scale.fn(ns)) %>%
-      rbind(data.frame(x = 1, y = cpuTime), .)
-
-    colored <- rbind(
-      time.rec %>% dplyr::mutate(x = count, y = time.cpu,
-                                 group = "Reads", color = "red"),
-      time.comp %>% dplyr::mutate(x = count, y = time.cpu,
-                                  group = "Reads", color = "blue")
-    )
-
-    plot <- ggplot(df, aes(x = x, y = y)) +
-      geom_point() +
-      geom_line() +
-      suppressWarnings(geom_point(data = colored, color = colored$color, aes_all(colnames(colored)), inherit.aes = FALSE)) +
-      geom_vline(data = colored, aes(xintercept=x), colour=colored$color, alpha = 0.2) +
-      labs(
-        x = "Number of Instances Running",
-        y = "CPUh per Instance"
-      )
-    ggplotly(plot, dynamicTicks = TRUE)
-  })
-
-  output$scaling.efficiency.plot.cpu.overall <- renderPlotly({
-    .scale.fn <- ui.scaling.def$fn(scaling.efficiency.params())
-    time.fro <- inst.frontier.timings()
     time.rec <- inst.recommended.timings()
     time.com <- inst.comparison.timings()
-    ns <- 2:ui.instance.opts.count.max
+    time.fro <- inst.frontier.timings() %>%
+      dplyr::filter(!(id %in% time.rec$id) & !(id %in% time.com$id)) %>%
+      dplyr::filter(!(count %in% time.rec$count) & !(count %in% time.com$count))
 
+    times <- rbind(
+      dplyr::mutate(time.rec, group = "Recommended"),
+      dplyr::mutate(time.com, group = "Comparison"),
+      dplyr::mutate(time.fro, group = "Frontier")
+    ) %>%
+      dplyr::group_by(group, count) %>%
+      dplyr::top_n(-1, wt = stat.time.sum)
 
-    cpuTime <- input$time.cpu
-    df <- data.frame(x = ns, y = ns * cpuTime * .scale.fn(ns)) %>%
-      rbind(data.frame(x = 1, y = cpuTime), .)
-
-    colored <- rbind(
-      time.fro %>% dplyr::mutate(x = count, y = count * time.cpu, color = "green"),
-      time.rec %>% dplyr::mutate(x = count, y = count * time.cpu, color = "red"),
-      time.com %>% dplyr::mutate(x = count, y = count * time.cpu, color = "blue")
-    )
+    df <- dplyr::mutate(times, x = count, y = stat.time.sum)
 
     plot <- ggplot(df, aes(x = x, y = y)) +
-      geom_point() +
       geom_line() +
-      suppressWarnings(
-        geom_point(data = colored, color = colored$color, aes_all(colnames(colored)), inherit.aes = FALSE)
-      ) +
-      geom_vline(data = colored, aes(xintercept=x), colour=colored$color, alpha = 0.2) +
+      suppressWarnings(geom_point(aes(color = group, id = id, time = stat.time.sum, cost = stat.price.sum, perf = col.recom.inv))) +
+      scale_color_manual(values = c("Recommended" = "red", "Comparison" = "blue", "Frontier" = "green"),
+                         aesthetics = c("color")) +
+      # geom_vline(aes(xintercept = count, id = id, time = stat.time.sum), color=df$color, alpha = 0.2) +
       labs(
         x = "Number of Instances Running",
-        y = "Overall CPUh"
+        y = "Query Time"
       )
     ggplotly(plot, dynamicTicks = TRUE)
   })
@@ -1081,16 +958,16 @@ server <- function(input, output, session) {
 
   config.maxvals <- reactive({
     list(
-      time.cpu  = input$time.cpu.maxval  %||% 30000,
+      time.cpu  = input$time.cpu.maxval  %||% 1000,
       data.read = input$data.read.maxval %||% 5000,
       data.xchg = input$data.xchg.maxval %||% 5000
     )
   })
 
   output$time.cpu.slider <- renderUI({
-    sliderInput("time.cpu", "CPUh", min=0, step=100,
+    sliderInput("time.cpu", "CPUh", min=0, step=1,
                 max=config.maxvals()$time.cpu,
-                value=3000)
+                value=20)
   })
 
   output$data.read.slider <- renderUI({
@@ -1447,17 +1324,8 @@ client <- function(request) {
             h3("Speedup"),
             plotlyOutput("scaling.efficiency.plot"),
             ##
-            h3("Reads per instance"),
-            plotlyOutput("scaling.efficiency.plot.reads"),
-            ##
-            h3("CPUh per instance"),
-            plotlyOutput("scaling.efficiency.plot.cpu"),
-            ##
-            h3("Reads for all instances"),
-            plotlyOutput("scaling.efficiency.plot.reads.overall"),
-            ##
-            h3("CPUh for all instances"),
-            plotlyOutput("scaling.efficiency.plot.cpu.overall")
+            h3("Best time per instance count"),
+            plotlyOutput("scaling.efficiency.plot.time"),
           ),
           ## ---------------------------------------------------------------------- ##
                                         # HISTORICAL COMPARISON #
