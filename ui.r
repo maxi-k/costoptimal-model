@@ -565,7 +565,7 @@ server <- function(input, output, session) {
                         rep("Comparison", nrow(c))))
   }
 
-  instances.specs.significant <- reactive({
+  instances.specs.all <- reactive({
     r <- inst.recommended()
     s <- inst.comparison()
     p <- inst.frontier() %>% dplyr::filter(!(id %in% r$id))
@@ -573,8 +573,12 @@ server <- function(input, output, session) {
       dplyr::mutate(network.Gbps = ifelse(network.is.steady,
                                           paste(network.Gbps),
                                           paste("<", network.Gbps))) %>%
-      dplyr::select(-starts_with("id."), -network.is.steady) %>%
       cbind(view.table.column.instance.type(s, p, r), .)
+  })
+
+  instances.specs.significant <- reactive({
+    instances.specs.all() %>%
+      dplyr::select(-starts_with("id."), -starts_with("meta."), -network.is.steady)
   })
 
   instances.table.times.base <- reactive({
@@ -636,10 +640,16 @@ server <- function(input, output, session) {
     }
   })
 
+  output$instances.slicing <- renderDT({
+    instances.specs.all() %>%
+      dplyr::select(type, starts_with("id")) %>%
+      ui.as.dt.formatted()
+  })
+
   output$instances.metadata <- renderDT({
     all <- instSet.long()
-    signif <- instances.specs.significant()
-    dplyr::inner_join(signif, all, by = c("id")) %>%
+    spec <- instances.specs.significant()
+    dplyr::inner_join(spec, all, by = c("id")) %>%
       dplyr::select(type, id, starts_with("meta.")) %>%
       ui.as.dt.formatted()
   })
@@ -1286,6 +1296,11 @@ client <- function(request) {
             ##
             h3("Derived Specs"),
             DTOutput("instances.specs.derived"),
+            hr(),
+            ##
+            h3("Slicing"),
+            helpText("Shows how slices are calculated and what fractions for network etc. are derived from them."),
+            DTOutput("instances.slicing"),
             hr(),
             ##
             h3("Metadata"),

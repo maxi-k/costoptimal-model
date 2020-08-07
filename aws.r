@@ -135,15 +135,40 @@ aws.data.normalize <- function(df, commits = aws.data.commits) {
                )
 }
 
-aws.data.current <- aws.data.normalize(aws.data.instances)
+aws.data.with.prefixes <- function(df) {
+    df %>%
+        dplyr::mutate(
+                   id.prefix = sub("^([A-Za-z1-9-]+)\\..*", "\\1", id),
+                   id.numstr = sub("^[A-Za-z1-9-]+\\.([1-9]*).*", "\\1", id),
+                   id.number = id.numstr %>% as.numeric %>% replace(is.na(.), 0)
+               ) %>%
+      dplyr::group_by(id.prefix) %>%
+      dplyr::group_modify(function(df, group) {
+        large <- top_n(df, 1, wt = id.number)
+        dplyr::mutate(df,
+                      id.slice        = if_else(id.number == 0,
+                                                if_else(str_detect(id, "metal"), large$id.number,
+                                                        if_else(str_detect(id, "xlarge"), 1, 0.5)),
+                                                id.number),
+                      id.slice.factor = id.slice / large$id.number,
+                      id.slice.of     = large$id,
+                      id.slice.net    = large$network.Gbps * id.slice.factor) }) %>%
+      dplyr::ungroup()
+}
+
+aws.data.current <- aws.data.with.prefixes(aws.data.normalize(aws.data.instances))
 
 aws.data.all <- rbind(
-    aws.data.current %>%
-      dplyr::mutate(meta.origin = "website"),
-    aws.data.historical %>%
-      aws.data.normalize() %>%
-      dplyr::mutate(meta.origin = "history")
-    )
+  aws.data.current %>%
+  dplyr::mutate(meta.origin = "website"),
+  #
+  aws.data.historical %>%
+  aws.data.normalize() %>%
+  dplyr::group_by(meta.join.entry) %>%
+  dplyr::group_modify(function(df, g) { aws.data.with.prefixes(df); }) %>%
+  dplyr::ungroup() %>%
+  dplyr::mutate(meta.origin = "history")
+)
 
 aws.data.all.by.date <- aws.data.all %>%
     dplyr::mutate(
@@ -158,15 +183,6 @@ aws.data.metacols <- c("meta.region.name", "meta.join.entry",
 
 
 aws.data.prefixes.irrelevant <- c("a1", "g3", "p3", "g3s", "p2")
-
-aws.data.with.prefixes <- function(df) {
-    df %>%
-        dplyr::mutate(
-                   id.prefix = sub("^([A-Za-z1-9-]+)\\..*", "\\1", id),
-                   id.numstr = sub("^[A-Za-z1-9-]+\\.([1-9]*).*", "\\1", id),
-                   id.number = id.numstr %>% as.numeric %>% replace(is.na(.), 0)
-               )
-}
 
 ## Filter functions
 
@@ -200,7 +216,7 @@ aws.spot.interruption.frequencies.load()
 aws.spot.interruption.frequencies.plot <- function() {
     df <- aws.spot.interruption.frequencies %>%
         dplyr::group_by(instance.type) %>%
-        dplyr::summarise(freq.avg = mean(freq.num), n = dplyr::n())
+        dplyr::summarise(freq.avg = mean(freq.num), n = dplyr::n(), .groups = "drop")
     ggplot(df, aes(x = n, y = freq.avg, label = instance.type)) +
         geom_point() +
         geom_label_repel() +
@@ -220,7 +236,7 @@ aws.data.mkfilter.spot.inter.freq <- function(perc) {
         freq <- aws.spot.interruption.frequencies %>%
             dplyr::filter(region.id == .region) %>%
             dplyr::group_by(instance.type) %>%
-            dplyr::summarise(meta.freq.avg = mean(freq.num)) %>%
+            dplyr::summarise(meta.freq.avg = mean(freq.num), .groups = "drop") %>%
             dplyr::filter(meta.freq.avg <= perc)
         dplyr::inner_join(df, freq, by = c("id" = "instance.type"))
     }

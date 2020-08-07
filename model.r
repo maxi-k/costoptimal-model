@@ -173,8 +173,7 @@ model.calc.storage.speed <- function(.inst, network.speed) {
 model.with.speeds <- function(inst) {
     dplyr::mutate(inst,
              ## TODO discount based on 'up-to' -> split fair based on slices
-             calc.network.factor  = 1 - (!network.is.steady) * 0.6,
-             calc.network.speed   = (network.Gbps / 8) * calc.network.factor,
+             calc.network.speed   = if_else(network.is.steady, network.Gbps, id.slice.net) / 8,
              calc.memory.speed    = model.factors.bandwidth$RAM,
              calc.storage.speed   = model.calc.storage.speed(inst, calc.network.speed),
              ## no hyperthreads, assume 2 threads/core
