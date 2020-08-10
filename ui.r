@@ -397,7 +397,7 @@ server <- function(input, output, session) {
     t <- inst.comparison.timings()
     rbind(
       head(t, n = 1),
-      dplyr::filter(t, count == input$comparison.count)
+      head(dplyr::filter(t, count == input$comparison.count), n = 1)
     )
   })
 
@@ -631,7 +631,7 @@ server <- function(input, output, session) {
 
   instances.specs.all <- reactive({
     r <- inst.recommended()
-    s <- inst.comparison.timings.relevant()
+    s <- inst.comparison()
     p <- inst.frontier() %>% dplyr::filter(!(id %in% r$id))
     rbind(r, p, s) %>%
       dplyr::mutate(network.Gbps = ifelse(network.is.steady,

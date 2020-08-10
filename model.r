@@ -121,7 +121,6 @@ model.calc.time.for.config <- function(.inst, .count, .query, .distr.cache, .dis
     .pack.spool <- model.distr.pack(.bins.spool, .distr.spool)
     .spool.sum  <- sum(.distr.spool)
     .inv.eff <- .count * .n.eff
-    print(c(.count, .n.eff, .inv.eff))
 
     dplyr::transmute(.inst,
                      id.name          = id,
