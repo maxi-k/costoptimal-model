@@ -128,27 +128,45 @@ ui.as.dt.formatted <- function(df, signif = 4, ...) {
                                         # Plotting Functions
 ## ---------------------------------------------------------------------------------------------- ##
 
-## Distribution Plot
-ui.plot.distribution <- function(instance, dist) {
+## Distr.Caching Plot
+ui.plot.distr.caching <- function(instance, dist, labs.x = "Data Read [GiB]", labs.y = "Number of Accesses") {
   initdata <- dist$initial %>% data.frame(y = ., x = 1:length(.), group = "S3 Initial Load")
   data <- dist$working %>% data.frame(y = . + initdata$y, x = 1:length(.))
-  data$group = if_else(data$x <= instance$calc.memory.caching, "Memory", "SSD/S3")
-  nudge.x <- 0.03 * max(c(max(instance$calc.memory.caching + instance$calc.storage.caching), nrow(data)))
+  data$group = if_else(data$x <= instance$calc.mem.caching, "Memory", "SSD/S3")
+  nudge.x <- 0.03 * max(c(max(instance$calc.mem.caching + instance$calc.sto.caching), nrow(data)))
   nudge.y <- max(data$y) / 4
   plot <- ggplot(instance) +
     scale_fill_manual(values=ui.styles.color.palette1) +
     geom_area(data=data, aes(y = y, x = x, fill = group), stat="identity") +
     geom_area(data=initdata, aes(y = y, x = x, fill = group), stat="identity") +
-    geom_vline(aes(xintercept=calc.memory.caching), colour="blue") +
-    geom_vline(aes(xintercept=calc.memory.caching + calc.storage.caching), colour="blue") +
-    geom_text(aes(x=calc.memory.caching, y=nudge.y * 2, label="Memory"), colour="blue", angle=90,
+    geom_vline(aes(xintercept=calc.mem.caching), colour="blue") +
+    geom_vline(aes(xintercept=calc.mem.caching + calc.sto.caching), colour="blue") +
+    geom_text(aes(x=calc.mem.caching, y=nudge.y * 2, label="Memory"), colour="blue", angle=90,
               nudge_x = nudge.x, nudge_y = -nudge.y) +
-    geom_text(aes(x=calc.memory.caching + calc.storage.caching, y=nudge.y * 2, label="Storage"), colour="blue", angle=90,
+    geom_text(aes(x=calc.mem.caching + calc.sto.caching, y=nudge.y * 2, label="Storage"), colour="blue", angle=90,
               nudge_x = nudge.x, nudge_y = nudge.y) +
-    labs(x = "Data Read [GiB]",
-         y = "Number of Accesses")
+    labs(x = labs.x, y = labs.y)
   ggplotly(plot, dynamicTicks = TRUE)
 }
+
+ui.plot.distr.spooling <- function(instance, dist, labs.x = "Data Materialized [GiB]", labs.y = "Space Reuse") {
+  data <- data.frame(y = dist, x = 1:length(dist))
+  data$group = if_else(data$x <= instance$calc.mem.spooling, "Memory", "SSD/S3")
+  nudge.x <- 0.03 * max(c(max(instance$calc.mem.spooling + instance$calc.sto.spooling), nrow(data)))
+  nudge.y <- max(data$y) / 4
+  plot <- ggplot(instance) +
+    scale_fill_manual(values=ui.styles.color.palette1) +
+    geom_area(data=data, aes(y = y, x = x, fill = group), stat="identity") +
+    geom_vline(aes(xintercept=calc.mem.spooling), colour="blue") +
+    geom_vline(aes(xintercept=calc.mem.spooling + calc.sto.spooling), colour="blue") +
+    geom_text(aes(x=calc.mem.spooling, y=nudge.y * 2, label="Memory"), colour="blue", angle=90,
+              nudge_x = nudge.x, nudge_y = -nudge.y) +
+    geom_text(aes(x=calc.mem.spooling + calc.sto.caching, y=nudge.y * 2, label="Storage"), colour="blue", angle=90,
+              nudge_x = nudge.x, nudge_y = nudge.y) +
+    labs(x = labs.x, y = labs.y)
+  ggplotly(plot, dynamicTicks = TRUE)
+}
+
 
 ## Generic Instance Plot
 ui.instance.plot.pareto.quadrants <- list(
@@ -172,9 +190,11 @@ ui.instance.plot.scalings <- list(
 ui.instance.plot.scale <- names(ui.instance.plot.scalings)
 
 ui.instance.plot.numeric.cols <- model.calc.costs(
-  query = data.frame(data.xchg = 10, data.read = 100, time.cpu = 100),
+  query = data.frame(data.read = 100, time.cpu = 100),
   inst = aws.data.current.large,
-  timing.fn = model.make.timing.fn(purrr::map(3:8, function(x) model.make.distr.fn(10)(x)), 1)
+  timing.fn = model.make.timing.fn(purrr::map(3:8, function(x) model.make.distr.fn(10)(x)),
+                                   purrr::map(3:8, function(x) model.make.distr.fn(10)(x)),
+                                   1)
 ) %>%
   ui.data.timing.enrich("stat.time.sum") %>%
   dplyr::select_if(is.numeric)
@@ -233,11 +253,14 @@ server <- function(input, output, session) {
                                         # TIMINGS & QUERY BASE DEFINITIONS #
   ## -------------------------------------------------------------------------------------- ##
 
+  spooling.read.sum <- reactive({
+    input$data.read * input$spooling.fraction
+  })
+
   query.data.frame <- reactive({
     data.frame(
       time.cpu  = input$time.cpu %||% 0,
-      data.read = input$data.read %||% ui.instance.opts.count.max,
-      data.xchg = input$data.xchg %||% 0
+      data.read = input$data.read %||% ui.instance.opts.count.max
     )
   })
 
@@ -245,31 +268,47 @@ server <- function(input, output, session) {
     input$time.period.num * ui.time.units[[input$time.period.unit]]
   })
 
-  distribution.precomputed <- reactive({
-    .scale.fn <- ui.scaling.def$fn(scaling.efficiency.params())
+  distr.caching.precomputed <- reactive({
     .read <- input$data.read
     .distr.fn <- model.make.distr.fn(shape = input$locality)
-    res <- purrr::map(1:ui.instance.opts.count.max, function(count) .distr.fn(.read))
-    res
+    purrr::map(1:ui.instance.opts.count.max, function(count) .distr.fn(round(.read / count)))
   })
 
-  distribution.recommended <- reactive({
-    model.distr.split.fn(input$distribution.load.first)(distribution.precomputed()[[head(inst.recommendation(), n = 1)$count]])
+  distr.spooling.precomputed <- reactive({
+    .read <- spooling.read.sum()
+    .distr.fn <- model.make.distr.fn(shape = input$spooling.shape)
+    purrr::map(1:ui.instance.opts.count.max, function(count) {
+      shape <- round(.read / count)
+      if (shape < 1) { 0 } else { .distr.fn(shape) }
+    })
   })
 
-  distribution.comparison <- reactive({
-    model.distr.split.fn(input$distribution.load.first)(distribution.precomputed()[[input$comparison.count]])
+  distr.caching.recommended <- reactive({
+    model.distr.split.fn(input$distr.caching.load.first)(distr.caching.precomputed()[[head(inst.recommendation(), n = 1)$count]])
+  })
+
+  distr.caching.comparison <- reactive({
+    model.distr.split.fn(input$distr.caching.load.first)(distr.caching.precomputed()[[input$comparison.count]])
+  })
+
+  distr.spooling.recommended <- reactive({
+    distr.spooling.precomputed()[[head(inst.recommendation(), n = 1)$count]]
+  })
+
+  distr.spooling.comparison <- reactive({
+    distr.spooling.precomputed()[[input$comparison.count]]
   })
 
   instance.timings.all <- reactive({
     .col.rec <- input$recommendationColumn
     .scale.par <- scaling.efficiency.params()
     .inst <- instSet()
-    timing.fn <- model.make.timing.fn(distribution.precomputed(),
-                                     input$instance.count.max,
-                                     ui.scaling.def$fn(.scale.par),
-                                     model.distr.split.fn(input$distribution.load.first),
-                                     query.time.period.seconds())
+    timing.fn <- model.make.timing.fn(distr.caching.precomputed(),
+                                      distr.spooling.precomputed(),
+                                      input$instance.count.max,
+                                      ui.scaling.def$fn(.scale.par),
+                                      model.distr.split.fn(input$distr.caching.load.first),
+                                      query.time.period.seconds())
     model.calc.costs(
       query = query.data.frame(),
       inst = .inst,
@@ -354,6 +393,14 @@ server <- function(input, output, session) {
       dplyr::arrange( !! by)
   })
 
+  inst.comparison.timings.relevant <- reactive({
+    t <- inst.comparison.timings()
+    rbind(
+      head(t, n = 1),
+      dplyr::filter(t, count == input$comparison.count)
+    )
+  })
+
   inst.frontier.timings <- reactive({
     ids <- instances.plot.frontier()$id
     instance.timings() %>% dplyr::filter(id %in% ids)
@@ -386,19 +433,31 @@ server <- function(input, output, session) {
                                         # READ ACCESS DISTRIBUTION #
   ## -------------------------------------------------------------------------------------- ##
 
-  output$distributionPlotRecommended <- renderPlotly({
-    ui.plot.distribution(head(inst.recommended(), n = 1), distribution.recommended())
+  output$distr.caching.recommended.plot <- renderPlotly({
+    ui.plot.distr.caching(head(inst.recommended(), n = 1), distr.caching.recommended())
   })
 
-  output$distributionPlotComparison <- renderPlotly({
+  output$distr.caching.comparison.plot <- renderPlotly({
     selected <- inst.comparison()
     validate(
       need(nrow(selected) >= 1, "Please select a comparison instance")
     )
-    ui.plot.distribution(selected, distribution.comparison())
+    ui.plot.distr.caching(selected, distr.caching.comparison())
   })
 
-  output$distribution.comparison.msg <- renderUI({
+  output$distr.spooling.recommended.plot <- renderPlotly({
+    ui.plot.distr.spooling(head(inst.recommended(), n = 1), distr.spooling.recommended())
+  })
+
+  output$distr.spooling.comparison.plot <- renderPlotly({
+    selected <- inst.comparison()
+    validate(
+      need(nrow(selected) >= 1, "Please select a comparison instance")
+    )
+    ui.plot.distr.spooling(selected, distr.spooling.comparison())
+  })
+
+  distr.comparison.msg <- reactive({
     inst <- inst.comparison.timings()
     if(nrow(inst) == 0) {
       return("")
@@ -407,10 +466,15 @@ server <- function(input, output, session) {
     if(input$comparison.count == best$count) {
       return("")
     }
-    shiny::wellPanel(
-             class = "warning-msg top-margin",
-             paste("The selected count is not the recommended count (", best$count, ")", sep="")
-           )
+    paste("The selected count is not the recommended count (", best$count, ")", sep="")
+  })
+
+  distr.caching.comparison.msg <- renderUI({
+    shiny::wellPanel(class = "warning-msg top-margin", distr.comparison.msg())
+  })
+
+  distr.spooling.comparison.msg <- renderUI({
+    shiny::wellPanel(class = "warning-msg top-margin", distr.comparison.msg())
   })
 
   ## -------------------------------------------------------------------------------------- ##
@@ -567,7 +631,7 @@ server <- function(input, output, session) {
 
   instances.specs.all <- reactive({
     r <- inst.recommended()
-    s <- inst.comparison()
+    s <- inst.comparison.timings.relevant()
     p <- inst.frontier() %>% dplyr::filter(!(id %in% r$id))
     rbind(r, p, s) %>%
       dplyr::mutate(network.Gbps = ifelse(network.is.steady,
@@ -583,7 +647,7 @@ server <- function(input, output, session) {
 
   instances.table.times.base <- reactive({
     r <- inst.recommended.timings()
-    s <- inst.comparison.timings()
+    s <- inst.comparison.timings.relevant()
     p <- inst.frontier.timings() %>% dplyr::filter(!(id %in% r$id))
     rbind(r, p, s) %>%
       dplyr::select(-id.name, -count) %>%
@@ -619,6 +683,7 @@ server <- function(input, output, session) {
   output$instances.specs.derived <- renderDT({
     instances.specs.significant() %>%
       dplyr::select(type, id, starts_with("calc.")) %>%
+      rename_at(vars(starts_with("calc.")), list(~ str_replace(., "calc.", ""))) %>%
       ui.as.dt.formatted()
   })
 
@@ -651,12 +716,20 @@ server <- function(input, output, session) {
     spec <- instances.specs.significant()
     dplyr::inner_join(spec, all, by = c("id")) %>%
       dplyr::select(type, id, starts_with("meta.")) %>%
+      rename_at(vars(starts_with("meta.")), list(~ str_replace(., "meta.", ""))) %>%
       ui.as.dt.formatted()
   })
 
   output$instances.reads.gib <- renderDT({
     instances.table.times.base() %>%
-      dplyr::select(type, id, starts_with("read."), starts_with("stat.read")) %>%
+      dplyr::select(type, id, starts_with("read."), starts_with("stat.read.")) %>%
+      rename_at(vars(contains("read.")), list(~ str_replace(., "read.", ""))) %>%
+      ui.as.dt.formatted()
+  })
+
+  output$instances.rws.gib <- renderDT({
+    instances.table.times.base() %>%
+      dplyr::select(type, id, starts_with("rw."), starts_with("stat.rw.")) %>%
       ui.as.dt.formatted()
   })
 
@@ -851,10 +924,11 @@ server <- function(input, output, session) {
     .filter.fn <- ui.instance.filter.fn.get(input$instanceFilter)
     .col.rec <- input$recommendationColumn
     .scale.par <- scaling.efficiency.params()
-    .timing.fn <- model.make.timing.fn(distribution.precomputed(),
+    .timing.fn <- model.make.timing.fn(distr.caching.precomputed(),
+                                       distr.spooling.precomputed(),
                                        input$instance.count.max,
                                        ui.scaling.def$fn(.scale.par),
-                                       model.distr.split.fn(input$distribution.load.first),
+                                       model.distr.split.fn(input$distr.caching.load.first),
                                        query.time.period.seconds())
     .query <- query.data.frame()
     furrr::future_map_dfr(ui.instance.sets, function(set) {
@@ -969,8 +1043,7 @@ server <- function(input, output, session) {
   config.maxvals <- reactive({
     list(
       time.cpu  = input$time.cpu.maxval  %||% 1000,
-      data.read = input$data.read.maxval %||% 5000,
-      data.xchg = input$data.xchg.maxval %||% 5000
+      data.read = input$data.read.maxval %||% 5000
     )
   })
 
@@ -986,12 +1059,6 @@ server <- function(input, output, session) {
                 value=800)
   })
 
-  output$data.xchg.slider <- renderUI({
-    sliderInput("data.xchg", "Sum of Exchange Data", min=0, step=10,
-                max=config.maxvals()$data.xchg,
-                value=200)
-  })
-
   observeEvent(input$config.options.show, {
     maxvals <- config.maxvals()
 
@@ -1003,8 +1070,7 @@ server <- function(input, output, session) {
       h2("Slider Ranges"),
       helpText("Set the slider ranges for the input configuration values here."),
       shiny::numericInput("time.cpu.maxval", "Max CPU Operations", value=maxvals$time.cpu),
-      shiny::numericInput("data.read.maxval", "Max Sum of Reads", value=maxvals$data.read),
-      shiny::numericInput("data.xchg.maxval", "Max Exchange Data", value=maxvals$data.xchg)
+      shiny::numericInput("data.read.maxval", "Max Sum of Reads", value=maxvals$data.read)
     ))
   })
 }
@@ -1055,23 +1121,25 @@ client <- function(request) {
         helpText("Amount of CPUh required to fulfill this query."),
         uiOutput("data.read.slider"),
         helpText("Sum of Reads [GiB] required to fulfill this query (Mem/SSD/S3)."),
-        uiOutput("data.xchg.slider"),
-        helpText("Exchange Data [GiB] between instances required to fulfill this query. Is 0 for single instances."),
         hr(),
         ## --------------------
         h3("M2: Caching"),
         helpText("How is data cached on instances between queries?"),
         hr(),
-        sliderInput("locality", "Memory Access Distribution Factor", min=1e-8, max=1 - 1e-8, value=0.1),
+        sliderInput("locality", "Caching Data Distribution Factor", min=1e-8, max=1 - 1e-8, value=0.1),
         helpText("Zipf distribution factor for simulating read locality. Higher values produce higher locality."),
-        checkboxInput("distribution.load.first", "First Read is from S3", value = FALSE),
+        checkboxInput("distr.caching.load.first", "First Read is from S3", value = FALSE),
         helpText("Whether the first read in the access distribution is a read from S3 (vs an optimal read)"),
         hr(),
         ## --------------------
         h3("M3: Materialization "),
         helpText("How much data is materialized and exchanged between instances?"),
         hr(),
-        helpText(),
+        sliderInput("spooling.fraction", "Materialized Fraction of Data", min = 0, max = 2, step=0.05, value=0.2),
+        helpText("How much of the data read is materialized and exchanged."),
+        sliderInput("spooling.shape", "Materialization Data Distribution Factor", min = 1e-8, max = 1 - 1e-8, value=0.1),
+        helpText("How the materialized data is distributed across ram, ssd and s3."),
+        hr(),
         ## --------------------
         h3("M4: Scaling"),
         helpText("How well do distributed workloads scale across multiple instances?"),
@@ -1308,12 +1376,19 @@ client <- function(request) {
             DTOutput("instances.metadata"),
             hr(),
             ##
-            h2("Timing & Pricing Tables"),
+            h2("Read & Write Tables"),
             ##
             h3("Calculated Read Operations"),
             helpText("Calculated GiB reads of the recommended and comparison instance."),
             DTOutput("instances.reads.gib"),
             hr(),
+            ##
+            h3("Calculated Read + Write Operations"),
+            helpText("Calculated GiB read+writes of the recommended and comparison instance."),
+            DTOutput("instances.rws.gib"),
+            hr(),
+            ##
+            h2("Timing & Pricing Tables"),
             ##
             h3("Calculated Times"),
             helpText("Calculated Times of the recommended and comparison instance."),
@@ -1333,9 +1408,11 @@ client <- function(request) {
             "Access Distribution",
             style = "padding-top: 10px",
             ##
+            h2("Caching"),
+            ##
             h3("Recommended Instance"),
             helpText("Memory Access Distribution for the recommended instance."),
-            plotlyOutput("distributionPlotRecommended"),
+            plotlyOutput("distr.caching.recommended.plot"),
             hr(),
             ##
             shiny::fluidRow(
@@ -1343,9 +1420,25 @@ client <- function(request) {
                                    h3("Comparison Instance"),
                                    helpText("Memory Access Distribution for the comparison instance.")
                                    ),
-                     shiny::column(6, uiOutput("distribution.comparison.msg"))
+                     shiny::column(6, uiOutput("distr.caching.comparison.msg"))
                    ),
-            plotlyOutput("distributionPlotComparison")
+            plotlyOutput("distr.caching.comparison.plot"),
+            hr(),
+            ##
+            h2("Materialization"),
+            ##
+            h3("Recommended Instance"),
+            helpText("Materialization Distribution for the recommended instance."),
+            plotlyOutput("distr.spooling.recommended.plot"),
+            ##
+            shiny::fluidRow(
+                     shiny::column(6,
+                                   h3("Comparison Instance"),
+                                   helpText("Materialization Distribution for the comparison instance.")
+                                   ),
+                     shiny::column(6, uiOutput("distr.spooling.comparison.msg"))
+                   ),
+            plotlyOutput("distr.spooling.comparison.plot")
           ),
           ## ---------------------------------------------------------------------- ##
                                         # SCALING EFFICIENCY GRAPHS #

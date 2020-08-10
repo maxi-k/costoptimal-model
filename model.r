@@ -102,38 +102,56 @@ model.distr.split.fn <- function(.split.first.read) {
                                         # Calculate Timings
 ## ---------------------------------------------------------------------------------------------- ##
 
-model.calc.time.for.config <- function(.inst, .count, .query, .distr, .n.eff, .time.period) {
-    .bins <- list(
-        data.mem = list(size = round(.inst$calc.memory.caching),
-                        prio = .inst$calc.memory.speed),
-        data.sto = list(size = round(.inst$calc.storage.caching),
-                        prio = .inst$calc.storage.speed),
-        data.s3  = list(size = rep(length(.distr$working), times = nrow(.inst)),
-                        prio = .inst$calc.network.speed)
+model.calc.time.for.config <- function(.inst, .count, .query, .distr.cache, .distr.spool, .n.eff, .time.period) {
+    .bins.cache <- list(
+        data.mem = list(size = round(.inst$calc.mem.caching), prio = .inst$calc.mem.speed),
+        data.sto = list(size = round(.inst$calc.sto.caching), prio = .inst$calc.sto.speed),
+        data.s3  = list(size = rep(length(.distr.cache$working), times = nrow(.inst)),
+                        prio = .inst$calc.net.speed)
     )
-    .pack <- model.distr.pack(.bins, .distr$working)
+
+    .bins.spool <- list(
+        data.mem = list(size = round(.inst$calc.mem.spooling), prio = .inst$calc.mem.speed),
+        data.sto = list(size = round(.inst$calc.sto.spooling), prio = .inst$calc.sto.speed),
+        data.s3  = list(size = rep(length(.distr.spool), times = nrow(.inst)),
+                        prio = .inst$calc.net.speed)
+    )
+
+    .pack.cache <- model.distr.pack(.bins.cache, .distr.cache$working)
+    .pack.spool <- model.distr.pack(.bins.spool, .distr.spool)
+    .spool.sum  <- sum(.distr.spool)
+    .inv.eff <- .count * .n.eff
+    print(c(.count, .n.eff, .inv.eff))
+
     dplyr::transmute(.inst,
                      id.name          = id,
                      count            = .count,
                      id               = paste(id.name, count, sep="/"),
                      cost.usdph       = cost.usdph * .count,
-                     # TODO: initial reads from s3?
-                     read.mem         = .pack$data.mem,
-                     read.sto         = .pack$data.sto,
-                     read.s3          = .pack$data.s3,
-                     read.xchg        = if_else(.count == 1, 0.0, .query$data.xchg * 1.0),
-                     read.load        = sum(.distr$initial),
-                     read.work        = sum(.distr$working),
 
-                     stat.read.noxchg = read.mem + read.sto + read.s3 + read.load,
-                     stat.read.sum    = stat.read.noxchg + read.xchg,
+                     read.cache.load  = sum(.distr.cache$initial),
+                     read.cache.mem   = .pack.cache$data.mem,
+                     read.cache.sto   = .pack.cache$data.sto,
+                     read.cache.s3    = .pack.cache$data.s3,
+
+                     read.spool.mem   = .pack.spool$data.mem,
+                     read.spool.sto   = .pack.spool$data.sto,
+                     read.spool.s3    = .pack.spool$data.s3,
+
+                     rw.mem           = read.cache.mem + 2 * read.spool.mem,
+                     rw.sto           = read.cache.sto + 2 * read.spool.sto,
+                     rw.s3            = read.cache.s3  + 2 * read.spool.s3,
+                     rw.xchg          = if_else(.count == 1, 0.0, 2 * .spool.sum),
+
+                     stat.read.spool  = .spool.sum,
+                     stat.read.work   = sum(.distr.cache$working),
 
                      time.cpu         = (.query$time.cpu * 3600 / calc.cpu.real) * .n.eff,
-                     # time.mem       = ( read.mem   / calc.memory.speed) * .n.eff,
-                     time.sto         = (read.sto   / calc.storage.speed) * .n.eff,
-                     time.s3          = (read.s3    / calc.network.speed) * .n.eff,
-                     time.xchg        = (read.xchg  / calc.network.speed) * .n.eff,
-                     time.load        = (read.load  / calc.network.speed) * .n.eff,
+                     # time.mem       = ( rw.mem         / calc.memory.speed)   * .n.eff,
+                     time.sto         = (rw.sto          / calc.sto.speed) * .inv.eff,
+                     time.s3          = (rw.s3           / calc.net.speed) * .inv.eff,
+                     time.xchg        = (rw.xchg / 2     / calc.net.speed) * .inv.eff,
+                     time.load        = (read.cache.load / calc.net.speed) * .inv.eff,
 
                      stat.time.sum    = time.s3 + time.sto + time.cpu + time.xchg + time.load,
                      stat.time.max    = pmax(time.s3, time.sto, time.cpu, time.xchg, time.load),
@@ -141,17 +159,18 @@ model.calc.time.for.config <- function(.inst, .count, .query, .distr, .n.eff, .t
                      )
 }
 
-model.make.timing.fn <- function(.distr.list,
+model.make.timing.fn <- function(.distr.list.caching,
+                                 .distr.list.spooling,
                                  .max.count = NaN,
                                  .eff.fn = function(n) { 1 },
-                                 .distr.split.fn = model.distr.split.fn(TRUE),
+                                 .distr.caching.split.fn = model.distr.split.fn(TRUE),
                                  .time.period = 86400) {
   function(.query, .instances) {
     .scale <- c(1, .eff.fn(2:.max.count))
-    .distr <- lapply(.distr.list, .distr.split.fn)
+    .cdistr <- lapply(.distr.list.caching, .distr.caching.split.fn)
     .frames <- furrr::future_map_dfr(1:.max.count, function(i) {
       model.calc.time.for.config(
-        .instances, i, .query, .distr[[i]], .scale[i], .time.period
+        .instances, i, .query, .cdistr[[i]], .distr.list.spooling[[i]], .scale[i], .time.period
       )
     })
   }
@@ -173,13 +192,15 @@ model.calc.storage.speed <- function(.inst, network.speed) {
 model.with.speeds <- function(inst) {
     dplyr::mutate(inst,
              ## TODO discount based on 'up-to' -> split fair based on slices
-             calc.network.speed   = if_else(network.is.steady, network.Gbps, id.slice.net) / 8,
-             calc.memory.speed    = model.factors.bandwidth$RAM,
-             calc.storage.speed   = model.calc.storage.speed(inst, calc.network.speed),
-             ## no hyperthreads, assume 2 threads/core
-             calc.cpu.real        = vcpu.count  / 2,
-             calc.memory.caching  = memory.GiB  / 2,
-             calc.storage.caching = storage.GiB / 2,
+             calc.net.speed    = if_else(network.is.steady, network.Gbps, id.slice.net) / 8,
+             calc.mem.speed    = model.factors.bandwidth$RAM,
+             calc.sto.speed    = model.calc.storage.speed(inst, calc.net.speed),
+             ## no hyperthreads, a ssume 2 threads/core
+             calc.cpu.real     = vcpu.count  / 2,
+             calc.mem.caching  = memory.GiB  / 2,
+             calc.sto.caching  = storage.GiB / 2,
+             calc.mem.spooling = memory.GiB - calc.mem.caching,
+             calc.sto.spooling = storage.GiB - calc.sto.caching,
            )
 }
 
