@@ -48,7 +48,7 @@ plots.m1.draw <- function() {
     geom_line(color = "black") +
     geom_point(color = .df$color) +
     # geom_vline(data = .df.flanks, aes(xintercept=x)) +
-    geom_text(aes(label = label), nudge_x = 15, nudge_y = 0.03, size = 2.2) +
+    geom_text(aes(label = label), nudge_x = 17, nudge_y = 0.03, size = 2.2) +
     theme_light() +
     theme(text = element_text(size = 9), plot.margin=grid::unit(c(0,0,0,0), "mm")) +
     labs(x = "CPUh", y = "Workload Cost")
@@ -97,10 +97,10 @@ plots.m2.draw <- function() {
   ggplot(.df, aes(x = x, y = y)) +
     geom_line(color = "black") +
     geom_point(color = .df$color) +
-    geom_text(aes(label = label), nudge_x = 0.05, nudge_y = 0.015, size = 2.2) +
+    geom_text(aes(label = label), nudge_x = 0.07, nudge_y = 0.02, size = 2.2, angle = 30) +
     theme_light() +
     theme(text = element_text(size = 9), plot.margin=grid::unit(c(0,0,0,0), "mm")) +
-    labs(x = "Distribution Factor", y = "Workload Cost")
+    labs(x = "Locality Distribution Factor", y = "Workload Cost")
 }
 
 plots.m2.draw()
