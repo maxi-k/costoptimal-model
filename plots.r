@@ -198,6 +198,62 @@ plots.m3.cost.draw <- function() {
 
 ## plots.m3.cost.draw()
 
-ggsave(plots.mkpath("m3-cost-spool.pdf"), plots.m3.cost.draw(),
+## ggsave(plots.mkpath("m3-cost-spool.pdf"), plots.m3.cost.draw(),
+##        width = 3, height = 2, units = "in",
+##        device = cairo_pdf)
+
+
+## ---------------------------------------------------------------------------------------------- ##
+                                        # M4: Scale Out & Down #
+## ---------------------------------------------------------------------------------------------- ##
+
+## Interesting Budget Configuration c5d -> c5n -> c5
+## http://127.0.0.1:3030/?_inputs_&instance.count.max=32&locality=0.2&timings.plot.budget.ticks.at.limits=true&instSet.details.show=0&instanceFilter=%22Paper%20Table%201%22&timings.plot.budget.step.digits=3&instance=%22c5d.24xlarge%22&spooling.fraction=0.4&tables.frontier.show=false&plotly_relayout-A=%22%7B%5C%22width%5C%22%3A1242%2C%5C%22height%5C%22%3A9600%7D%22&instances.plot.display.frontier=true&time.cpu=25&instances.plot.frontier.quadrant=%22top.left%22&data.read=2008&plotly_doubleclick-A=%22%5C%22instances.plot%5C%22%22&instance.type.opt.include=%22all%22&plotly_click-A=%22%5B%7B%5C%22curveNumber%5C%22%3A0%2C%5C%22pointNumber%5C%22%3A4%2C%5C%22x%5C%22%3A2383.80703584345%2C%5C%22y%5C%22%3A0.116526956083714%7D%5D%22&instFilter.details.show=0&config.options.show=0&instances.plot.display.frontier.only=false&spooling.shape=0.1&instances.plot.x=%22stat.time.sum%22&time.period.num=1&plotly_hover-A=null&timings.plot.budget.step=100&timings.plot.budget.duplicates.filter=true&timings.plot.budget.limits.logarithmic=true&recommendationColumn=%22stat.price.sum%22&instances.plot.scale.y=%22Linear%22&scaling.efficiency.param.%20p=0.98&.clientValue-default-plotlyCrosstalkOpts=%7B%22on%22%3A%22plotly_click%22%2C%22persistent%22%3Afalse%2C%22dynamic%22%3Afalse%2C%22selectize%22%3Afalse%2C%22opacityDim%22%3A0.2%2C%22selected%22%3A%7B%22opacity%22%3A1%7D%2C%22debounce%22%3A0%2C%22color%22%3A%5B%5D%7D&plotly_afterplot-A=%22%5C%22instances.plot.queriesPerDollar%5C%22%22&timings.plot.budget.col.cost=%22stat.price.sum%22&instances.plot.y=%22col.recom.inv%22&instances.plot.scale.x=%22Linear%22&user.notes=%22%22&time.period.unit=%22Weeks%22&timings.plot.budget.col.optim=%22stat.time.sum%22&instanceSet=%222019-11-30%20%7C%20101%20%7C%20website%22&timings.plot.budget.limits.display=true&comparison.count=1&distr.caching.load.first=false
+
+plots.m4.budget.draw <- function() {
+  .read <- 2000
+  .query <- data.frame(
+    time.cpu  = 25,
+    data.read = .read
+  )
+  .max.count <- 32
+  .distr.cache <- purrr::map(1:.max.count, function(count) {
+    model.make.distr.fn(0.2)(round(.read / count))
+  })
+  .distr.spool <- purrr::map(1:.max.count, function(count) {
+    model.make.distr.fn(0.1)(round(0.4 * .read / count))
+  })
+  .scaling.fac <- 0.98
+  .budgets.lim <- seq(3.5, 4.5, length.out = 10) # dollar limits
+
+  .time.fn <- model.make.timing.fn(
+    .distr.list.caching  = .distr.cache,
+    .distr.list.spooling = .distr.spool,
+    .max.count = .max.count,
+    .eff.fn = model.make.scaling.fn(list(p = .scaling.fac)),
+    .distr.caching.split.fn = model.distr.split.fn(FALSE)
+  )
+
+  .costs <- model.calc.costs(.query, plots.inst, .time.fn)
+  print(dplyr::select(dplyr::arrange(.costs, stat.price.sum, stat.time.sum), id, stat.price.sum, stat.time.sum))
+  .recom <- model.budgets.discrete(.costs, .budgets.lim)
+  .df <- .recom %>% dplyr::mutate(
+                             label = paste(paste(count, "x", sep = ""),
+                                           str_replace(id.name, "xlarge", "")),
+                             )
+  print(nrow(.df))
+
+  ggplot(.df, aes(x = budget.optim, y = budget.cost)) +
+    geom_point() +
+    geom_line() +
+    geom_text(aes(label = label), nudge_x = 250, nudge_y = 0.05, size = 2.2) +
+    labs(y = "Workload Cost ($)", x = "Query Time (s)") +
+    theme_light() +
+    theme(text = element_text(size = 7), plot.margin=grid::unit(c(0,0,0,0), "mm"))
+}
+
+plots.m4.budget.draw()
+
+ggsave(plots.mkpath("m4-budget.pdf"), plots.m4.budget.draw(),
        width = 3, height = 2, units = "in",
        device = cairo_pdf)
