@@ -1029,6 +1029,22 @@ server <- function(input, output, session) {
   observeEvent(input$instFilter.details.show, {
     cnt.all <- nrow(instSet.all() %>% dplyr::filter(complete.cases(.)))
     cnt.filtered <- nrow(instSet())
+
+    region <- instSet.long() %>% head(n = 1) %>% .$meta.region.name
+    inst <- instSet()$id
+    if (length(region) != 0 & length(inst) != 0) {
+      uri <- paste(sep="",
+                   "https://ec2instances.info/",
+                   "?region=", region,
+                   "&compare_on=true",
+                   "&selected=", paste(inst, collapse=",")
+                   )
+      link.elem <- shiny::a(href=uri, target="_new",
+                            class="btn btn-default top-margin",
+                            "Compare on ec2instances.info")
+    } else {
+      link.elem <- shiny::div()
+    }
     showModal(modalDialog(
       title = "Details of the selected filters",
       easyClose = TRUE,
@@ -1040,6 +1056,7 @@ server <- function(input, output, session) {
                "Instances included after filtering: ",
                shiny::strong(toString(cnt.filtered))),
       h3("Included instances"),
+      link.elem,
       helpText("The instances included in the selected set after filtering using the selected methods."),
       shiny::strong(helpText("Instances with incomplete data are always filtered out.")),
       DTOutput("instSet.filtered.ids")
