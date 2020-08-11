@@ -279,8 +279,8 @@ server <- function(input, output, session) {
     .read <- spooling.read.sum()
     .distr.fn <- model.make.distr.fn(shape = input$spooling.shape)
     purrr::map(1:ui.instance.opts.count.max, function(count) {
-      shape <- round(.read / count)
-      if (shape < 1) { 0 } else { .distr.fn(shape) }
+      n <- round(.read / count)
+      if (n < 1) { 0 } else { .distr.fn(n) }
     })
   })
 

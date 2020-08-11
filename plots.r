@@ -145,3 +145,59 @@ plots.m2.distr.draw <- function() {
 ## ggsave(plots.mkpath("m2-distr-zipf.pdf"), plots.m2.distr.draw(),
 ##        width = 3, height = 2, units = "in",
 ##        device = cairo_pdf)
+
+
+## ---------------------------------------------------------------------------------------------- ##
+                                        # M3: Materialization #
+## ---------------------------------------------------------------------------------------------- ##
+
+## Config where chaning the materialization fraction changes from c5 -> c5d -> c5n
+## http://127.0.0.1:3030/?_inputs_&instance.count.max=32&locality=0.8&timings.plot.budget.ticks.at.limits=true&instSet.details.show=0&instanceFilter=%22Paper%20Table%201%22&timings.plot.budget.step.digits=3&instance=%22%22&spooling.fraction=0.4&tables.frontier.show=false&plotly_relayout-A=%22%7B%5C%22width%5C%22%3A1242%2C%5C%22height%5C%22%3A9220%7D%22&instances.plot.display.frontier=true&time.cpu=20&instances.plot.frontier.quadrant=%22top.left%22&data.read=1998&instance.type.opt.include=%22frontier%22&instFilter.details.show=0&config.options.show=0&instances.plot.display.frontier.only=false&spooling.shape=0.1&instances.plot.x=%22stat.time.sum%22&time.period.num=1&plotly_hover-A=%22%5B%7B%5C%22curveNumber%5C%22%3A0%2C%5C%22pointNumber%5C%22%3A86%2C%5C%22x%5C%22%3A285.5405361662%2C%5C%22y%5C%22%3A0.28472599407325%7D%5D%22&timings.plot.budget.step=100&timings.plot.budget.duplicates.filter=true&timings.plot.budget.limits.logarithmic=true&recommendationColumn=%22stat.price.sum%22&instances.plot.scale.y=%22Linear%22&scaling.efficiency.param.%20p=0.98&.clientValue-default-plotlyCrosstalkOpts=%7B%22on%22%3A%22plotly_click%22%2C%22persistent%22%3Afalse%2C%22dynamic%22%3Afalse%2C%22selectize%22%3Afalse%2C%22opacityDim%22%3A0.2%2C%22selected%22%3A%7B%22opacity%22%3A1%7D%2C%22debounce%22%3A0%2C%22color%22%3A%5B%5D%7D&plotly_afterplot-A=%22%5C%22instances.plot.queriesPerDollar%5C%22%22&timings.plot.budget.col.cost=%22stat.price.sum%22&instances.plot.y=%22col.recom.inv%22&instances.plot.scale.x=%22Linear%22&user.notes=%22%22&time.period.unit=%22Weeks%22&timings.plot.budget.col.optim=%22stat.time.sum%22&instanceSet=%222019-11-30%20%7C%20101%20%7C%20website%22&timings.plot.budget.limits.display=true&comparison.count=1&distr.caching.load.first=false
+
+plots.m3.cost.draw <- function() {
+  .read <- 2000
+  .query <- data.frame(
+    time.cpu  = 20,
+    data.read = .read
+  )
+  .distr.cache <- model.make.distr.fn(0.8)(.read)
+  .distr.fracs <- seq(0, 0.55, 0.05)
+  .cost.list <- purrr::map_dfr(.distr.fracs, function(.frac) {
+    .read.spool <- .frac * .read
+    .distr.spool <- if (.frac == 0) { 0 } else {
+      model.make.distr.fn(0.1)(round(.read.spool))
+    }
+    .time.fn <- model.make.timing.fn(
+      .distr.list.caching  = list(.distr.cache),
+      .distr.list.spooling = list(.distr.spool),
+      .max.count = 1,
+      .distr.caching.split.fn = model.distr.split.fn(FALSE)
+    )
+    .costs <- model.calc.costs(.query, plots.inst, .time.fn)
+    .recom <- model.recommend.from.timings.arr(.query, .costs)
+    head(.recom, n = 1)
+  })
+  .df <- .cost.list %>%
+    dplyr::transmute(
+             x = .distr.fracs,
+             y = stat.price.sum,
+             is.flank = x == 0 | id != dplyr::lag(id),
+             color = ifelse(is.flank, "blue", "black"),
+             label = str_replace(id.name, "xlarge", "")
+           )
+  .df.flanks <- .df %>% dplyr::filter(is.flank)
+  ggplot(.df, aes(x = x, y = y)) +
+    geom_line(color = "black") +
+    geom_point(color = .df$color) +
+    # geom_vline(data = .df.flanks, aes(xintercept=x)) +
+    geom_text(aes(label = label), size = 2.2, nudge_x = 0.035, nudge_y = -0.015) +
+    theme_light() +
+    theme(text = element_text(size = 7), plot.margin=grid::unit(c(0,0,0,0), "mm")) +
+    labs(x = "Materialized Fraction", y = "Workload Cost")
+}
+
+## plots.m3.cost.draw()
+
+ggsave(plots.mkpath("m3-cost-spool.pdf"), plots.m3.cost.draw(),
+       width = 3, height = 2, units = "in",
+       device = cairo_pdf)
