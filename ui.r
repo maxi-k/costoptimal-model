@@ -632,7 +632,7 @@ server <- function(input, output, session) {
   instances.specs.all <- reactive({
     r <- inst.recommended()
     s <- inst.comparison()
-    p <- inst.frontier() %>% dplyr::filter(!(id %in% r$id))
+    p <- if (input$tables.frontier.show) { inst.frontier() %>% dplyr::filter(!(id %in% r$id)) } else { data.frame() }
     rbind(r, p, s) %>%
       dplyr::mutate(network.Gbps = ifelse(network.is.steady,
                                           paste(network.Gbps),
@@ -648,7 +648,7 @@ server <- function(input, output, session) {
   instances.table.times.base <- reactive({
     r <- inst.recommended.timings()
     s <- inst.comparison.timings.relevant()
-    p <- inst.frontier.timings() %>% dplyr::filter(!(id %in% r$id))
+    p <- if (input$tables.frontier.show) { inst.frontier.timings() %>% dplyr::filter(!(id %in% r$id)) } else { data.frame() }
     rbind(r, p, s) %>%
       dplyr::select(-id.name, -count) %>%
       cbind(view.table.column.instance.type(s, p, r), .)
@@ -736,6 +736,15 @@ server <- function(input, output, session) {
   output$instances.times <- renderDT({
     instances.table.times.base() %>%
       dplyr::select(type, id, starts_with("time."), starts_with("stat.time.")) %>%
+      ui.as.dt.formatted()
+  })
+
+  output$instances.times.perc <- renderDT({
+    instances.table.times.base() %>%
+      dplyr::select(type, id, starts_with("time."), starts_with("stat.time.")) %>%
+      mutate_at(vars(contains("time.")), function(x) { 100 * x / .$stat.time.sum}) %>%
+      dplyr::select(-stat.time.sum, -stat.time.max) %>%
+      rename_at(vars(contains("time.")), list(~ str_replace(., "time.", "perc."))) %>%
       ui.as.dt.formatted()
   })
 
@@ -1348,6 +1357,8 @@ client <- function(request) {
           ## ---------------------------------------------------------------------- ##
           tabPanel(
             "Tables",
+
+            checkboxInput("tables.frontier.show", "Display Frontier Instances", value = FALSE),
             h2("Instance Tables"),
             ##
             shiny::fluidRow(
@@ -1393,6 +1404,11 @@ client <- function(request) {
             h3("Calculated Times"),
             helpText("Calculated Times of the recommended and comparison instance."),
             DTOutput("instances.times"),
+            hr(),
+            ##
+            h3("Calculated Time Percentages"),
+            helpText("Percentages of total time (stat.time.sum)"),
+            DTOutput("instances.times.perc"),
             hr(),
             ##
             h3("Calculated Prices"),

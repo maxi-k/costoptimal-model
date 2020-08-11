@@ -146,14 +146,14 @@ model.calc.time.for.config <- function(.inst, .count, .query, .distr.cache, .dis
                      stat.read.work   = sum(.distr.cache$working),
 
                      time.cpu         = (.query$time.cpu * 3600 / calc.cpu.real) * .n.eff,
-                     # time.mem       = ( rw.mem         / calc.memory.speed)   * .n.eff,
+                     time.mem         = (rw.mem          / calc.mem.speed) * .inv.eff,
                      time.sto         = (rw.sto          / calc.sto.speed) * .inv.eff,
                      time.s3          = (rw.s3           / calc.net.speed) * .inv.eff,
                      time.xchg        = (rw.xchg / 2     / calc.net.speed) * .inv.eff,
                      time.load        = (read.cache.load / calc.net.speed) * .inv.eff,
 
-                     stat.time.sum    = time.s3 + time.sto + time.cpu + time.xchg + time.load,
-                     stat.time.max    = pmax(time.s3, time.sto, time.cpu, time.xchg, time.load),
+                     stat.time.sum    = time.s3 + time.sto + time.cpu + time.xchg + time.load + time.mem,
+                     stat.time.max    = pmax(time.s3, time.sto, time.cpu, time.xchg, time.load, time.mem),
                      stat.time.period = .time.period
                      )
 }
