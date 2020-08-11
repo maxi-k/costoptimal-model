@@ -161,33 +161,41 @@ ggsave(plots.mkpath("m2-cost-zipf.pdf"), plots.m2.cost.draw(),
        device = cairo_pdf)
 
 plots.m2.distr.draw <- function() {
-  instance <- plots.inst %>% dplyr::filter(id == "c5d.24xlarge") %>% model.with.speeds()
-  dist <- model.make.distr.fn(0.2)(2000)
+  .id <- "z1d.12xlarge"
+  .id.short <- str_replace(.id, "xlarge", "")
+  instance <- plots.inst %>% dplyr::filter(id == .id) %>% model.with.speeds()
+  .read = 2000
+  .shape1 = 0.1
+  .shape2 = 0.4
 
-  data <- data.frame(y = dist, x = 1:length(dist))
+  data <- rbind(
+    data.frame(y = model.make.distr.fn(.shape1)(.read), x = 1:.read, dist = .shape1),
+    data.frame(y = model.make.distr.fn(.shape2)(.read), x = 1:.read, dist = .shape2)
+  )
   if (instance$calc.net.speed >= instance$calc.sto.speed) {
-    data$group = if_else(data$x <= instance$calc.mem.caching, "Memory", "S3")
+    data$fill = if_else(data$x <= instance$calc.mem.caching, "Memory", "S3")
   } else {
-    data$group = if_else(data$x <= instance$calc.mem.caching, "Memory",
-                         if_else(data$x <= instance$calc.mem.caching + instance$calc.sto.caching, "SSD", "S3"))
+    data$fill = if_else(data$x <= instance$calc.mem.caching, "Memory",
+                        if_else(data$x <= instance$calc.mem.caching + instance$calc.sto.caching, "SSD", "S3"))
   }
   nudge.x <- 0.03 * max(c(max(instance$calc.mem.caching + instance$calc.sto.spooling), nrow(data)))
   nudge.y <- max(data$y) / 4
   plot <- ggplot(instance) +
     scale_fill_manual(values=ui.styles.color.palette1) +
-    geom_area(data=data, aes(y = y, x = x, fill = group), stat="identity") +
+    geom_area(data=data, aes(y = y, x = x, fill = fill), stat="identity") +
     geom_vline(aes(xintercept=calc.mem.caching), colour="blue") +
     geom_vline(aes(xintercept=calc.mem.caching + calc.sto.spooling), colour="blue") +
-    geom_text(aes(x=calc.mem.caching, y=nudge.y * 2, label="Instance Memory"), colour="blue", angle=90,
-              nudge_x = nudge.x, nudge_y = nudge.y, size = 2.2) +
-    geom_text(aes(x=calc.mem.caching + calc.sto.caching, y=nudge.y * 2, label="Instance Storage"), colour="blue", angle=90,
-              nudge_x = nudge.x, nudge_y = nudge.y, size = 2.2) +
+    geom_text(aes(x=calc.mem.caching, y=nudge.y * 2, label=paste(.id.short, "Memory")), colour="blue", angle=90,
+              nudge_x = nudge.x, size = 2) +
+    geom_text(aes(x=calc.mem.caching + calc.sto.caching, y=nudge.y * 2, label=paste(.id.short, "Storage")), colour="blue", angle=90,
+              nudge_x = nudge.x, size = 2) +
     labs(x = "GiB in Workload", y = "Number of Accesses", fill = "Hierarchy") +
     theme_light() +
     theme(text = element_text(size = 7), plot.margin = grid::unit(c(0.5, 0, 0, 0), "mm"),
           legend.title = element_blank(), legend.text = element_text(size = 7),
           legend.position = "bottom", legend.key.size = unit(0.5, "lines"),
-          legend.margin = margin(0, 0, 0, 0, "cm"))
+          legend.margin = margin(0, 0, 0, 0, "cm")) +
+    facet_grid(rows = vars(dist))
   plot
 }
 

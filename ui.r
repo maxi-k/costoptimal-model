@@ -9,8 +9,8 @@ source("./model.r")
 ## From https://github.com/arcticicestudio/nord
 ui.styles.color.palette1 <- c(
     "#a3be8c",
-    "#ebcb8b",
     "#b48ead",
+    "#ebcb8b",
     "#8fbcbb",
     "#5e81ac",
     "#4c566a",
