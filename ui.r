@@ -45,6 +45,7 @@ ui.time.units <- list(
 )
 
 ui.instance.filters <- list(
+  "Paper Table 1" = aws.data.filter.paper,
   "Without Slices" = aws.data.filter.large,
   "Without A1.*, G3.*, P3.*" = aws.data.filter.relevant.family,
   "Spot Prices (eu-central avg)" = aws.data.filter.spot.price,
@@ -53,7 +54,7 @@ ui.instance.filters <- list(
   "Spot Interruptions <10%" = aws.data.mkfilter.spot.inter.freq(10),
   "Spot Interruptions <20%" = aws.data.mkfilter.spot.inter.freq(20)
 )
-ui.instance.filter.initial = c("Without Slices", "Without A1.*, G3.*, P3.*")
+ui.instance.filter.initial = c("Paper Table 1")
 ui.instance.filter.for.snowset = "Without A1.*, G3.*, P3.*"
 
 ui.instance.sets <- aws.data.all.by.date %>% dplyr::group_split() %>% rev()

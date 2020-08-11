@@ -207,6 +207,20 @@ aws.data.current.large.relevant <- aws.data.current %>%
     aws.data.filter.relevant.family()
 aws.data.current.relevant <- aws.data.filter.relevant.family(aws.data.current)
 
+
+paper.inst.ids <- c(
+ "c5n.18xlarge", "c5.24xlarge", "z1d.12xlarge", "c5d.24xlarge",
+ "m5.24xlarge", "i3.16xlarge", "m5d.24xlarge", "m5n.24xlarge",
+ "r5.24xlarge", "m5dn.24xlarge", "r5d.24xlarge", "r5n.24xlarge",
+ "r5dn.24xlarge", "i3en.24xlarge", "x1e.32xlarge"
+)
+
+aws.data.filter.paper <- function(df) {
+  dplyr::filter(df, id %in% paper.inst.ids)
+}
+
+aws.data.paper <- aws.data.filter.paper(aws.data.current)
+
 ## ---------------------------------------------------------------------------------------------- ##
                                         # SPOT INTERRUPTION FREQUENCIES
 ## ---------------------------------------------------------------------------------------------- ##
