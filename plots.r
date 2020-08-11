@@ -58,6 +58,56 @@ plots.m1.draw <- function() {
 ##        width = 3, height = 2, units = "in",
 ##        device = cairo_pdf)
 
+plots.m1.all.draw <- function() {
+  .n.points <- 10
+  .cpu.max <- 200
+  .query <- data.frame(
+    time.cpu  = seq(0, .cpu.max, length.out = .n.points),
+    data.read =  rep(10000, .n.points)
+  )
+  .ids <- c("c5n.18xlarge", "c5.24xlarge", "i3en.24xlarge",
+            "m5dn.24xlarge", "r5dn.24xlarge")
+  .inst <- dplyr::filter(plots.inst, id %in% .ids)
+
+  .costs <- model.calc.costs(.query, .inst, plots.m1.timing.fn)
+  .df <- dplyr::group_modify(.costs, function(group, qid) {
+    dplyr::transmute(group,
+                     x = .query$time.cpu[qid$queryIndex],
+                     y = stat.price.sum,
+                     label = str_replace(id, "xlarge", ""),
+                     is.best = y == min(y),
+                     color = if_else(is.best, "blue", "grey")
+                     )
+    }) %>%
+    dplyr::ungroup() %>%
+    dplyr::group_by(label)
+
+  .labeled <- .df %>% dplyr::filter(x == max(x) | is.best) %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(
+             is.flank = x == 0 | label != dplyr::lag(label),
+             color = if_else(is.flank & is.best, "blue", "black"),
+             nudge.x = if_else(is.best, 10, 18),
+             nudge.y = if_else(is.best, -1.5, 0.2)
+           )
+
+  ggplot(.df, aes(x = x, y = y, group = label)) +
+    geom_line(color = "grey", size = 0.2) +
+    geom_point(color = .df$color, size = 0.5) +
+    geom_text(data = .labeled, aes(label = label), color = .labeled$color,
+              nudge_x = .labeled$nudge.x, nudge_y = .labeled$nudge.y, size = 2.0) +
+    theme_light() +
+    theme(text = element_text(size = 7), plot.margin=grid::unit(c(0,0,0,0), "mm")) +
+    xlim(0, .cpu.max + 25) +
+    labs(x = "CPUh", y = "Workload Cost ($)")
+}
+
+# plots.m1.all.draw()
+
+ggsave(plots.mkpath("m1-cost-cpu-all.pdf"), plots.m1.all.draw(),
+       width = 3, height = 2, units = "in",
+       device = cairo_pdf)
+
 
 ## ---------------------------------------------------------------------------------------------- ##
                                         # M2: Caching #
@@ -97,7 +147,7 @@ plots.m2.cost.draw <- function() {
   ggplot(.df, aes(x = x, y = y)) +
     geom_line(color = "black") +
     geom_point(color = .df$color) +
-    geom_text(aes(label = label), nudge_x = 0.07, nudge_y = 0.02, size = 2.2, angle = 30) +
+    geom_text(aes(label = label), nudge_x = 0.06, nudge_y = 0.015, size = 2.0, angle = 30) +
     theme_light() +
     theme(text = element_text(size = 7), plot.margin=grid::unit(c(0,0,0,0), "mm")) +
     labs(x = "Locality Distribution Factor", y = "Workload Cost")
@@ -105,9 +155,9 @@ plots.m2.cost.draw <- function() {
 
 ## plots.m2.cost.draw()
 
-## ggsave(plots.mkpath("m2-cost-zipf.pdf"), plots.m2.cost.draw(),
-##        width = 3, height = 2, units = "in",
-##        device = cairo_pdf)
+ggsave(plots.mkpath("m2-cost-zipf.pdf"), plots.m2.cost.draw(),
+       width = 3, height = 2, units = "in",
+       device = cairo_pdf)
 
 plots.m2.distr.draw <- function() {
   instance <- plots.inst %>% dplyr::filter(id == "c5d.24xlarge") %>% model.with.speeds()
