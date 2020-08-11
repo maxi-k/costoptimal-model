@@ -51,12 +51,12 @@ plots.m1.draw <- function() {
     geom_text(aes(label = label), nudge_x = 17, nudge_y = 0.03, size = 2.2) +
     theme_light() +
     theme(text = element_text(size = 7), plot.margin=grid::unit(c(0,0,0,0), "mm")) +
-    labs(x = "CPUh", y = "Workload Cost")
+    labs(x = "CPUh", y = "Workload Cost ($)")
 }
 
-## ggsave(plots.mkpath("m1-cost-cpu.pdf"), plots.m1.draw(),
-##        width = 3, height = 2, units = "in",
-##        device = cairo_pdf)
+ggsave(plots.mkpath("m1-cost-cpu.pdf"), plots.m1.draw(),
+       width = 3, height = 2, units = "in",
+       device = cairo_pdf)
 
 plots.m1.all.draw <- function() {
   .n.points <- 10
@@ -80,6 +80,7 @@ plots.m1.all.draw <- function() {
                      )
     }) %>%
     dplyr::ungroup() %>%
+    dplyr::arrange(is.best) %>%
     dplyr::group_by(label)
 
   .labeled <- .df %>% dplyr::filter(x == max(x) | is.best) %>%
@@ -150,7 +151,7 @@ plots.m2.cost.draw <- function() {
     geom_text(aes(label = label), nudge_x = 0.06, nudge_y = 0.015, size = 2.0, angle = 30) +
     theme_light() +
     theme(text = element_text(size = 7), plot.margin=grid::unit(c(0,0,0,0), "mm")) +
-    labs(x = "Locality Distribution Factor", y = "Workload Cost")
+    labs(x = "Locality Distribution Factor", y = "Workload Cost ($)")
 }
 
 ## plots.m2.cost.draw()
@@ -192,9 +193,9 @@ plots.m2.distr.draw <- function() {
 
 ## plots.m2.distr.draw()
 
-## ggsave(plots.mkpath("m2-distr-zipf.pdf"), plots.m2.distr.draw(),
-##        width = 3, height = 2, units = "in",
-##        device = cairo_pdf)
+ggsave(plots.mkpath("m2-distr-zipf.pdf"), plots.m2.distr.draw(),
+       width = 3, height = 2, units = "in",
+       device = cairo_pdf)
 
 
 ## ---------------------------------------------------------------------------------------------- ##
@@ -243,14 +244,14 @@ plots.m3.cost.draw <- function() {
     geom_text(aes(label = label), size = 2.2, nudge_x = 0.035, nudge_y = -0.015) +
     theme_light() +
     theme(text = element_text(size = 7), plot.margin=grid::unit(c(0,0,0,0), "mm")) +
-    labs(x = "Materialized Fraction", y = "Workload Cost")
+    labs(x = "Materialized Fraction", y = "Workload Cost ($)")
 }
 
 ## plots.m3.cost.draw()
 
-## ggsave(plots.mkpath("m3-cost-spool.pdf"), plots.m3.cost.draw(),
-##        width = 3, height = 2, units = "in",
-##        device = cairo_pdf)
+ggsave(plots.mkpath("m3-cost-spool.pdf"), plots.m3.cost.draw(),
+       width = 3, height = 2, units = "in",
+       device = cairo_pdf)
 
 
 ## ---------------------------------------------------------------------------------------------- ##
@@ -285,14 +286,11 @@ plots.m4.budget.draw <- function() {
   )
 
   .costs <- model.calc.costs(.query, plots.inst, .time.fn)
-  print(dplyr::select(dplyr::arrange(.costs, stat.price.sum, stat.time.sum), id, stat.price.sum, stat.time.sum))
   .recom <- model.budgets.discrete(.costs, .budgets.lim)
   .df <- .recom %>% dplyr::mutate(
                              label = paste(paste(count, "x", sep = ""),
                                            str_replace(id.name, "xlarge", "")),
                              )
-  print(nrow(.df))
-
   ggplot(.df, aes(x = budget.optim, y = budget.cost)) +
     geom_point() +
     geom_line() +
@@ -302,7 +300,7 @@ plots.m4.budget.draw <- function() {
     theme(text = element_text(size = 7), plot.margin=grid::unit(c(0,0,0,0), "mm"))
 }
 
-plots.m4.budget.draw()
+# plots.m4.budget.draw()
 
 ggsave(plots.mkpath("m4-budget.pdf"), plots.m4.budget.draw(),
        width = 3, height = 2, units = "in",
