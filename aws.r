@@ -181,8 +181,12 @@ aws.data.metacols <- c("meta.region.name", "meta.join.entry",
                        "meta.group", "meta.origin",
                        "commit.date", "commit.msg", "commit.hash")
 
-
-aws.data.prefixes.irrelevant <- c("a1", "g3", "p3", "g3s", "p2")
+aws.data.prefixes.irrelevant <- c(
+  "a1", "g3", "p3", "g3s", "p2",
+  "c1", "c3", "c4", "cr1", "d2",
+  "u-9tb1", "u-12tb1", "u-6tb1", "u-24tb1",
+  "r3", "m1", "m2", "m6g", "t1", "cc2"
+)
 
 ## Filter functions
 

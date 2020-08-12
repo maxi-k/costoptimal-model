@@ -41,10 +41,9 @@ try.params <- function() {
               .distr.caching.split.fn = .split.fn
             )
             .times <- model.calc.costs(.query, .insts, timing.fn = .timer)
-            .recom <- .times %>% dplyr::top_n(-2, stat.price.sum) %>%
-              dplyr::mutate(
-                       is.first = stat.price.sum == min(stat.price.sum)
-                     ) %>%
+            .recom <- .times %>%
+              dplyr::mutate(rank = rank(stat.price.sum)) %>%
+              dplyr::arrange(rank) %>%
               dplyr::ungroup()
             dplyr::mutate(.recom,
                           param.cpuh = .cpuh,
