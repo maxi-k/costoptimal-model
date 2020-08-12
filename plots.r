@@ -42,7 +42,7 @@ plots.m1.draw <- function() {
     geom_point(color = .df$color) +
     # geom_vline(data = .df.flanks, aes(xintercept=x)) +
     geom_text(aes(label = label), nudge_x = 17, nudge_y = 0.03, size = 2.2) +
-    theme_light() +
+    theme_bw() +
     theme(text = element_text(size = 7), plot.margin=grid::unit(c(0,0,0,0), "mm")) +
     labs(x = "CPUh", y = "Workload Cost ($)")
 }
@@ -92,7 +92,7 @@ plots.m1.all.draw <- function() {
   ggplot(.df, aes(x = x, y = y, group = label, color = color)) +
     scale_fill_manual(values=palette) +
     geom_line(size = 0.2) +
-    theme_light() +
+    theme_bw() +
     geom_text(data = .labeled, aes(label = label), color = .labeled$color, size = 2.0) +
     theme(text = element_text(size = 7), plot.margin=grid::unit(c(0,0,0,0), "mm")) +
     xlim(0, .cpu.max + 25) +
@@ -146,7 +146,7 @@ plots.m2.cost.draw <- function() {
     geom_line(color = "black") +
     geom_point(color = .df$color) +
     geom_text(aes(label = label), nudge_x = 0.06, nudge_y = 0.015, size = 2.0, angle = 30) +
-    theme_light() +
+    theme_bw() +
     theme(text = element_text(size = 7), plot.margin=grid::unit(c(0,0,0,0), "mm")) +
     labs(x = "Locality Distribution Factor", y = "Workload Cost ($)")
 }
@@ -187,7 +187,7 @@ plots.m2.distr.draw <- function() {
     geom_text(aes(x=calc.mem.caching + calc.sto.caching, y=nudge.y * 2, label=paste(.id.short, "Storage")), colour="blue", angle=90,
               nudge_x = nudge.x, size = 2) +
     labs(x = "GiB in Workload", y = "Number of Accesses", fill = "Hierarchy") +
-    theme_light() +
+    theme_bw() +
     theme(text = element_text(size = 7), plot.margin = grid::unit(c(0.5, 0, 0, 0), "mm"),
           legend.title = element_blank(), legend.text = element_text(size = 7),
           legend.position = "bottom", legend.key.size = unit(0.5, "lines"),
@@ -247,7 +247,7 @@ plots.m3.cost.draw <- function() {
     geom_point(color = .df$color) +
     # geom_vline(data = .df.flanks, aes(xintercept=x)) +
     geom_text(aes(label = label), size = 2.2, nudge_x = 0.035, nudge_y = -0.015) +
-    theme_light() +
+    theme_bw() +
     theme(text = element_text(size = 7), plot.margin=grid::unit(c(0,0,0,0), "mm")) +
     labs(x = "Materialized Fraction", y = "Workload Cost ($)")
 }
@@ -301,7 +301,7 @@ plots.m4.budget.draw <- function() {
     geom_line() +
     geom_text(aes(label = label), nudge_x = 250, nudge_y = 0.05, size = 2.2) +
     labs(y = "Workload Cost ($)", x = "Worload Execution Time (s)") +
-    theme_light() +
+    theme_bw() +
     theme(text = element_text(size = 7), plot.margin=grid::unit(c(0,0,0,0), "mm"))
 }
 
