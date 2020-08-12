@@ -148,13 +148,17 @@ model.calc.time.for.config <- function(.inst, .count, .query, .distr.cache, .dis
                      time.cpu         = (.query$time.cpu * 3600 / calc.cpu.real) * .n.eff,
                      time.mem         = (rw.mem          / calc.mem.speed) * .inv.eff,
                      time.sto         = (rw.sto          / calc.sto.speed) * .inv.eff,
-                     time.s3          = (rw.s3           / calc.net.speed) * .inv.eff,
+                     time.s3          = (rw.s3           / calc.s3.speed ) * .inv.eff,
                      time.xchg        = (rw.xchg / 2     / calc.net.speed) * .inv.eff,
-                     time.load        = (read.cache.load / calc.net.speed) * .inv.eff,
+                     time.load        = (read.cache.load / calc.s3.speed ) * .inv.eff,
 
                      stat.time.sum    = time.s3 + time.sto + time.cpu + time.xchg + time.load + time.mem,
                      stat.time.max    = pmax(time.s3, time.sto, time.cpu, time.xchg, time.load, time.mem),
-                     stat.time.period = .time.period
+                     stat.time.period = .time.period,
+
+                     stat.elas.s3bw   = calc.s3.speed,
+                     stat.elas.effi   = .n.eff,
+                     stat.elas.scan   = .query$data.read
                      )
 }
 
@@ -190,8 +194,8 @@ model.calc.storage.speed <- function(.inst, network.speed) {
 
 model.with.speeds <- function(inst) {
     dplyr::mutate(inst,
-             ## TODO discount based on 'up-to' -> split fair based on slices
              calc.net.speed    = if_else(network.is.steady, network.Gbps, id.slice.net) / 8,
+             calc.s3.speed     = calc.net.speed * 0.8,
              calc.mem.speed    = model.factors.bandwidth$RAM,
              calc.sto.speed    = model.calc.storage.speed(inst, calc.net.speed),
              ## no hyperthreads, a ssume 2 threads/core
