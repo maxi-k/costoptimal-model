@@ -2,7 +2,8 @@ source("./model.r")
 source("./aws.r")
 
 try.params <- function() {
-  .range.scan  <- c(10    , 100 , 1000 , 10000, 100 * 1000)
+
+  .range.scan  <- 16*2^(0:12)
   .range.cache <- c(0.001 , 0.1 , 0.5  , 0.8  , 0.999)
   .range.sdist <- c(0.001 , 0.5 ,  0.999)
   .range.spool <- c(0     , 0.1 , 0.5  , 0.8  , 1)
