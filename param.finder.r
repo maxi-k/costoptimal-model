@@ -2,14 +2,14 @@ source("./model.r")
 source("./aws.r")
 
 try.params <- function() {
-  .range.scan  <- c(1     , 10  , 100  , 1000 , 10000)
+  .range.scan  <- c(10    , 100 , 1000 , 10000, 100 * 1000)
   .range.cache <- c(0.001 , 0.1 , 0.5  , 0.8  , 0.999)
-  .range.sdist <- c(0.001 , 0.5,  0.999)
+  .range.sdist <- c(0.001 , 0.5 ,  0.999)
   .range.spool <- c(0     , 0.1 , 0.5  , 0.8  , 1)
-  .range.cpu   <- c(0     , 1   , 10   , 20   , 100)
+  .range.cpu   <- c(1)
 
   .split.fn <- model.distr.split.fn(FALSE)
-  .insts <- aws.data.current
+  .insts <- aws.data.current.large.relevant
 
   purrr::map_dfr(.range.scan, function(.scanned) {
     purrr::map_dfr(.range.cache, function(.cache.skew) {
@@ -40,7 +40,11 @@ try.params <- function() {
               .distr.caching.split.fn = .split.fn
             )
             .times <- model.calc.costs(.query, .insts, timing.fn = .timer)
-            .recom <- model.recommend.from.timings.arr(.query, .times)
+            .recom <- .times %>% dplyr::top_n(-2, stat.price.sum) %>%
+              dplyr::mutate(
+                       is.first = stat.price.sum == min(stat.price.sum)
+                     ) %>%
+              dplyr::ungroup()
             dplyr::mutate(.recom,
                           param.cpuh = .cpuh,
                           param.scanned = .scanned,
@@ -57,8 +61,9 @@ try.params <- function() {
 
 system.time({
   res <<- try.params()
-  write.csv(res, "tested.params.all.csv")
+  write.csv(res, "tested.params.relevant.csv")
 })
 
 library("sqldf")
 result <- sqldf("SELECT id, count(*) from res group by id")
+result
