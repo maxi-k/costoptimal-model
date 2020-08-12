@@ -117,8 +117,8 @@ model.calc.time.for.config <- function(.inst, .count, .query, .distr.cache, .dis
                         prio = .inst$calc.net.speed)
     )
 
-    .pack.cache <- model.distr.pack(.bins.cache, .distr.cache$working)
-    .pack.spool <- model.distr.pack(.bins.spool, .distr.spool)
+    .pack.cache <- model.distr.pack(.bins.cache, .distr.cache$working) %>% as.data.frame()
+    .pack.spool <- model.distr.pack(.bins.spool, .distr.spool) %>% as.data.frame()
     .spool.sum  <- sum(.distr.spool)
     .inv.eff <- .count * .n.eff
 
@@ -129,13 +129,13 @@ model.calc.time.for.config <- function(.inst, .count, .query, .distr.cache, .dis
                      cost.usdph       = cost.usdph * .count,
 
                      read.cache.load  = sum(.distr.cache$initial),
-                     read.cache.mem   = .pack.cache$data.mem,
-                     read.cache.sto   = .pack.cache$data.sto,
-                     read.cache.s3    = .pack.cache$data.s3,
+                     read.cache.mem   = .pack.cache$data.mem %||% 0,
+                     read.cache.sto   = .pack.cache$data.sto %||% 0,
+                     read.cache.s3    = .pack.cache$data.s3 %||% 0,
 
-                     read.spool.mem   = .pack.spool$data.mem,
-                     read.spool.sto   = .pack.spool$data.sto,
-                     read.spool.s3    = .pack.spool$data.s3,
+                     read.spool.mem   = .pack.spool$data.mem %||% 0,
+                     read.spool.sto   = .pack.spool$data.sto %||% 0,
+                     read.spool.s3    = .pack.spool$data.s3 %||% 0,
 
                      rw.mem           = read.cache.mem + 2 * read.spool.mem,
                      rw.sto           = read.cache.sto + 2 * read.spool.sto,

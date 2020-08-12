@@ -1,6 +1,3 @@
-## Wanna show
-
-
 source("./model.r")
 source("./aws.r")
 
@@ -23,10 +20,6 @@ plots.m1.timing.fn <- function(.query, .inst) {
                 )
 }
 
-## TODO:
-## - show all, grey
-## - pareto on top
-##
 plots.m1.draw <- function() {
   .n.points <- 10
   .query <- data.frame(
@@ -67,16 +60,20 @@ plots.m1.all.draw <- function() {
   )
   .ids <- c("c5n.18xlarge", "c5.24xlarge", "i3en.24xlarge",
             "m5dn.24xlarge", "r5dn.24xlarge")
-  .inst <- dplyr::filter(plots.inst, id %in% .ids)
+  .inst <- plots.inst
+
+  palette <- ui.styles.color.palette1
+  names(palette) <- .ids
 
   .costs <- model.calc.costs(.query, .inst, plots.m1.timing.fn)
   .df <- dplyr::group_modify(.costs, function(group, qid) {
     dplyr::transmute(group,
+                     id = id,
                      x = .query$time.cpu[qid$queryIndex],
                      y = stat.price.sum,
                      label = str_replace(id, "xlarge", ""),
                      is.best = y == min(y),
-                     color = if_else(is.best, "blue", "grey")
+                     color = if_else(id %in% .ids, palette[id], "grey"),
                      )
     }) %>%
     dplyr::ungroup() %>%
@@ -87,19 +84,19 @@ plots.m1.all.draw <- function() {
     dplyr::ungroup() %>%
     dplyr::mutate(
              is.flank = x == 0 | label != dplyr::lag(label),
-             color = if_else(is.flank & is.best, "blue", "black"),
+             color = if_else(id %in% .ids, palette[id], "grey"),
              nudge.x = if_else(is.best, 10, 18),
              nudge.y = if_else(is.best, -1.5, 0.2)
            )
 
-  ggplot(.df, aes(x = x, y = y, group = label)) +
-    geom_line(color = "grey", size = 0.2) +
-    geom_point(color = .df$color, size = 0.5) +
-    geom_text(data = .labeled, aes(label = label), color = .labeled$color,
-              nudge_x = .labeled$nudge.x, nudge_y = .labeled$nudge.y, size = 2.0) +
+  ggplot(.df, aes(x = x, y = y, group = label, color = color)) +
+    scale_fill_manual(values=palette) +
+    geom_line(size = 0.2) +
     theme_light() +
+    geom_text(data = .labeled, aes(label = label), color = .labeled$color, size = 2.0) +
     theme(text = element_text(size = 7), plot.margin=grid::unit(c(0,0,0,0), "mm")) +
     xlim(0, .cpu.max + 25) +
+    scale_y_log10() +
     labs(x = "CPUh", y = "Workload Cost ($)")
 }
 
@@ -171,7 +168,7 @@ plots.m2.distr.draw <- function() {
   data <- rbind(
     data.frame(y = model.make.distr.fn(.shape1)(.read), x = 1:.read, dist = .shape1),
     data.frame(y = model.make.distr.fn(.shape2)(.read), x = 1:.read, dist = .shape2)
-  )
+  ) # %>% dplyr::filter(x > 5) %>% dplyr::mutate(x = x - 5)
   if (instance$calc.net.speed >= instance$calc.sto.speed) {
     data$fill = if_else(data$x <= instance$calc.mem.caching, "Memory", "S3")
   } else {
@@ -303,7 +300,7 @@ plots.m4.budget.draw <- function() {
     geom_point() +
     geom_line() +
     geom_text(aes(label = label), nudge_x = 250, nudge_y = 0.05, size = 2.2) +
-    labs(y = "Workload Cost ($)", x = "Query Time (s)") +
+    labs(y = "Workload Cost ($)", x = "Worload Execution Time (s)") +
     theme_light() +
     theme(text = element_text(size = 7), plot.margin=grid::unit(c(0,0,0,0), "mm"))
 }
