@@ -8,8 +8,8 @@ try.params <- function() {
   .range.sdist <- c(0.001 , 0.5 ,  0.999)
   .range.spool <- c(0     , 0.1 , 0.5  , 0.8  , 1)
   .range.cpu   <- c(1)
+  .range.split <- c(TRUE, FALSE)
 
-  .split.fn <- model.distr.split.fn(FALSE)
   .insts <- aws.data.current.large.relevant
 
   purrr::map_dfr(.range.scan, function(.scanned) {
@@ -22,36 +22,39 @@ try.params <- function() {
           .spool.distr <- if(.spooled < 1) { 0 } else { model.make.distr.fn(.spool.skew)(.spooled) }
           .spool.distr.list <- list(.spool.distr)
           purrr::map_dfr(.range.cpu, function(.cpuh) {
+            purrr::map_dfr(.range.split, function(.do.split) {
+              .split.fn <-
+              .query <- data.frame(
+                time.cpu  = .cpuh,
+                data.read = .scanned
+              )
+              .timer <- model.make.timing.fn(
+                .distr.list.caching  = .cache.distr.list,
+                .distr.list.spooling = .spool.distr.list,
+                .max.count <- 1,
+                .distr.caching.split.fn = model.distr.split.fn(.do.split)
+              )
 
-            .query <- data.frame(
-              time.cpu  = .cpuh,
-              data.read = .scanned
-            )
-            .timer <- model.make.timing.fn(
-              .distr.list.caching  = .cache.distr.list,
-              .distr.list.spooling = .spool.distr.list,
-              .max.count <- 1,
-              .distr.caching.split.fn = .split.fn
-            )
-
-            .timer <- model.make.timing.fn(
-              .distr.list.caching  = .cache.distr.list,
-              .distr.list.spooling = .spool.distr.list,
-              .max.count <- 1,
-              .distr.caching.split.fn = .split.fn
-            )
-            .times <- model.calc.costs(.query, .insts, timing.fn = .timer)
-            .recom <- .times %>%
-              dplyr::mutate(rank = rank(stat.price.sum)) %>%
-              dplyr::arrange(rank) %>%
-              dplyr::ungroup()
-            dplyr::mutate(.recom,
-                          param.cpuh = .cpuh,
-                          param.scanned = .scanned,
-                          param.cache.skew = .cache.skew,
-                          param.spool.skew = .spool.skew,
-                          param.spool.frac = .spool.frac
-                          )
+              .timer <- model.make.timing.fn(
+                .distr.list.caching  = .cache.distr.list,
+                .distr.list.spooling = .spool.distr.list,
+                .max.count <- 1,
+                .distr.caching.split.fn = model.distr.split.fn(.do.split)
+              )
+              .times <- model.calc.costs(.query, .insts, timing.fn = .timer)
+              .recom <- .times %>%
+                dplyr::mutate(rank = rank(stat.price.sum)) %>%
+                dplyr::arrange(rank) %>%
+                dplyr::ungroup()
+              dplyr::mutate(.recom,
+                            param.cpuh = .cpuh,
+                            param.scanned = .scanned,
+                            param.cache.skew = .cache.skew,
+                            param.spool.skew = .spool.skew,
+                            param.spool.frac = .spool.frac,
+                            param.do.split   = .do.split
+                            )
+            })
           })
         })
       })
