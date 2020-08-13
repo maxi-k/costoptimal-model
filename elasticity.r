@@ -18,12 +18,10 @@ model.modulator.sin <- function(.w, .window, .num) {
 
 model.modulator.sin.other <- function(.w, .window, .num) {
   .freqs <- c(1, 1.5, 2, 3, 3.5, 4) * pi
-    .cpu.factor <- (sum(sin(.window / .freqs)) + 1) / 2
-    .mem.factor <- (sum(cos(.window / .freqs)) + 1) / 2
+  .factor <- max((sum(sin(.window / .freqs)) + 1) / 4, 0)
   dplyr::mutate(.w,
-                time.cpu = time.cpu * .cpu.factor / .num,
-                data.read = data.read * .mem.factor / .num
-                )
+                time.cpu = time.cpu * .factor / .num,
+                data.read = data.read * .factor / .num)
 }
 
 plot.modulated.workload <- function(.mod) {
@@ -60,12 +58,19 @@ model.merge.window.costs <- function(.recom.cur, .recom.nxt) {
                 stat.time.sum     = stat.time.sum    + .recom.nxt$stat.time.sum,
                 stat.time.max     = stat.time.max    + .recom.nxt$stat.time.max,
                 stat.time.period  = stat.time.period + .recom.nxt$stat.time.period,
+                stat.time.switch  = stat.time.switch,
 
                 stat.price.sum    = stat.price.sum    + .recom.nxt$stat.price.sum,
                 stat.price.max    = stat.price.max    + .recom.nxt$stat.price.max,
-                stat.price.switch = 0 ,
+                stat.price.period = stat.price.period + .recom.nxt$stat.price.period,
+                stat.price.switch = stat.price.switch,
+
                 window.start      = .recom.cur$window.start,
                 window.end        = .recom.nxt$window.start,
+
+                stat.elas.s3bw   = .recom.nxt$stat.elas.s3bw,
+                stat.elas.effi   = .recom.nxt$stat.elas.effi,
+                stat.elas.scan   = .recom.nxt$read.cache.mem + .recom.nxt$read.cache.sto
   )
 }
 
@@ -97,12 +102,16 @@ model.scale.down.distrs <- function(.distrs, .factor) {
 ##   max.inst    = 32,
 ##   window.size = duration(1, "hour"),
 ##   period.size = duration(1, "week")
+##   max.latency = duration(1, "hour")
 ## )
 model.elastic.costs <- function(.inst, .params) {
+  stopifnot(nrow(.inst) > 0)
   .wl <- data.frame(
     time.cpu  = .params$time.cpu,
     data.read = .params$data.read
   )
+  .latency.sec <- int_length(.params$max.latency)
+  .window.sec  <- int_length(.params$window.size)
 
   .dist.cache.whole <- model.make.distrs(.params$cache.skew, .params$max.inst, .params$data.read)
   .dist.spool.whole <- model.make.distrs(.params$cache.skew, .params$max.inst, .params$data.read * .params$spool.frac)
@@ -117,65 +126,116 @@ model.elastic.costs <- function(.inst, .params) {
                          .params$max.inst,
                          .scale.eff.fn,
                          .dist.split.fn,
-                         lubridate::dseconds(.w$window.seconds))
+                         int_length(.w$window.seconds))
   }
 
-  # TODO: use result of previous merge for next window application (-> reduce)
+  costs.for.window <- function(.w, .max.latency = .latency.sec) {
+    possible <- model.calc.costs(.w, .inst, make.window.timing.fn(.w)) %>%
+      dplyr::filter(stat.time.sum <= .max.latency) %>%
+      dplyr::arrange(stat.price.period) %>%
+      dplyr::mutate(window.start = .w$window.id,
+                    window.end = .w$window.id,
+                    stat.time.switch = 0,
+                    stat.price.switch = 0)
+  }
+  best <- function(.w) head(.w, n = 1)
+
   .mod <- model.modulate.workload(.wl, model.modulator.sin.other, .params$period.size, .params$window.size)
-  slider::slide_dfr(.mod, .after = 1, function(.windows) {
-    .cur <- head(.windows, n = 1)
-
-    .costs.cur <- model.calc.costs(.cur, .inst, make.window.timing.fn(.cur))
-    .recom.cur <- model.recommend.from.timings.arr(.cur, .costs.cur) %>%
-      head(n = 1) %>%
-      dplyr::mutate(window.start = .cur$window.id)
-
-    if (nrow(.windows) == 1) {
-      return(dplyr::mutate(.recom.cur, stat.price.switch = 0, window.end = .cur$window.id))
+  .split <- split(.mod, f = 1:nrow(.mod))
+  .init <- list(best(costs.for.window(.split[[1]])))
+  .stats <- list("same best" = 0, "switch" = 0, "stay" = 0, "phony" = 0)
+  addstat <- function(name) {
+    .stats[[name]] <<- .stats[[name]] + 1
+  }
+  res <- purrr::reduce(.split[2:length(.split)], .init = .init, function(.acc, .cur) {
+    .recom.prv <- .acc[[length(.acc)]]
+    stopifnot(.recom.prv$window.end + 1 == .cur$window.id)
+    .costs.cur <- costs.for.window(.cur)
+    if(nrow(.costs.cur) == 0) {
+      stop("no instance satisfies time constraint")
     }
-    .nxt <- tail(.windows, n = 1)
-    .costs.nxt <- model.calc.costs(.nxt, .inst, make.window.timing.fn(.nxt))
-    .recom.nxt <- model.recommend.from.timings.arr(.cur, .costs.nxt) %>%
-      head(n = 1) %>%
-      dplyr::mutate(window.start = .nxt$window.id)
-    if (.recom.cur$id == .recom.nxt$id) { #todo: multiple best?
-      return(
-        model.merge.window.costs(.recom.cur, .recom.nxt) %>%
-        dplyr::mutate(stat.time.period = .cur$window.seconds + .nxt$window.seconds)
-      )
+    if (.recom.prv$id == best(.costs.cur)$id) { # best stays the same
+      addstat("same best")
+      .acc[[length(.acc)]] <-
+        dplyr::mutate(
+                 model.merge.window.costs(.recom.prv, best(.costs.cur)),
+                 window.start   = .recom.prv$window.start,
+                 window.end     = .cur$window.id)
+      return(.acc)
+    } # best is different
+    .time.switch <- (if (best(.costs.cur)$id.name == .recom.prv$id.name) {
+                       .recom.prv$stat.elas.scan / .recom.prv$count
+                     } else {
+                       .recom.prv$stat.elas.scan
+                     }) / (best(.costs.cur)$stat.elas.s3bw * best(.costs.cur)$count)
+    .cost.switch <- .time.switch * best(.costs.cur)$cost.usdph / 3600
+    .switch.candidate <- best(dplyr::filter(.costs.cur, stat.time.sum + .time.switch <= .window.sec))
+    .can.switch <- nrow(.switch.candidate) > 0
+    .can.stay <- .recom.prv$id %in% .costs.cur$id
+    if(.can.stay) {
+      .prv.incur <- .costs.cur %>% dplyr::filter(id == .recom.prv$id) %>% best()
+      .cost.stay <- .prv.incur$stat.price.period - best(.costs.cur)$stat.price.period
+      if (!.can.switch || .cost.stay < .cost.switch) {
+        addstat("stay")
+        .acc[[length(.acc)]] <- model.merge.window.costs(.recom.prv, .prv.incur)
+        return(.acc)
+      }
     }
-    .switch.cost <- .cur$data.read * .recom.nxt$stat.elas.effi / .recom.nxt$stat.elas.s3bw
-    .stay.inst.cost <- dplyr::filter(.costs.nxt, id == .recom.cur$id) %>% head(n = 1)
-    .stay.cost <- .stay.inst.cost$stat.price.sum - .recom.nxt$stat.price.sum
-    return(
-      if (.stay.cost <= .switch.cost) {
-        model.merge.window.costs(.recom.cur, .stay.inst.cost) %>%
-          dplyr::mutate(stat.time.period = .cur$window.seconds + .nxt$window.seconds)
-      } else {
-        .nxt.switch <- dplyr::mutate(.recom.nxt,
-                                stat.price.switch = .switch.cost,
-                                stat.price.sum    = stat.price.sum + stat.price.switch,
-                                window.end        = .nxt$window.id)
-        # TODO; reduce
-        rbind(.recom.cur %>% dplyr::mutate(stat.price.switch = 0, window.end = .cur$window.id),
-              .nxt.switch)
-    })
-  })
+    if (!.can.stay && !.can.switch) {
+      warning("Can neither stay nor switch. Switching to the fastest instance.")
+      addstat("phony")
+      .switch.candidate <- .costs.cur %>% dplyr::arrange(stat.time.sum, stat.price.sum) %>% best()
+      ## browser()
+    }
+    addstat("switch")
+    .acc[[length(.acc) + 1]] <- .switch.candidate %>%
+      dplyr::mutate(stat.time.switch = .time.switch,
+                    stat.price.switch = .cost.switch)
+    .acc
+  }) %>% bind_rows()
+  print(.stats)
+  res
 }
 
 ## --------------------------------------------------------------------------------
 .params <- list(
   time.cpu    = 24 * 7 * 5,
-  data.read   = 24 * 7 * 2000,
+  data.read   = 24 * 7 * 1000,
   cache.skew  = 0.1,
   spool.frac  = 0.1,
   spool.skew  = 0.8,
   scale.eff   = 0.9,
   max.inst    = 32,
-  window.size = duration(2, "hour"),
-  period.size = duration(1, "week")
+  window.size = duration(1, "hour"),
+  period.size = duration(1, "week"),
+  max.latency = duration(0.5, "hour")
 )
-.recoms <- model.elastic.costs(aws.data.current.large.relevant, .params)
+.recoms <- model.elastic.costs(aws.data.current.relevant, .params)
+
+local({
+  .wl <- data.frame(
+    time.cpu  = .params$time.cpu,
+    data.read = .params$data.read
+  )
+  .dist.cache.whole <- model.make.distrs(.params$cache.skew, .params$max.inst, .params$data.read)
+  .dist.spool.whole <- model.make.distrs(.params$cache.skew, .params$max.inst, .params$data.read * .params$spool.frac)
+  .dist.split.fn <- model.distr.split.fn(FALSE)
+  .scale.eff.fn  <- model.make.scaling.fn(list(p = .params$scale.eff))
+  .time.fn <- model.make.timing.fn(.dist.cache.whole,
+                                   .dist.spool.whole,
+                                   .params$max.inst,
+                                   .scale.eff.fn,
+                                   .dist.split.fn,
+                                   int_length(.params$period.size))
+  .baseline.costs <- model.calc.costs(.wl, aws.data.current.relevant, .time.fn)
+  .baseline.recom <- .baseline.costs %>% # TODO: Like this or with max latency? what to use as max latency?
+    top_n(-1, wt = stat.price.sum) %>%
+    head(n = 1)
+  print(paste("Baseline with", .baseline.recom$id, "costs", .baseline.recom$stat.price.period))
+  print(paste("Split workload costs ", sum(.recoms$stat.price.period)))
+  .price.diff <- (.baseline.recom$cost.usdph / 3600) * int_length(.params$period.size) - sum(.recoms$stat.price.period)
+  print(paste("Difference: ", .price.diff))
+})
 ## --------------------------------------------------------------------------------
 
 plot.elastic.recoms <- function(.wl, .costs) {
@@ -184,10 +244,14 @@ plot.elastic.recoms <- function(.wl, .costs) {
     geom_line(aes(x = window.id, y = time.cpu,  color = "cpuh")) +
     geom_line(aes(x = window.id, y = data.read / 2000, color = "scan")) +
     # geom_line(data = .costs, aes(x = window.start, y = stat.price.sum, color = "$")) +
+    # geom_text(data=.costs, aes(label = str_replace(id, "xlarge", ""),
+    #                            x = (window.start + window.end) / 2,
+    #                            y = .maxval),
+    #           angle = 90, size = 3) +
     geom_segment(data=.costs,
-                 aes(x = window.start, xend = window.end,
+                 aes(x = window.start, xend = window.end + 1,
                      y = .maxval, yend = .maxval,
-                     color = id), size = 3)
+                     color = paste(id, " (", stat.price.period, ")", sep="")), size = 3)
 }
 
 plot.elastic.recoms(
@@ -200,4 +264,5 @@ plot.elastic.recoms(
   .recoms
 )
 
+write.csv(.recoms, "data/elasticity.data.csv")
 ggsave("../figures/m5-elasticity-initial.pdf")

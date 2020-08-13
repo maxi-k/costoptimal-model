@@ -1,5 +1,8 @@
 source("./util.r")
 
+## Use parallel evaluation
+future::plan(future::multicore, workers = round(future::availableCores() * 0.75))
+
 ## ---------------------------------------------------------------------------------------------- ##
                                         # Model Constants
 ## ---------------------------------------------------------------------------------------------- ##
@@ -158,7 +161,7 @@ model.calc.time.for.config <- function(.inst, .count, .query, .distr.cache, .dis
 
                      stat.elas.s3bw   = calc.s3.speed,
                      stat.elas.effi   = .n.eff,
-                     stat.elas.scan   = .query$data.read
+                     stat.elas.scan   = read.cache.mem + read.cache.sto
                      )
 }
 
