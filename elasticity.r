@@ -175,7 +175,7 @@ model.elastic.costs <- function(.inst, .params) {
     if(.can.stay) {
       .prv.incur <- .costs.cur %>% dplyr::filter(id == .recom.prv$id) %>% best()
       .cost.stay <- .prv.incur$stat.price.period - best(.costs.cur)$stat.price.period
-      if (!.can.switch || .cost.stay < .cost.switch) {
+      if (!.can.switch || .cost.stay < .cost.switch * (1 + .params$min.cost.frac)) {
         addstat("stay")
         .acc[[length(.acc)]] <- model.merge.window.costs(.recom.prv, .prv.incur)
         return(.acc)
@@ -208,14 +208,15 @@ model.elastic.costs <- function(.inst, .params) {
   max.inst    = 32,
   window.size = duration(1, "hour"),
   period.size = duration(1, "week"),
-  max.latency = duration(0.5, "hour")
+  max.latency = duration(0.5, "hour"),
+  min.cost.frac = 0.3
 )
 .recoms <- model.elastic.costs(aws.data.current.relevant, .params)
 
 local({
   .wl <- data.frame(
-    time.cpu  = .params$time.cpu,
-    data.read = .params$data.read
+    time.cpu  = .params$time.cpu / 24 / 7,
+    data.read = .params$data.read / 24 / 7
   )
   .dist.cache.whole <- model.make.distrs(.params$cache.skew, .params$max.inst, .params$data.read)
   .dist.spool.whole <- model.make.distrs(.params$cache.skew, .params$max.inst, .params$data.read * .params$spool.frac)
@@ -228,8 +229,9 @@ local({
                                    .dist.split.fn,
                                    int_length(.params$period.size))
   .baseline.costs <- model.calc.costs(.wl, aws.data.current.relevant, .time.fn)
-  .baseline.recom <- .baseline.costs %>% # TODO: Like this or with max latency? what to use as max latency?
-    top_n(-1, wt = stat.price.sum) %>%
+  .baseline.recom <- .baseline.costs %>%
+    dplyr::filter(round(stat.time.sum) <= int_length(.params$max.latency)) %>%
+    top_n(-1, wt = cost.usdph) %>%
     head(n = 1)
   print(paste("Baseline with", .baseline.recom$id, "costs", .baseline.recom$stat.price.period))
   print(paste("Split workload costs ", sum(.recoms$stat.price.period)))
