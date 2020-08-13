@@ -126,7 +126,7 @@ model.elastic.costs <- function(.inst, .params) {
                          .params$max.inst,
                          .scale.eff.fn,
                          .dist.split.fn,
-                         int_length(.w$window.seconds))
+                         .window.sec)
   }
 
   costs.for.window <- function(.w, .max.latency = .latency.sec) {
@@ -215,8 +215,8 @@ model.elastic.costs <- function(.inst, .params) {
 
 local({
   .wl <- data.frame(
-    time.cpu  = .params$time.cpu / 24 / 7,
-    data.read = .params$data.read / 24 / 7
+    time.cpu  = .params$time.cpu,
+    data.read = .params$data.read
   )
   .dist.cache.whole <- model.make.distrs(.params$cache.skew, .params$max.inst, .params$data.read)
   .dist.spool.whole <- model.make.distrs(.params$cache.skew, .params$max.inst, .params$data.read * .params$spool.frac)
@@ -228,14 +228,15 @@ local({
                                    .scale.eff.fn,
                                    .dist.split.fn,
                                    int_length(.params$period.size))
+  .nwindows <- int_length(.params$period.size) / int_length(.params$window.size)
   .baseline.costs <- model.calc.costs(.wl, aws.data.current.relevant, .time.fn)
   .baseline.recom <- .baseline.costs %>%
-    dplyr::filter(round(stat.time.sum) <= int_length(.params$max.latency)) %>%
-    top_n(-1, wt = cost.usdph) %>%
+    dplyr::filter(round(stat.time.sum) <= int_length(.params$max.latency) * .nwindows) %>%
+    top_n(-1, wt = stat.price.sum) %>%
     head(n = 1)
   print(paste("Baseline with", .baseline.recom$id, "costs", .baseline.recom$stat.price.period))
   print(paste("Split workload costs ", sum(.recoms$stat.price.period)))
-  .price.diff <- (.baseline.recom$cost.usdph / 3600) * int_length(.params$period.size) - sum(.recoms$stat.price.period)
+  .price.diff <- .baseline.recom$stat.price.period - sum(.recoms$stat.price.period)
   print(paste("Difference: ", .price.diff))
 })
 ## --------------------------------------------------------------------------------
@@ -253,7 +254,7 @@ plot.elastic.recoms <- function(.wl, .costs) {
     geom_segment(data=.costs,
                  aes(x = window.start, xend = window.end + 1,
                      y = .maxval, yend = .maxval,
-                     color = paste(id, " (", stat.price.period, ")", sep="")), size = 3)
+                     color = id), size = 3)
 }
 
 plot.elastic.recoms(

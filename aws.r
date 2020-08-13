@@ -63,7 +63,7 @@ aws.data.historical.new.load <- function() {
     and instance_type not like 't3%' --burst")
   aws.data.historical.new <<- as.data.frame(data) %>%
     dplyr::transmute(
-             id                                = instance_type,
+             id                                = as.character(instance_type),
              vcpu.value.count                  = as.numeric(vCPU),
              memory.value.gib                  = as.numeric(memory),
              clockSpeed.value.ghz              = as.numeric(str_replace(clock_speed_ghz, "GHz", "")),

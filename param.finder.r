@@ -34,13 +34,6 @@ try.params <- function() {
                 .max.count <- 1,
                 .distr.caching.split.fn = model.distr.split.fn(.do.split)
               )
-
-              .timer <- model.make.timing.fn(
-                .distr.list.caching  = .cache.distr.list,
-                .distr.list.spooling = .spool.distr.list,
-                .max.count <- 1,
-                .distr.caching.split.fn = model.distr.split.fn(.do.split)
-              )
               .times <- model.calc.costs(.query, .insts, timing.fn = .timer)
               .recom <- .times %>%
                 dplyr::mutate(rank = rank(stat.price.sum)) %>%
@@ -64,9 +57,9 @@ try.params <- function() {
 
 system.time({
   res <<- try.params()
-  write.csv(res, "tested.params.relevant.csv")
+  write.csv(res, "tested.params.with.split.csv")
 })
 
 library("sqldf")
-result <- sqldf("SELECT id, count(*) from res group by id")
+result <- sqldf("SELECT id, count(*) from res where rank = 1 group by id")
 result
