@@ -28,17 +28,67 @@ aws.data.commits.coltypes <- cols(
     commit.msg  = col_character()
 )
 
-aws.data.load <- function(path = aws.data.folder, filename = "ec2-instances.info.csv") {
-    full.path <- paste(path, filename, sep="/")
-    result <- read_csv(full.path, col_types = aws.data.coltypes)
-    aws.data.instances <<- result
-}
-
 aws.data.historical.load <- function() {
     aws.data.historical <<- aws.data.load(filename = "historical-data.csv")
 }
 
-aws.data.commits.load <- function(path = aws.data.folder,
+aws.data.historical.new.load <- function() {
+  dates <- read.csv(paste(aws.data.folder, 'historical-data-times.csv', sep="/"))
+  data <- read.csv(paste(aws.data.folder, 'historical-data-raw.csv', sep="/"))
+  data <- sqldf("
+    select *,
+           case when storage_size is null then 'EBS'
+                when storage_size = 0 then 'EBS'
+                when storage_nvme_ssd = 'true' then 'NVMe'
+                when storage_ssd = 'true' then 'SSD'
+                else 'HDD'
+           end as storage_type,
+           substr(instance_type, 0, instr(instance_type, '.')) instance_prefix,
+           substr(instance_type, instr(instance_type, '.')+1) instance_suffix,
+           case when instr(physical_processor, 'AMD')!=0 then 'AMD'
+                when instr(physical_processor, 'Intel')!=0 then 'Intel'
+                when instance_type like 'a1%' then 'ARM'
+                else '?'
+           end as CPU_brand
+    from data d1 join dates using (entry)
+    where pricing is not null
+    and vCPU is not null
+    and generation = 'current'
+    and network_performance NOT IN ('High', 'Moderate', 'Low', 'Very Low', 'Very High')
+    and (GPU is null or GPU = 0)
+    and (FPGA is null or FPGA = 0)
+    and instance_type not like 'a1%' --ARM
+    and instance_type not like '%.metal'
+    and instance_type not like 't2%' --burst
+    and instance_type not like 't3%' --burst")
+  aws.data.historical.new <<- as.data.frame(data) %>%
+    dplyr::transmute(
+             id                                = instance_type,
+             vcpu.value.count                  = as.numeric(vCPU),
+             memory.value.gib                  = as.numeric(memory),
+             clockSpeed.value.ghz              = as.numeric(str_replace(clock_speed_ghz, "GHz", "")),
+             clockSpeed.value.ghz              = ifelse(clockSpeed.value.ghz == "", NULL, clockSpeed.value.ghz),
+             clockSpeed.value.ghz              = as.numeric(clockSpeed.value.ghz),
+             storage.sum.gib                   = storage_size * storage_devices,
+             storage.sum.gib                   = ifelse(is.na(storage.sum.gib), 0, storage.sum.gib),
+             storage.count                     = ifelse(is.na(storage_devices), 0, storage_devices),
+             storage.type                      = storage_type,
+             network_performance               = network_performance,
+             network_performance.value.Gib     = str_replace(network_performance, "Up to", ""),
+             network_performance.value.Gib     = str_replace(network_performance.value.Gib, "Gigabit", ""),
+             network_performance.value.Gib     = str_replace(network_performance.value.Gib, "Gbps", ""),
+             network_performance.value.Gib     = as.numeric(network_performance.value.Gib),
+             network_performance.is_guaranteed = !str_detect(network_performance, "Up to"),
+             cost.ondemand.value.usdph         = as.numeric(pricing),
+             processorName                     = physical_processor,
+             clockSpeed.text                   = clock_speed_ghz,
+             region.name                       = "us-east-1",
+             join.entry                        = entry - 1
+           )
+  aws.data.historical.new
+}
+
+ws.data.commits.load <- function(path = aws.data.folder,
                                   filename = "ec2-instances.info-commit-mapping.csv") {
     full.path <- paste(path, filename, sep="/")
     result <- read_csv(full.path, col_types = aws.data.commits.coltypes)
@@ -91,8 +141,7 @@ s3.benchmark.dvassallo.raw.load <- function(path = aws.data.folder,
 }
 
 aws.data.commits.load()
-aws.data.historical.load()
-aws.data.load()
+aws.data.historical.new.load()
 
 ## ---------------------------------------------------------------------------------------------- ##
                                         # Data Processing
@@ -156,19 +205,16 @@ aws.data.with.prefixes <- function(df) {
       dplyr::ungroup()
 }
 
-aws.data.current <- aws.data.with.prefixes(aws.data.normalize(aws.data.instances))
 
-aws.data.all <- rbind(
-  aws.data.current %>%
-  dplyr::mutate(meta.origin = "website"),
-  #
-  aws.data.historical %>%
+aws.data.all <-
+  aws.data.historical.new %>%
   aws.data.normalize() %>%
   dplyr::group_by(meta.join.entry) %>%
   dplyr::group_modify(function(df, g) { aws.data.with.prefixes(df); }) %>%
   dplyr::ungroup() %>%
-  dplyr::mutate(meta.origin = "history")
-)
+  dplyr::mutate(meta.origin = "instances.json")
+
+aws.data.current <- dplyr::filter(aws.data.all, meta.join.entry == max(meta.join.entry))
 
 aws.data.all.by.date <- aws.data.all %>%
     dplyr::mutate(
@@ -322,3 +368,4 @@ aws.data.filter.s3join.large <- function(df) {
 ## Precomputed sets
 aws.data.current.s3join <- s3.benchmark.dvassallo.join(aws.data.current)
 aws.data.current.large.s3join <- s3.benchmark.dvassallo.join(aws.data.current.large)
+

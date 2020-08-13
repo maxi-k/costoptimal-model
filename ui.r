@@ -366,7 +366,8 @@ server <- function(input, output, session) {
   })
 
   inst.recommended <- reactive({
-    instSet() %>% dplyr::filter(id %in% inst.recommendation()$id.name)
+    names <- inst.recommendation()$id.name
+    instSet() %>% dplyr::filter(id %in% names)
   })
 
   inst.recommended.timings <- reactive({

@@ -212,6 +212,10 @@ model.with.speeds <- function(inst) {
 ## ---------------------------------------------------------------------------------------------- ##
 
 model.calc.costs <- function(query, inst, timing.fn) {
+  if (nrow(inst) == 0) {
+    print("No instances given, returning empty dataframe.")
+    return(data.frame())
+  }
   if (nrow(query) > 1) {
     results <- furrr::future_map_dfr(1:nrow(query), function(i) {
       times <- model.calc.costs(query[i, ], inst = inst, timing.fn = timing.fn)
