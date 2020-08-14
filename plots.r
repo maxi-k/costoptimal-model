@@ -104,10 +104,10 @@ plots.m1.all.draw <- function() {
           legend.position = "none") +
     scale_y_log10() +
     scale_x_continuous(limits = c(10, 32)) +
-    labs(x = "CPUh", y = "Workload Cost ($)")
+    labs(x = "CPUh", y = "Workload Cost ($) [log]")
 }
 
-plots.m1.all.draw()
+# plots.m1.all.draw()
 ggsave(plots.mkpath("m1-cost-cpu-all.pdf"), plots.m1.all.draw(),
        width = 3.6, height = 2.5, units = "in",
        device = cairo_pdf)

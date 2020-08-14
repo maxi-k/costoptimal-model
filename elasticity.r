@@ -247,14 +247,14 @@ plot.elastic.recoms <- function(.wl, .costs) {
     geom_line(aes(x = window.id, y = time.cpu,  color = "cpuh")) +
     geom_line(aes(x = window.id, y = data.read / 2000, color = "scan")) +
     # geom_line(data = .costs, aes(x = window.start, y = stat.price.sum, color = "$")) +
-    # geom_text(data=.costs, aes(label = str_replace(id, "xlarge", ""),
-    #                            x = (window.start + window.end) / 2,
-    #                            y = .maxval),
-    #           angle = 90, size = 3) +
     geom_segment(data=.costs,
                  aes(x = window.start, xend = window.end + 1,
                      y = .maxval, yend = .maxval,
-                     color = id), size = 3)
+                     color = id.name), size = 3) +
+    geom_text(data=.costs, aes(label = count,
+                               x = (window.start + window.end) / 2,
+                               y = .maxval),
+              size = 3.5)
 }
 
 plot.elastic.recoms(
