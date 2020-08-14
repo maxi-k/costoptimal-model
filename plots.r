@@ -60,12 +60,12 @@ plots.m1.all.draw <- function() {
     data.read = 3000
   )
   .ids <- c("c5n.18", "c5.24", "c5d.24",
-            "m5dn.24", "r5dn.24", "other")
+            "m5dn.24", "i3en.24", "other")
 
   .inst <- aws.data.current.large.relevant %>%
     dplyr::filter(!(id %in% c("x1e.32xlarge", "x1.32xlarge", "m4.16xlarge")))
 
-  palette <- rainbow(length(.ids))
+  palette <- scales::viridis_pal(1, 0, 1, 1, "A")(length(.ids))
   names(palette) <- .ids
   palette["other"] <- "#cccccc"
 
@@ -77,34 +77,36 @@ plots.m1.all.draw <- function() {
                      y = stat.price.sum,
                      label = str_replace(id, "xlarge", ""),
                      is.best = y == min(y),
-                     color = ifelse(label %in% .ids, label, "other"),
-                     )
-    }) %>%
+                     rank = rank(y),
+                     color = ifelse(label %in% .ids, label, "other"))
+  }) %>%
     dplyr::ungroup() %>%
-    dplyr::arrange(is.best) %>%
-    dplyr::group_by(label)
+    dplyr::arrange(is.best, color) %>%
+    dplyr::group_by(label) %>%
+    dplyr::mutate(is.flank = rank != dplyr::lag(rank))
 
-  .labeled <- .df %>% dplyr::filter(is.best) %>%
+  .flanks <- .df %>% dplyr::filter(is.flank)
+  .labeled <- .df %>%
     dplyr::ungroup() %>%
-    dplyr::mutate(
-             is.flank = x == 0 | label != dplyr::lag(label),
-             nudge.x = 0.5,
-             nudge.y = -0.02
-           ) %>%
-    dplyr::filter(is.flank | x == min(x))
+    dplyr::filter(color != "other", is.best & is.flank | !is.best & x == max(x)) %>%
+    dplyr::mutate(nudge.x = 1.5, nudge.y = ifelse(is.flank, -0.01, 0))
 
   ggplot(.df, aes(x = x, y = y, group = label, color = color)) +
     scale_color_manual(values=palette) +
-    geom_line() +
+    geom_line(data = .df %>% dplyr::filter(color == "other")) +
+    geom_line(data = .df %>% dplyr::filter(color != "other")) +
     theme_bw() +
-    geom_point(data = .labeled) +
+    geom_point(data = .flanks, color = "blue", shape = 4) +
     geom_text(data = .labeled, aes(label = label),
               nudge_x = .labeled$nudge.x, nudge_y = .labeled$nudge.y,
-              color = "black", ) +
-    theme(plot.margin=grid::unit(c(1,1,1,1), "mm")) +
+              size = 2) +
+    theme(plot.margin=grid::unit(c(1,1,1,1), "mm"),
+          legend.position = "none") +
     scale_y_log10() +
+    scale_x_continuous(limits = c(10, 33)) +
     labs(x = "CPUh", y = "Workload Cost ($)")
 }
+
 plots.m1.all.draw()
 ggsave(plots.mkpath("m1-cost-cpu-all.pdf"), plots.m1.all.draw(),
        width = 3.6, height = 2.5, units = "in",
