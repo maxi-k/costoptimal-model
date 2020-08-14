@@ -1082,7 +1082,7 @@ server <- function(input, output, session) {
   })
 
   output$data.read.slider <- renderUI({
-    sliderInput("data.read", "Sum of Reads", min=ui.instance.opts.count.max, step=10,
+    sliderInput("data.read", "Sum of Reads", min=ui.instance.opts.count.max, step=1,
                 max=config.maxvals()$data.read,
                 value=800)
   })
