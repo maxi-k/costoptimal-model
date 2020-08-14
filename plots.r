@@ -103,7 +103,7 @@ plots.m1.all.draw <- function() {
     theme(plot.margin=grid::unit(c(1,1,1,1), "mm"),
           legend.position = "none") +
     scale_y_log10() +
-    scale_x_continuous(limits = c(10, 33)) +
+    scale_x_continuous(limits = c(10, 32)) +
     labs(x = "CPUh", y = "Workload Cost ($)")
 }
 
