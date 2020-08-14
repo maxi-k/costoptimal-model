@@ -88,7 +88,7 @@ aws.data.historical.new.load <- function() {
   aws.data.historical.new
 }
 
-ws.data.commits.load <- function(path = aws.data.folder,
+aws.data.commits.load <- function(path = aws.data.folder,
                                   filename = "ec2-instances.info-commit-mapping.csv") {
     full.path <- paste(path, filename, sep="/")
     result <- read_csv(full.path, col_types = aws.data.commits.coltypes)

@@ -52,58 +52,62 @@ ggsave(plots.mkpath("m1-cost-cpu.pdf"), plots.m1.draw(),
        device = cairo_pdf)
 
 plots.m1.all.draw <- function() {
-  .n.points <- 10
-  .cpu.max <- 200
+  .n.points <- 100
+  .value.range <- seq(10, 30, length.out = .n.points)
+  .xlim <- tail(.value.range, n = 1)
   .query <- data.frame(
-    time.cpu  = seq(0, .cpu.max, length.out = .n.points),
-    data.read =  rep(10000, .n.points)
+    time.cpu  = .value.range,
+    data.read = 3000
   )
-  .ids <- c("c5n.18xlarge", "c5.24xlarge", "i3en.24xlarge",
-            "m5dn.24xlarge", "r5dn.24xlarge")
-  .inst <- plots.inst
+  .ids <- c("c5n.18", "c5.24", "c5d.24",
+            "m5dn.24", "r5dn.24", "other")
 
-  palette <- ui.styles.color.palette1
+  .inst <- aws.data.current.large.relevant %>%
+    dplyr::filter(!(id %in% c("x1e.32xlarge", "x1.32xlarge", "m4.16xlarge")))
+
+  palette <- rainbow(length(.ids))
   names(palette) <- .ids
+  palette["other"] <- "#cccccc"
 
   .costs <- model.calc.costs(.query, .inst, plots.m1.timing.fn)
   .df <- dplyr::group_modify(.costs, function(group, qid) {
     dplyr::transmute(group,
-                     id = id,
+                     id = as.character(id),
                      x = .query$time.cpu[qid$queryIndex],
                      y = stat.price.sum,
                      label = str_replace(id, "xlarge", ""),
                      is.best = y == min(y),
-                     color = if_else(id %in% .ids, palette[id], "grey"),
+                     color = ifelse(label %in% .ids, label, "other"),
                      )
     }) %>%
     dplyr::ungroup() %>%
     dplyr::arrange(is.best) %>%
     dplyr::group_by(label)
 
-  .labeled <- .df %>% dplyr::filter(x == max(x) | is.best) %>%
+  .labeled <- .df %>% dplyr::filter(is.best) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(
              is.flank = x == 0 | label != dplyr::lag(label),
-             color = if_else(id %in% .ids, palette[id], "grey"),
-             nudge.x = if_else(is.best, 10, 18),
-             nudge.y = if_else(is.best, -1.5, 0.2)
-           )
+             nudge.x = 0.5,
+             nudge.y = -0.02
+           ) %>%
+    dplyr::filter(is.flank | x == min(x))
 
   ggplot(.df, aes(x = x, y = y, group = label, color = color)) +
-    scale_fill_manual(values=palette) +
-    geom_line(size = 0.2) +
+    scale_color_manual(values=palette) +
+    geom_line() +
     theme_bw() +
-    geom_text(data = .labeled, aes(label = label), color = .labeled$color, size = 2.0) +
-    theme(text = element_text(size = 7), plot.margin=grid::unit(c(0,0,0,0), "mm")) +
-    xlim(0, .cpu.max + 25) +
+    geom_point(data = .labeled) +
+    geom_text(data = .labeled, aes(label = label),
+              nudge_x = .labeled$nudge.x, nudge_y = .labeled$nudge.y,
+              color = "black", ) +
+    theme(plot.margin=grid::unit(c(1,1,1,1), "mm")) +
     scale_y_log10() +
     labs(x = "CPUh", y = "Workload Cost ($)")
 }
-
-# plots.m1.all.draw()
-
+plots.m1.all.draw()
 ggsave(plots.mkpath("m1-cost-cpu-all.pdf"), plots.m1.all.draw(),
-       width = 3, height = 2, units = "in",
+       width = 3.6, height = 2.5, units = "in",
        device = cairo_pdf)
 
 
@@ -147,11 +151,11 @@ plots.m2.cost.draw <- function() {
     geom_point(color = .df$color) +
     geom_text(aes(label = label), nudge_x = 0.06, nudge_y = 0.015, size = 2.0, angle = 30) +
     theme_bw() +
-    theme(text = element_text(size = 7), plot.margin=grid::unit(c(0,0,0,0), "mm")) +
+    theme(plot.margin=grid::unit(c(1,1,1,1), "mm")) +
     labs(x = "Locality Distribution Factor", y = "Workload Cost ($)")
 }
 
-## plots.m2.cost.draw()
+plots.m2.cost.draw()
 
 ggsave(plots.mkpath("m2-cost-zipf.pdf"), plots.m2.cost.draw(),
        width = 3, height = 2, units = "in",
@@ -268,20 +272,19 @@ ggsave(plots.mkpath("m3-cost-spool.pdf"), plots.m3.cost.draw(),
 
 ## TODO: add snowflake c5d for comparison
 plots.m4.budget.draw <- function() {
-  .read <- 2000
+  .read <- 5000
   .query <- data.frame(
-    time.cpu  = 25,
+    time.cpu  = 5,
     data.read = .read
   )
-  .max.count <- 32
+  .max.count <- 128
   .distr.cache <- purrr::map(1:.max.count, function(count) {
     model.make.distr.fn(0.2)(round(.read / count))
   })
   .distr.spool <- purrr::map(1:.max.count, function(count) {
     model.make.distr.fn(0.1)(round(0.4 * .read / count))
   })
-  .scaling.fac <- 0.98
-  .budgets.lim <- seq(3.5, 20.5, length.out = 20) # dollar limits
+  .scaling.fac <- 0.90
 
   .time.fn <- model.make.timing.fn(
     .distr.list.caching  = .distr.cache,
@@ -291,23 +294,42 @@ plots.m4.budget.draw <- function() {
     .distr.caching.split.fn = model.distr.split.fn(FALSE)
   )
 
-  .costs <- model.calc.costs(.query, plots.inst, .time.fn)
-  .recom <- model.budgets.discrete(.costs, .budgets.lim)
-  .df <- .recom %>% dplyr::mutate(
-                             label = paste(paste(count, "x", sep = ""),
-                                           str_replace(id.name, "xlarge", "")),
-                             )
-  ggplot(.df, aes(x = budget.optim, y = budget.cost)) +
-    geom_point() +
+  .inst.all <- aws.data.current
+  .inst.snf <- .inst.all %>% dplyr::filter(id == "c5d.2xlarge")
+
+  .costs.all <- model.calc.costs(.query, .inst.all, .time.fn)
+  .costs.snf <- model.calc.costs(.query, .inst.snf, .time.fn)
+
+  .budgets.lim <- seq(
+    min(c(.costs.all$stat.price.sum)),
+    max(c(.costs.snf$stat.price.sum)),
+    length.out = 20
+  )
+
+  .recom.all <- model.budgets.discrete(.costs.all, .budgets.lim)
+  .recom.snf <- model.budgets.discrete(.costs.snf, .budgets.lim)
+
+  .df <- rbind(
+    .recom.all %>% dplyr::mutate(group = "all"),
+    .recom.snf %>% dplyr::mutate(group = "snowflake")
+  )
+
+  .labels <- .df %>%
+    dplyr::filter(row_number() %% 2 != 0 | stat.price.sum == max(stat.price.sum)) %>%
+    dplyr::mutate(label = paste(count, "x ", id.name, sep = ""),
+                  label = str_replace(label, "large", "l"))
+  ggplot(.df, aes(x = budget.optim, y = budget.cost, group = group, color = group)) +
+    geom_point(size = 0.8) +
     geom_line() +
-    geom_text(aes(label = label), nudge_x = 250, nudge_y = 0.05, size = 2.2) +
+    scale_x_log10() +
+    geom_text(data=.labels, aes(label = label), nudge_x = 0.2, nudge_y = 0.22, size = 1.8) +
     labs(y = "Workload Cost ($)", x = "Workload Execution Time (s)") +
     theme_bw() +
-    theme(text = element_text(size = 7), plot.margin=grid::unit(c(0,0,0,0), "mm"))
+    theme(plot.margin=grid::unit(c(0,0,0,0), "mm"),
+          legend.position = "bottom")
 }
 
 plots.m4.budget.draw()
-
 ggsave(plots.mkpath("m4-budget.pdf"), plots.m4.budget.draw(),
-       width = 3, height = 2, units = "in",
+       width = 3.6, height = 2.6, units = "in",
        device = cairo_pdf)
