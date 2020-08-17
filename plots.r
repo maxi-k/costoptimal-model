@@ -47,9 +47,9 @@ plots.m1.draw <- function() {
     labs(x = "CPUh", y = "Workload Cost ($)")
 }
 
-ggsave(plots.mkpath("m1-cost-cpu.pdf"), plots.m1.draw(),
-       width = 3, height = 2, units = "in",
-       device = cairo_pdf)
+# ggsave(plots.mkpath("m1-cost-cpu.pdf"), plots.m1.draw(),
+#        width = 3, height = 2, units = "in",
+#        device = cairo_pdf)
 
 plots.m1.all.draw <- function() {
   .n.points <- 100
@@ -108,9 +108,9 @@ plots.m1.all.draw <- function() {
 }
 
 # plots.m1.all.draw()
-ggsave(plots.mkpath("m1-cost-cpu-all.pdf"), plots.m1.all.draw(),
-       width = 3.6, height = 2.5, units = "in",
-       device = cairo_pdf)
+# ggsave(plots.mkpath("m1-cost-cpu-all.pdf"), plots.m1.all.draw(),
+#        width = 3.6, height = 2.5, units = "in",
+#        device = cairo_pdf)
 
 
 ## ---------------------------------------------------------------------------------------------- ##
@@ -157,11 +157,11 @@ plots.m2.cost.draw <- function() {
     labs(x = "Locality Distribution Factor", y = "Workload Cost ($)")
 }
 
-plots.m2.cost.draw()
+# plots.m2.cost.draw()
 
-ggsave(plots.mkpath("m2-cost-zipf.pdf"), plots.m2.cost.draw(),
-       width = 3, height = 2, units = "in",
-       device = cairo_pdf)
+# ggsave(plots.mkpath("m2-cost-zipf.pdf"), plots.m2.cost.draw(),
+#        width = 3, height = 2, units = "in",
+#        device = cairo_pdf)
 
 plots.m2.distr.draw <- function() {
   .id <- "z1d.12xlarge"
@@ -204,9 +204,9 @@ plots.m2.distr.draw <- function() {
 
 ## plots.m2.distr.draw()
 
-ggsave(plots.mkpath("m2-distr-zipf.pdf"), plots.m2.distr.draw(),
-       width = 3, height = 2, units = "in",
-       device = cairo_pdf)
+# ggsave(plots.mkpath("m2-distr-zipf.pdf"), plots.m2.distr.draw(),
+#        width = 3, height = 2, units = "in",
+#        device = cairo_pdf)
 
 
 ## ---------------------------------------------------------------------------------------------- ##
@@ -260,9 +260,9 @@ plots.m3.cost.draw <- function() {
 
 ## plots.m3.cost.draw()
 
-ggsave(plots.mkpath("m3-cost-spool.pdf"), plots.m3.cost.draw(),
-       width = 3, height = 2, units = "in",
-       device = cairo_pdf)
+## ggsave(plots.mkpath("m3-cost-spool.pdf"), plots.m3.cost.draw(),
+##        width = 3, height = 2, units = "in",
+##        device = cairo_pdf)
 
 
 ## ---------------------------------------------------------------------------------------------- ##
@@ -350,6 +350,6 @@ plots.m4.budget.draw <- function() {
 }
 
 # plots.m4.budget.draw()
-ggsave(plots.mkpath("m4-budget.pdf"), plots.m4.budget.draw(),
-       width = 3.6, height = 2.6, units = "in",
-       device = cairo_pdf)
+## ggsave(plots.mkpath("m4-budget.pdf"), plots.m4.budget.draw(),
+##        width = 3.6, height = 2.6, units = "in",
+##        device = cairo_pdf)
