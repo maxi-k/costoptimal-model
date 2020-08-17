@@ -88,6 +88,7 @@ plots.m1.all.draw <- function() {
     dplyr::mutate(is.flank = rank != dplyr::lag(rank))
 
   .flanks <- .df %>% dplyr::filter(is.flank, is.best) %>% dplyr::ungroup()
+  .transitions <- dplyr::filter(.flanks, x != min(x))
   .labeled <- .df %>%
     dplyr::filter(!any(is.best)) %>%
     dplyr::ungroup() %>%
@@ -98,8 +99,8 @@ plots.m1.all.draw <- function() {
     geom_line(data = .df %>% dplyr::filter(color == "other")) +
     geom_line(data = .df %>% dplyr::filter(color != "other")) +
     theme_bw() +
-    geom_point(data = .flanks, shape = 4, color = "black") +
-    geom_vline(data = dplyr::filter(.flanks, x != min(x)), aes(xintercept=x), color = "black", linetype = "dashed", size = 0.2) +
+    geom_point(data = .transitions, shape = 4, color = "black") +
+    geom_vline(data = .transitions, aes(xintercept=x), color = "black", linetype = "dashed", size = 0.2) +
     geom_text(data = .flanks, aes(y = min(y) / 2, x = x + 0.35 * max(x), label = paste(label, "best"))) +
     geom_text(data = .labeled, aes(x = max(x) + 1, label = label),
               hjust = 0) +
