@@ -57,7 +57,7 @@ plots.m1.draw <- function() {
 
 plots.m1.all.draw <- function() {
   .n.points <- 100
-  .value.range <- seq(10, 30, length.out = .n.points)
+  .value.range <- seq(10, 50, length.out = .n.points)
   .xlim <- tail(.value.range, n = 1)
   .query <- data.frame(
     time.cpu  = .value.range,
@@ -69,7 +69,7 @@ plots.m1.all.draw <- function() {
   .inst <- aws.data.current.large.relevant %>%
     dplyr::filter(!(id %in% c("x1e.32xlarge", "x1.32xlarge", "m4.16xlarge")))
 
-  palette <- scales::viridis_pal(1, 0, 1, 1, "A")(length(.ids))
+  palette <- style.instance.colors
   names(palette) <- .ids
   palette["other"] <- "#cccccc"
 
@@ -89,32 +89,31 @@ plots.m1.all.draw <- function() {
     dplyr::group_by(label) %>%
     dplyr::mutate(is.flank = rank != dplyr::lag(rank))
 
-  .flanks <- .df %>% dplyr::filter(is.flank)
+  .flanks <- .df %>% dplyr::filter(is.flank, is.best) %>% dplyr::ungroup()
   .labeled <- .df %>%
+    dplyr::filter(!any(is.best)) %>%
     dplyr::ungroup() %>%
-    dplyr::filter(color != "other", is.best & is.flank | !is.best & x == max(x)) %>%
-    dplyr::mutate(nudge.x = 1.5, nudge.y = ifelse(is.flank, -0.01, 0))
+    dplyr::filter(color != "other", x == max(x))
 
   ggplot(.df, aes(x = x, y = y, group = label, color = color)) +
     scale_color_manual(values=palette) +
     geom_line(data = .df %>% dplyr::filter(color == "other")) +
     geom_line(data = .df %>% dplyr::filter(color != "other")) +
     theme_bw() +
-    geom_point(data = .flanks, color = "blue", shape = 4) +
-    geom_text(data = .labeled, aes(label = label),
-              nudge_x = .labeled$nudge.x, nudge_y = .labeled$nudge.y,
-              size = 2) +
+    geom_vline(data = dplyr::filter(.flanks, x != min(x)), aes(xintercept=x), color = "blue") +
+    geom_text(data = .flanks, aes(y = min(y) * 1.1, x = x + 0.4 * max(x), label = paste("Best:", label))) +
+    geom_text(data = .labeled, aes(x = max(x) + 1, label = label),
+              hjust = 0) +
     theme(plot.margin=grid::unit(c(1,1,1,1), "mm"),
           legend.position = "none") +
-    scale_y_log10() +
-    scale_x_continuous(limits = c(10, 32)) +
+    scale_x_continuous(limits = c(10, 60)) +
     labs(x = "CPUh", y = "Workload Cost ($) [log]")
 }
 
 # plots.m1.all.draw()
-# ggsave(plots.mkpath("m1-cost-cpu-all.pdf"), plots.m1.all.draw(),
-#        width = 3.6, height = 2.5, units = "in",
-#        device = cairo_pdf)
+ggsave(plots.mkpath("m1-cost-cpu-all.pdf"), plots.m1.all.draw(),
+       width = 3.6, height = 2.5, units = "in",
+       device = cairo_pdf)
 
 
 ## ---------------------------------------------------------------------------------------------- ##
@@ -270,22 +269,26 @@ plots.m3.cost.draw <- function() {
 ##
 plots.m3.spool.draw <- function() {
   res <- try.params()
-  plotdata <- res %>% dplyr::filter(rank == 1)
-  ## palette <- scales::viridis_pal(1, 0, 1, 1, "A")(length())
-  plot <- ggplot(plotdata, aes(x = param.scanned, y = param.spool.frac,
+  plotdata <- res %>%
+    dplyr::filter(rank == 1) %>%
+    dplyr::mutate(
+             id.prefix = sub("^([A-Za-z1-9-]+)\\..*", "\\1", id)
+           )
+  palette <- instance.colors
+  ggplot(plotdata, aes(x = param.scanned, y = param.spool.frac,
                                label = str_replace(id.name, "xlarge", ""))) +
-    scale_fill_manual(values = styles.color.palette.light) +
-    geom_tile(aes(fill = id.name)) +
+    scale_fill_manual(values = palette) +
+    geom_tile(aes(fill = id.prefix)) +
     geom_text(color = "black") +
     scale_y_continuous(expand = c(0, 0)) +
     scale_x_log10(expand = c(0, 0)) +
     theme(legend.position = "none")
 }
 
-## plots.m3.spool.draw()
-ggsave(plots.mkpath("m3-spool-frac-areas.pdf"), plots.m3.spool.draw(),
-       width = 3.6, height = 2.5, units = "in",
-       device = cairo_pdf)
+plots.m3.spool.draw()
+# ggsave(plots.mkpath("m3-spool-frac-areas.pdf"), plots.m3.spool.draw(),
+#        width = 3.6, height = 2.5, units = "in",
+#        device = cairo_pdf)
 
 
 ## ---------------------------------------------------------------------------------------------- ##

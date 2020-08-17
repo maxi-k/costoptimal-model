@@ -55,7 +55,7 @@ try.params <- memoize(function() {
   })
 })
 
-system.time({
-  tested.params <- try.params()
-  write.csv(res, "tested.params.with.split.csv")
-})
+##  system.time({
+##    tested.params <- try.params()
+##    write.csv(res, "tested.params.with.split.csv")
+##  })
