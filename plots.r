@@ -67,7 +67,7 @@ plots.m1.all.draw <- function() {
 
   .inst <- aws.data.current.large.relevant
 
-  palette <- style.instance.colors
+  palette <- style.instance.colors.vibrant
   names(palette) <- .ids
   palette["other"] <- "#cccccc"
 

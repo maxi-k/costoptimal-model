@@ -380,4 +380,6 @@ style.instance.colored <- c(
 ## TODO: better palettes
 ## - c*, i3, m5
 style.instance.colors <- styles.color.palette.light[1:length(style.instance.colored)]
-names(style.instance.colors) <- style.instance.colored
+style.instance.colors.vibrant <- shades::saturate(style.instance.colors, delta(0.5))
+
+names(style.instance.colors.dark) <- style.instance.colored
