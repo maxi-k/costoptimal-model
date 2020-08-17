@@ -1,9 +1,9 @@
 source("./model.r")
 source("./aws.r")
 
-try.params <- memoize(function() {
+try.params <- function() {
 
-  .range.scan  <- 16*2^(0:14) # ?
+  .range.scan  <- 16*2^(2:11) # ?
   .range.cache <- c(0.001)
   .range.sdist <- c(0.001)
   .range.spool <- seq(0, 1, by = 0.1)
@@ -53,7 +53,7 @@ try.params <- memoize(function() {
       })
     })
   })
-})
+}
 
 ##  system.time({
 ##    tested.params <- try.params()

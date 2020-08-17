@@ -57,17 +57,15 @@ plots.m1.draw <- function() {
 
 plots.m1.all.draw <- function() {
   .n.points <- 100
-  .value.range <- seq(10, 50, length.out = .n.points)
+  .value.range <- seq(10, 60, length.out = .n.points)
   .xlim <- tail(.value.range, n = 1)
   .query <- data.frame(
     time.cpu  = .value.range,
     data.read = 3000
   )
-  .ids <- c("c5n.18", "c5.24", "c5d.24",
-            "m5dn.24", "i3en.24", "other")
+  .ids <- c("c5n", "c5", "c5d", "m5dn", "i3en", "other")
 
-  .inst <- aws.data.current.large.relevant %>%
-    dplyr::filter(!(id %in% c("x1e.32xlarge", "x1.32xlarge", "m4.16xlarge")))
+  .inst <- aws.data.current.large.relevant
 
   palette <- style.instance.colors
   names(palette) <- .ids
@@ -79,7 +77,7 @@ plots.m1.all.draw <- function() {
                      id = as.character(id),
                      x = .query$time.cpu[qid$queryIndex],
                      y = stat.price.sum,
-                     label = str_replace(id, "xlarge", ""),
+                     label = sub("^([A-Za-z1-9-]+)\\..*", "\\1", id),
                      is.best = y == min(y),
                      rank = rank(y),
                      color = ifelse(label %in% .ids, label, "other"))
@@ -100,14 +98,15 @@ plots.m1.all.draw <- function() {
     geom_line(data = .df %>% dplyr::filter(color == "other")) +
     geom_line(data = .df %>% dplyr::filter(color != "other")) +
     theme_bw() +
-    geom_vline(data = dplyr::filter(.flanks, x != min(x)), aes(xintercept=x), color = "blue") +
-    geom_text(data = .flanks, aes(y = min(y) * 1.1, x = x + 0.4 * max(x), label = paste("Best:", label))) +
+    geom_point(data = .flanks, shape = 4, color = "black") +
+    geom_vline(data = dplyr::filter(.flanks, x != min(x)), aes(xintercept=x), color = "black", linetype = "dashed", size = 0.2) +
+    geom_text(data = .flanks, aes(y = min(y) / 2, x = x + 0.35 * max(x), label = paste(label, "best"))) +
     geom_text(data = .labeled, aes(x = max(x) + 1, label = label),
               hjust = 0) +
     theme(plot.margin=grid::unit(c(1,1,1,1), "mm"),
           legend.position = "none") +
-    scale_x_continuous(limits = c(10, 60)) +
-    labs(x = "CPUh", y = "Workload Cost ($) [log]")
+    coord_cartesian(xlim = c(10, 70), ylim = c(0, 15)) +
+    labs(x = "CPU Hours", y = "Workload Cost ($) [log]")
 }
 
 # plots.m1.all.draw()
@@ -267,28 +266,32 @@ plots.m3.cost.draw <- function() {
 ##        width = 3, height = 2, units = "in",
 ##        device = cairo_pdf)
 ##
+all.params <- try.params()
 plots.m3.spool.draw <- function() {
-  res <- try.params()
+  res <- all.params
   plotdata <- res %>%
     dplyr::filter(rank == 1) %>%
     dplyr::mutate(
              id.prefix = sub("^([A-Za-z1-9-]+)\\..*", "\\1", id)
            )
-  palette <- instance.colors
+  palette <- styles.color.palette.light
   ggplot(plotdata, aes(x = param.scanned, y = param.spool.frac,
-                               label = str_replace(id.name, "xlarge", ""))) +
+                       label = str_replace(id.name, "xlarge", ""))) +
     scale_fill_manual(values = palette) +
     geom_tile(aes(fill = id.prefix)) +
-    geom_text(color = "black") +
     scale_y_continuous(expand = c(0, 0)) +
-    scale_x_log10(expand = c(0, 0)) +
-    theme(legend.position = "none")
+    scale_x_log10(expand = c(0, 0), breaks = c(100, 1024, 10 * 1024, 100 * 1024),
+                  labels = c("100GB", "1TB", "10TB", "100TB")) +
+    theme(legend.position = "bottom") +
+    labs(
+      x = "Data Scanned [log]",
+      y = "Materialization Fraction")
 }
 
-plots.m3.spool.draw()
-# ggsave(plots.mkpath("m3-spool-frac-areas.pdf"), plots.m3.spool.draw(),
-#        width = 3.6, height = 2.5, units = "in",
-#        device = cairo_pdf)
+## plots.m3.spool.draw()
+ggsave(plots.mkpath("m3-spool-frac-areas.pdf"), plots.m3.spool.draw(),
+       width = 3.6, height = 2.5, units = "in",
+       device = cairo_pdf)
 
 
 ## ---------------------------------------------------------------------------------------------- ##
@@ -325,8 +328,8 @@ plots.m4.budget.draw <- function() {
     .time.period = 2^30
   )
 
-  .inst <- aws.data.current.relevant
-  .inst.id <- c("c5d.2xlarge")
+  .inst <- aws.data.current.large.relevant
+  .inst.id <- c("c5d", "x1", "r5n")
 
   .cost.all <- model.calc.costs(.query, .inst, .time.fn)
   .frontier <- model.calc.frontier(.cost.all,
@@ -336,15 +339,18 @@ plots.m4.budget.draw <- function() {
   .palette["other"] <- "#eeeeee"
   .df <- .cost.all %>% dplyr::mutate(
                                 id.prefix = sub("^([A-Za-z1-9-]+)\\..*", "\\1", id),
-                                group = ifelse(id %in% .frontier$id | id.name %in% .inst.id, id.prefix, "other")
-                              )
+                                group = ifelse(id %in% .frontier$id | id.prefix %in% .inst.id, id.prefix, "other"))
 
   .colored <- .df %>% dplyr::filter(group != "other")
   .greys <- .df %>% dplyr::filter(group == "other")
 
+
+  # print(.df %>% dplyr::filter(id.prefix == "x1"))
+  print(.df$color)
+
   ggplot(.df, aes(x = stat.time.sum, y = stat.price.sum, color = group)) +
-    scale_color_manual(values = .palette) +
-    geom_point(data = .greys) +
+    scale_color_manual(values = .palette, limits = c("c5", "c5d", "c5n", "m5", "m5n", "x1", "other")) +
+    geom_point(data = .greys, size = 1.5) +
     geom_point(data = .colored) +
     scale_x_log10() +
     scale_y_log10() +
@@ -354,6 +360,6 @@ plots.m4.budget.draw <- function() {
 }
 
 plots.m4.budget.draw()
-# ggsave(plots.mkpath("m4-budget.pdf"), plots.m4.budget.draw(),
-#        width = 3.6, height = 2.6, units = "in",
-#        device = cairo_pdf)
+ggsave(plots.mkpath("m4-budget.pdf"), plots.m4.budget.draw(),
+       width = 3.6, height = 2.6, units = "in",
+       device = cairo_pdf)

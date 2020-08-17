@@ -373,27 +373,11 @@ aws.data.current.large.s3join <- s3.benchmark.dvassallo.join(aws.data.current.la
                                         # STYLES
 ## ---------------------------------------------------------------------------------------------- ##
 
-style.instance.colored.grouped <- list(
-  "c" = c("c5", "c5n", "c5d"),
-  "m" = c("m5", "m5n", "m5d", "m5dn"),
-  "r" = c("r5", "r5n", "r5d", "r5dn"),
-  "i" = c("i3", "i3en"),
-  "x" = c("x1e")
-)
-style.instance.colored <- unlist(style.instance.colored.grouped)
-
-styles.instance.palettes <- c(
-  "c" = "Blues",
-  "m" = "Greens",
-  "r" = "Oranges",
-  "i" = "Purples",
-  "x" = "Reds"
+style.instance.colored <- c(
+  "c5", "c5n", "c5d", "m5", "i3",
 )
 
-style.instance.colors <- unlist(purrr::lmap(style.instance.colored.grouped, function(l) {
-  inst <- l[[1]]
-  palette.name <- styles.instance.palettes[[names(l)]]
-  palette <- brewer.pal(n = max(length(inst), 3), palette.name)[1:length(inst)]
-  names(palette) <- inst
-  list(palette)
-}))
+## TODO: better palettes
+## - c*, i3, m5
+style.instance.colors <- styles.color.palette.light[1:length(style.instance.colored)]
+names(style.instance.colors) <- style.instance.colored
