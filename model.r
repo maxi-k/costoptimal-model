@@ -264,3 +264,41 @@ model.budgets.discrete <- function(.times, .budgets,
             dplyr::top_n(-1, wt = budget.cost)
     })
 }
+
+model.calc.frontier <- function(data, x = "x", y = "y", id = "id",
+                                quadrant = c("top.right", "bottom.right",
+                                             "bottom.left", "top.left"),
+                                decreasing = TRUE) {
+  if (!is.data.frame(data)) {
+    stop(deparse(substitute(data)), " is not a data frame.")
+  }
+
+  z <- data[, c(x, y, id)]
+  z <- stats::na.omit(z)
+
+  if (!is.numeric(z[[x]]) | !is.numeric(z[[y]])) {
+    stop("both x and y must be numeric variables")
+  }
+
+  quadrant <- match.arg(quadrant)
+  if (quadrant == "top.right") {
+    zz <- z[order(z[, 1L], z[, 2L], decreasing = TRUE), ]
+    zz <- zz[which(!duplicated(cummax(zz[, 2L]))), ]
+    zz[order(zz[, 1L], zz[, 2L], decreasing = decreasing), ]
+  } else if (quadrant == "bottom.right") {
+    zz <- z[order(z[, 1L], z[, 2L], decreasing = TRUE), ]
+    zz <- zz[which(!duplicated(cummin(zz[, 2L]))), ]
+    zz <- zz[which(!duplicated(zz[, 1L])), ]
+    zz[order(zz[, 1L], zz[, 2L], decreasing = decreasing), ]
+  } else if (quadrant == "bottom.left") {
+    zz <- z[order(z[, 1L], z[, 2L], decreasing = FALSE), ]
+    zz <- zz[which(!duplicated(cummin(zz[, 2L]))), ]
+    zz[order(zz[, 1L], zz[, 2L], decreasing = decreasing), ]
+  } else {
+    zz <- z[order(z[, 1L], z[, 2L], decreasing = FALSE), ]
+    zz <- zz[which(!duplicated(cummax(zz[, 2L]))), ]
+    zz <- zz[order(zz[, 1L], zz[, 2L], decreasing = TRUE), ]
+    zz <- zz[which(!duplicated(zz[, 1L])), ]
+    zz[order(zz[, 1L], zz[, 2L], decreasing = decreasing), ]
+  }
+}

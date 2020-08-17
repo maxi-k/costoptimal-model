@@ -1,5 +1,6 @@
 source("./model.r")
 source("./aws.r")
+source("./param.finder.r")
 
 plots.inst <- aws.data.paper
 plots.path <- "../figures"
@@ -187,7 +188,7 @@ plots.m2.distr.draw <- function() {
   nudge.x <- 0.03 * max(c(max(instance$calc.mem.caching + instance$calc.sto.spooling), nrow(data)))
   nudge.y <- max(data$y) / 4
   plot <- ggplot(instance) +
-    scale_fill_manual(values=ui.styles.color.palette1) +
+    scale_fill_manual(values=styles.color.palette1) +
     geom_area(data=data, aes(y = y, x = x, fill = fill), stat="identity") +
     geom_vline(aes(xintercept=calc.mem.caching), colour="blue") +
     geom_vline(aes(xintercept=calc.mem.caching + calc.sto.spooling), colour="blue") +
@@ -266,6 +267,25 @@ plots.m3.cost.draw <- function() {
 ## ggsave(plots.mkpath("m3-cost-spool.pdf"), plots.m3.cost.draw(),
 ##        width = 3, height = 2, units = "in",
 ##        device = cairo_pdf)
+##
+plots.m3.spool.draw <- function() {
+  res <- try.params()
+  plotdata <- res %>% dplyr::filter(rank == 1)
+  ## palette <- scales::viridis_pal(1, 0, 1, 1, "A")(length())
+  plot <- ggplot(plotdata, aes(x = param.scanned, y = param.spool.frac,
+                               label = str_replace(id.name, "xlarge", ""))) +
+    scale_fill_manual(values = styles.color.palette.light) +
+    geom_tile(aes(fill = id.name)) +
+    geom_text(color = "black") +
+    scale_y_continuous(expand = c(0, 0)) +
+    scale_x_log10(expand = c(0, 0)) +
+    theme(legend.position = "none")
+}
+
+## plots.m3.spool.draw()
+ggsave(plots.mkpath("m3-spool-frac-areas.pdf"), plots.m3.spool.draw(),
+       width = 3.6, height = 2.5, units = "in",
+       device = cairo_pdf)
 
 
 ## ---------------------------------------------------------------------------------------------- ##
@@ -279,80 +299,58 @@ plots.m3.cost.draw <- function() {
 ## TODO: logarithmic budget limits
 ## TODO: all c5d's
 plots.m4.budget.draw <- function() {
-  .read <- 5000
+  .read <- 1000
   .query <- data.frame(
     time.cpu  = 5,
     data.read = .read
   )
   .max.count <- 128
   .distr.cache <- purrr::map(1:.max.count, function(count) {
-    model.make.distr.fn(0.2)(round(.read / count))
+    model.make.distr.fn(0.001)(round(.read / count))
   })
   .distr.spool <- purrr::map(1:.max.count, function(count) {
-    model.make.distr.fn(0.1)(round(0.4 * .read / count))
+    model.make.distr.fn(0.001)(round(0.3 * .read / count))
   })
-  .scaling.fac <- 0.90
+  .scaling.fac <- 0.95
 
   .time.fn <- model.make.timing.fn(
     .distr.list.caching  = .distr.cache,
     .distr.list.spooling = .distr.spool,
     .max.count = .max.count,
     .eff.fn = model.make.scaling.fn(list(p = .scaling.fac)),
-    .distr.caching.split.fn = model.distr.split.fn(FALSE)
+    .distr.caching.split.fn = model.distr.split.fn(FALSE),
+    .time.period = 2^30
   )
 
-  .inst.all <- aws.data.current
-  .inst.snf <- .inst.all %>% dplyr::filter(id == "c5d.2xlarge")
+  .inst <- aws.data.current.relevant
+  .inst.id <- c("c5d.2xlarge")
 
-  .inst.c5d <- aws.data.current
-  .inst.c5d <- .inst.all %>% dplyr::filter(str_detect(id, "c5d"))
+  .cost.all <- model.calc.costs(.query, .inst, .time.fn)
+  .frontier <- model.calc.frontier(.cost.all,
+                                   x = "stat.time.sum", y = "stat.price.sum",
+                                   id = "id", quadrant = "bottom.left")
+  .palette <- style.instance.colors
+  .palette["other"] <- "#eeeeee"
+  .df <- .cost.all %>% dplyr::mutate(
+                                id.prefix = sub("^([A-Za-z1-9-]+)\\..*", "\\1", id),
+                                group = ifelse(id %in% .frontier$id | id.name %in% .inst.id, id.prefix, "other")
+                              )
 
-  .costs.all <- model.calc.costs(.query, .inst.all, .time.fn)
-  .costs.c5d <- model.calc.costs(.query, .inst.c5d, .time.fn)
-  .costs.snf <- model.calc.costs(.query, .inst.snf, .time.fn)
+  .colored <- .df %>% dplyr::filter(group != "other")
+  .greys <- .df %>% dplyr::filter(group == "other")
 
-  .budgets.lim <- exp(seq(
-    log(min(c(.costs.all$stat.price.sum))),
-    log(max(c(.costs.snf$stat.price.sum))),
-    length.out = 20
-  ))
-
-  .recom.all <- model.budgets.discrete(.costs.all, .budgets.lim)
-  .recom.c5d <- model.budgets.discrete(.costs.c5d, .budgets.lim)
-  .recom.snf <- model.budgets.discrete(.costs.snf, .budgets.lim)
-
-  .df <- rbind(
-    .recom.all %>% dplyr::mutate(group = "all",
-                                 nudge.x = -0.17 * log(budget.cost, base = 10) - 0.12 * (1 / budget.cost),
-                                 nudge.y = -0.03),
-    .recom.c5d %>% dplyr::mutate(group = "c5d",
-                                 nudge.x = 0.15 * log(budget.cost, base = 10),
-                                 nudge.y = 0.05),
-    .recom.snf %>% dplyr::mutate(group = "snowflake",
-                                 nudge.x = 0.17 * log(budget.cost, base = 10) + 0.2 * (1 / budget.cost),
-                                 nudge.y = 0.015)
-  )
-
-  .labels <- .df %>%
-    dplyr::filter(row_number() %% 2 != 0 | stat.price.sum == max(stat.price.sum)) %>%
-    dplyr::mutate(label = paste(count, "x ", id.name, sep = ""),
-                  label = str_replace(label, "xlarge", ""),
-                  label = str_replace(label, "large", "1")) %>%
-    dplyr::distinct(label, .keep_all = TRUE)
-
-  ggplot(.df, aes(x = budget.optim, y = budget.cost, group = group, color = group)) +
-    geom_point(size = 0.8) +
-    geom_line() +
-    geom_text(data=.labels, aes(label = label), nudge_x = .labels$nudge.x, nudge_y = .labels$nudge.y, size = 1.8) +
-    scale_x_log10(limits = c(150, 50000)) +
+  ggplot(.df, aes(x = stat.time.sum, y = stat.price.sum, color = group)) +
+    scale_color_manual(values = .palette) +
+    geom_point(data = .greys) +
+    geom_point(data = .colored) +
+    scale_x_log10() +
     scale_y_log10() +
     labs(y = "Workload Cost ($) [log]", x = "Workload Execution Time (s) [log]") +
     theme_bw() +
-    theme(plot.margin=grid::unit(c(0,0,0,0), "mm"),
-          legend.position = "none")
+    theme(plot.margin=grid::unit(c(1,1,1,1), "mm"))
 }
 
-# plots.m4.budget.draw()
-## ggsave(plots.mkpath("m4-budget.pdf"), plots.m4.budget.draw(),
-##        width = 3.6, height = 2.6, units = "in",
-##        device = cairo_pdf)
+plots.m4.budget.draw()
+# ggsave(plots.mkpath("m4-budget.pdf"), plots.m4.budget.draw(),
+#        width = 3.6, height = 2.6, units = "in",
+#        device = cairo_pdf)

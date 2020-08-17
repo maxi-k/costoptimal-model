@@ -43,6 +43,34 @@ util.style.fonts.setup <- function() {
 
 util.style.fonts.setup()
 
+## From https://github.com/arcticicestudio/nord
+styles.color.palette1 <- c(
+    "#a3be8c",
+    "#b48ead",
+    "#ebcb8b",
+    "#8fbcbb",
+    "#5e81ac",
+    "#4c566a",
+    "#bf616a",
+    "#d08770",
+    "#81a1c1",
+    "#d8dee9",
+    "#88c0d0"
+)
+
+styles.color.palette.light <- c(
+    "#a3be8c",
+    "#b48ead",
+    "#ebcb8b",
+    "#8fbcbb",
+    "#5e81ac",
+    "#bf616a",
+    "#d08770",
+    "#81a1c1",
+    "#d8dee9",
+    "#88c0d0"
+)
+
 
 ## ---------------------------------------------------------------------------------------------- ##
                                         # Other Utilities

@@ -64,7 +64,7 @@ aws.data.historical.new.load <- function() {
   aws.data.historical.new <<- as.data.frame(data) %>%
     dplyr::transmute(
              id                                = as.character(instance_type),
-             vcpu.value.count                  = as.numeric(vCPU),
+             vcpu.value.count                  = as.numeric(as.character(vCPU)),
              memory.value.gib                  = as.numeric(memory),
              clockSpeed.value.ghz              = as.numeric(str_replace(clock_speed_ghz, "GHz", "")),
              clockSpeed.value.ghz              = ifelse(clockSpeed.value.ghz == "", NULL, clockSpeed.value.ghz),
@@ -232,7 +232,7 @@ aws.data.prefixes.irrelevant <- c(
   "a1", "g3", "p3", "g3s", "p2",
   "c1", "c3", "c4", "cr1", "d2",
   "u-9tb1", "u-12tb1", "u-6tb1", "u-24tb1",
-  "r3", "m1", "m2", "m4", "m6g", "t1", "cc2"
+  "r3", "m1", "m2", "m4", "m6g", "t1", "cc2", "m5a", "m5ad", "r5ad", "r5a"
 )
 
 ## Filter functions
@@ -369,3 +369,19 @@ aws.data.filter.s3join.large <- function(df) {
 aws.data.current.s3join <- s3.benchmark.dvassallo.join(aws.data.current)
 aws.data.current.large.s3join <- s3.benchmark.dvassallo.join(aws.data.current.large)
 
+## ---------------------------------------------------------------------------------------------- ##
+                                        # STYLES
+## ---------------------------------------------------------------------------------------------- ##
+
+style.instance.colored <- c(
+  "c5", "c5n", "c5d",
+  "m5", "m5n", "m5d", "m5dn",
+  "r5", "r5n", "r5d", "r5dn",
+  "i3", "i3en",
+  "x1e"
+)
+
+style.instance.colors <- scales::viridis_pal(1, 0, 1, 1, "A")(length(style.instance.colored))
+names(style.instance.colors) <- style.instance.colored
+
+style.instance.colors

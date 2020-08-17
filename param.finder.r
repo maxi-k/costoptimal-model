@@ -1,12 +1,12 @@
 source("./model.r")
 source("./aws.r")
 
-try.params <- function() {
+try.params <- memoize(function() {
 
-  .range.scan  <- 16*2^(0:12) # ?
+  .range.scan  <- 16*2^(0:14) # ?
   .range.cache <- c(0.001)
   .range.sdist <- c(0.001)
-  .range.spool <- c(0     , 0.1 , 0.5  , 0.8  , 1) # ?
+  .range.spool <- seq(0, 1, by = 0.1)
   .range.cpu   <- c(1)
   .range.split <- c(FALSE)
 
@@ -14,7 +14,7 @@ try.params <- function() {
 
   purrr::map_dfr(.range.scan, function(.scanned) {
     purrr::map_dfr(.range.cache, function(.cache.skew) {
-      .cache.distr <- model.make.distr.fn(.cache.skew)(.scanned)
+      .cache.distr <- model.make.distr.fn(.cache.skew)(round(.scanned))
       .cache.distr.list <- list(.cache.distr)
       purrr::map_dfr(.range.sdist, function(.spool.skew) {
         purrr::map_dfr(.range.spool, function(.spool.frac) {
@@ -24,10 +24,10 @@ try.params <- function() {
           purrr::map_dfr(.range.cpu, function(.cpuh) {
             purrr::map_dfr(.range.split, function(.do.split) {
               .split.fn <-
-              .query <- data.frame(
-                time.cpu  = .cpuh,
-                data.read = .scanned
-              )
+                .query <- data.frame(
+                  time.cpu  = .cpuh,
+                  data.read = .scanned
+                )
               .timer <- model.make.timing.fn(
                 .distr.list.caching  = .cache.distr.list,
                 .distr.list.spooling = .spool.distr.list,
@@ -53,21 +53,9 @@ try.params <- function() {
       })
     })
   })
-}
-
-system.time({
-  res <<- try.params()
-  write.csv(res, "tested.params.with.split.csv")
 })
 
-library("sqldf")
-result <- sqldf("SELECT id, count(*) from res where rank = 1 group by id")
-result
-
-
-plotdata <- res %>%
-  dplyr::filter(rank == 1)
-
-ggplot(plotdata, aes(x = param.scanned, y = param.spool.frac, label = id, color = id)) +
-  geom_text() +
-  scale_x_log10()
+system.time({
+  tested.params <- try.params()
+  write.csv(res, "tested.params.with.split.csv")
+})

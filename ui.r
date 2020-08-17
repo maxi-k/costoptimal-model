@@ -6,21 +6,6 @@ source("./model.r")
                                         # UI constants & definitions
 ## ---------------------------------------------------------------------------------------------- ##
 
-## From https://github.com/arcticicestudio/nord
-ui.styles.color.palette1 <- c(
-    "#a3be8c",
-    "#b48ead",
-    "#ebcb8b",
-    "#8fbcbb",
-    "#5e81ac",
-    "#4c566a",
-    "#bf616a",
-    "#d08770",
-    "#81a1c1",
-    "#d8dee9",
-    "#88c0d0"
-)
-
 ui.scaling.def <- list(
   formula = "$$t = T \\cdot ((1 - p) + \\frac{p}{n})$$",
   fn = model.make.scaling.fn,
@@ -73,43 +58,6 @@ ui.instance.filter.fn.get <- function(selection) {
          init = identity)
 }
 
-ui.calc.frontier <- function(data, x = "x", y = "y", id = "id",
-                             quadrant = c("top.right", "bottom.right",
-                                          "bottom.left", "top.left"),
-                             decreasing = TRUE) {
-  if (!is.data.frame(data)) {
-    stop(deparse(substitute(data)), " is not a data frame.")
-  }
-
-  z <- data[, c(x, y, id)]
-  z <- stats::na.omit(z)
-
-  if (!is.numeric(z[[x]]) | !is.numeric(z[[y]])) {
-    stop("both x and y must be numeric variables")
-  }
-
-  quadrant <- match.arg(quadrant)
-  if (quadrant == "top.right") {
-    zz <- z[order(z[, 1L], z[, 2L], decreasing = TRUE), ]
-    zz <- zz[which(!duplicated(cummax(zz[, 2L]))), ]
-    zz[order(zz[, 1L], zz[, 2L], decreasing = decreasing), ]
-  } else if (quadrant == "bottom.right") {
-    zz <- z[order(z[, 1L], z[, 2L], decreasing = TRUE), ]
-    zz <- zz[which(!duplicated(cummin(zz[, 2L]))), ]
-    zz <- zz[which(!duplicated(zz[, 1L])), ]
-    zz[order(zz[, 1L], zz[, 2L], decreasing = decreasing), ]
-  } else if (quadrant == "bottom.left") {
-    zz <- z[order(z[, 1L], z[, 2L], decreasing = FALSE), ]
-    zz <- zz[which(!duplicated(cummin(zz[, 2L]))), ]
-    zz[order(zz[, 1L], zz[, 2L], decreasing = decreasing), ]
-  } else {
-    zz <- z[order(z[, 1L], z[, 2L], decreasing = FALSE), ]
-    zz <- zz[which(!duplicated(cummax(zz[, 2L]))), ]
-    zz <- zz[order(zz[, 1L], zz[, 2L], decreasing = TRUE), ]
-    zz <- zz[which(!duplicated(zz[, 1L])), ]
-    zz[order(zz[, 1L], zz[, 2L], decreasing = decreasing), ]
-  }
-}
 
 ui.data.timing.enrich <- function(.df, col.rec) {
   .df %>%
@@ -137,7 +85,7 @@ ui.plot.distr.caching <- function(instance, dist, labs.x = "Data Read [GiB]", la
   nudge.x <- 0.03 * max(c(max(instance$calc.mem.caching + instance$calc.sto.caching), nrow(data)))
   nudge.y <- max(data$y) / 4
   plot <- ggplot(instance) +
-    scale_fill_manual(values=ui.styles.color.palette1) +
+    scale_fill_manual(values=styles.color.palette1) +
     geom_area(data=data, aes(y = y, x = x, fill = group), stat="identity") +
     geom_area(data=initdata, aes(y = y, x = x, fill = group), stat="identity") +
     geom_vline(aes(xintercept=calc.mem.caching), colour="blue") +
@@ -156,7 +104,7 @@ ui.plot.distr.spooling <- function(instance, dist, labs.x = "Data Materialized [
   nudge.x <- 0.03 * max(c(max(instance$calc.mem.spooling + instance$calc.sto.spooling), nrow(data)))
   nudge.y <- max(data$y) / 4
   plot <- ggplot(instance) +
-    scale_fill_manual(values=ui.styles.color.palette1) +
+    scale_fill_manual(values=styles.color.palette1) +
     geom_area(data=data, aes(y = y, x = x, fill = group), stat="identity") +
     geom_vline(aes(xintercept=calc.mem.spooling), colour="blue") +
     geom_vline(aes(xintercept=calc.mem.spooling + calc.sto.spooling), colour="blue") +
@@ -327,11 +275,11 @@ server <- function(input, output, session) {
       if(.include == "frontier") {
         frontiers <- times %>%
           dplyr::group_by(id.name) %>%
-          dplyr::group_map(~ ui.calc.frontier(.,
-                                             x = input$instances.plot.x,
-                                             y = input$instances.plot.y,
-                                             id = "id",
-                                             quadrant = input$instances.plot.frontier.quadrant)) %>%
+          dplyr::group_map(~ model.calc.frontier(.,
+                                                 x = input$instances.plot.x,
+                                                 y = input$instances.plot.y,
+                                                 id = "id",
+                                                 quadrant = input$instances.plot.frontier.quadrant)) %>%
           bind_rows()
         best <- dplyr::filter(times, id %in% frontiers$id)
       } else if (.include == "best.count") {
@@ -416,11 +364,11 @@ server <- function(input, output, session) {
   instance.timings.plot <- reactive({
     times <- instance.timings()
     if (input$instances.plot.display.frontier.only) {
-      frontier <- ui.calc.frontier(times,
-                                    x = input$instances.plot.x,
-                                    y = input$instances.plot.y,
-                                    id = "id",
-                                    quadrant = input$instances.plot.frontier.quadrant)
+      frontier <- model.calc.frontier(times,
+                                      x = input$instances.plot.x,
+                                      y = input$instances.plot.y,
+                                      id = "id",
+                                      quadrant = input$instances.plot.frontier.quadrant)
 
       times <- times %>% dplyr::filter(id %in% frontier$id | id.name == inst.comparison.id())
     }
@@ -539,11 +487,11 @@ server <- function(input, output, session) {
   ## -------------------------------------------------------------------------------------- ##
 
   instances.plot.frontier <- reactive({
-    ui.calc.frontier(instance.timings.plot(),
-                      x = input$instances.plot.x,
-                      y = input$instances.plot.y,
-                      id = "id",
-                      quadrant = input$instances.plot.frontier.quadrant)
+    model.calc.frontier(instance.timings.plot(),
+                        x = input$instances.plot.x,
+                        y = input$instances.plot.y,
+                        id = "id",
+                        quadrant = input$instances.plot.frontier.quadrant)
   })
 
   instance.colors <- reactive({
@@ -919,7 +867,7 @@ server <- function(input, output, session) {
       suppressWarnings(geom_point(aes(color = group, id = id, time = stat.time.sum, cost = stat.price.sum, perf = col.recom.inv))) +
       scale_color_manual(values = c("Recommended" = "red", "Comparison" = "blue", "Frontier" = "green"),
                          aesthetics = c("color")) +
-      # geom_vline(aes(xintercept = count, id = id, time = stat.time.sum), color=df$color, alpha = 0.2) +
+                                        # geom_vline(aes(xintercept = count, id = id, time = stat.time.sum), color=df$color, alpha = 0.2) +
       labs(
         x = "Number of Instances Running",
         y = "Query Time"
@@ -1485,7 +1433,7 @@ client <- function(request) {
             ##
             h3("Best time per instance count"),
             plotlyOutput("scaling.efficiency.plot.time"),
-          ),
+            ),
           ## ---------------------------------------------------------------------- ##
                                         # HISTORICAL COMPARISON #
           ## ---------------------------------------------------------------------- ##
