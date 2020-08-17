@@ -51,6 +51,9 @@ plots.m1.draw <- function() {
 #        width = 3, height = 2, units = "in",
 #        device = cairo_pdf)
 
+                                        # - 40cpuh
+                                        # - remove cross over points, add manually
+
 plots.m1.all.draw <- function() {
   .n.points <- 100
   .value.range <- seq(10, 30, length.out = .n.points)

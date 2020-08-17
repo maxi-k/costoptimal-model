@@ -3,12 +3,12 @@ source("./aws.r")
 
 try.params <- function() {
 
-  .range.scan  <- 16*2^(0:12)
-  .range.cache <- c(0.001 , 0.1 , 0.5  , 0.8  , 0.999)
-  .range.sdist <- c(0.001 , 0.5 ,  0.999)
-  .range.spool <- c(0     , 0.1 , 0.5  , 0.8  , 1)
+  .range.scan  <- 16*2^(0:12) # ?
+  .range.cache <- c(0.001)
+  .range.sdist <- c(0.001)
+  .range.spool <- c(0     , 0.1 , 0.5  , 0.8  , 1) # ?
   .range.cpu   <- c(1)
-  .range.split <- c(TRUE, FALSE)
+  .range.split <- c(FALSE)
 
   .insts <- aws.data.current.large.relevant
 
@@ -63,3 +63,11 @@ system.time({
 library("sqldf")
 result <- sqldf("SELECT id, count(*) from res where rank = 1 group by id")
 result
+
+
+plotdata <- res %>%
+  dplyr::filter(rank == 1)
+
+ggplot(plotdata, aes(x = param.scanned, y = param.spool.frac, label = id, color = id)) +
+  geom_text() +
+  scale_x_log10()
