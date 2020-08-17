@@ -374,7 +374,7 @@ aws.data.current.large.s3join <- s3.benchmark.dvassallo.join(aws.data.current.la
 ## ---------------------------------------------------------------------------------------------- ##
 
 style.instance.colored <- c(
-  "c5", "c5n", "c5d", "m5", "i3",
+  "c5", "c5n", "c5d", "m5", "i3", "x1", "m5n"
 )
 
 ## TODO: better palettes

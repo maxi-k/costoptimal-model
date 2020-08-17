@@ -305,7 +305,7 @@ ggsave(plots.mkpath("m3-spool-frac-areas.pdf"), plots.m3.spool.draw(),
 ## TODO: logarithmic budget limits
 ## TODO: all c5d's
 plots.m4.budget.draw <- function() {
-  .read <- 1000
+  .read <- 10000
   .query <- data.frame(
     time.cpu  = 5,
     data.read = .read
@@ -328,38 +328,50 @@ plots.m4.budget.draw <- function() {
     .time.period = 2^30
   )
 
-  .inst <- aws.data.current.large.relevant
-  .inst.id <- c("c5d", "x1", "r5n")
+  .inst <- rbind(aws.data.current.large.relevant,
+                 aws.data.current %>% dplyr::filter(id == "c5d.2xlarge") %>% dplyr::mutate(id = "snowflake"))
+  .inst.id <- c("c5d", "snowflake", "x1")
 
   .cost.all <- model.calc.costs(.query, .inst, .time.fn)
   .frontier <- model.calc.frontier(.cost.all,
                                    x = "stat.time.sum", y = "stat.price.sum",
                                    id = "id", quadrant = "bottom.left")
-  .palette <- style.instance.colors
-  .palette["other"] <- "#eeeeee"
   .df <- .cost.all %>% dplyr::mutate(
-                                id.prefix = sub("^([A-Za-z1-9-]+)\\..*", "\\1", id),
+                                id.prefix = sub("^([A-Za-z1-9-]+)\\..*", "\\1", id.name),
                                 group = ifelse(id %in% .frontier$id | id.prefix %in% .inst.id, id.prefix, "other"))
+
+  .groups <- unique(.df$group)
+  .levels <- intersect(unique(.inst$id.prefix), .groups)
+  .levels <- c(.levels, "snowflake", "other")
+
+  .palette <- styles.color.palette1[1:length(.levels)]
+  names(.palette) <- .levels
+  .palette["other"] <- "#eeeeee"
+  .palette <- rev(.palette)
 
   .colored <- .df %>% dplyr::filter(group != "other")
   .greys <- .df %>% dplyr::filter(group == "other")
 
+  .labels <- .colored %>%
+    dplyr::group_by(group) %>%
+    dplyr::filter(stat.price.sum == max(stat.price.sum))
 
-  # print(.df %>% dplyr::filter(id.prefix == "x1"))
-  print(.df$color)
-
-  ggplot(.df, aes(x = stat.time.sum, y = stat.price.sum, color = group)) +
-    scale_color_manual(values = .palette, limits = c("c5", "c5d", "c5n", "m5", "m5n", "x1", "other")) +
-    geom_point(data = .greys, size = 1.5) +
-    geom_point(data = .colored) +
-    scale_x_log10() +
+  ggplot(.df, aes(x = stat.time.sum, y = stat.price.sum, color = group, label = group)) +
+    scale_color_manual(values = .palette, limits = .levels) +
+    geom_point(data = .greys, size = 0.7) +
+    geom_point(data = .colored, size = 1) +
+    geom_text(data = .labels, nudge_x = -0.15, nudge_y = 0.08) +
+    scale_x_log10(limits = c(30, 1e05)) +
     scale_y_log10() +
-    labs(y = "Workload Cost ($) [log]", x = "Workload Execution Time (s) [log]") +
+    labs(y = "Workload Cost ($) [log]",
+         x = "Workload Execution Time (s) [log]",
+         color = "Instance") +
     theme_bw() +
-    theme(plot.margin=grid::unit(c(1,1,1,1), "mm"))
+    theme(plot.margin=grid::unit(c(1,1,1,1), "mm"),
+          legend.position = "none")
 }
 
-plots.m4.budget.draw()
+## plots.m4.budget.draw()
 ggsave(plots.mkpath("m4-budget.pdf"), plots.m4.budget.draw(),
        width = 3.6, height = 2.6, units = "in",
        device = cairo_pdf)
