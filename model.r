@@ -190,7 +190,7 @@ model.calc.storage.speed <- function(.inst, network.speed) {
   bws <- purrr::map_dbl(
                   as.character(.inst$storage.type),
                   ~ model.factors.bandwidth[[.]]
-                ) * .inst$storage.count
+                ) * .inst$id.slice.sto * .inst$id.slice.factor
   bws[is.na(bws)] = network.speed[is.na(bws)]
   bws
 }

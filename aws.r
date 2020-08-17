@@ -201,7 +201,8 @@ aws.data.with.prefixes <- function(df) {
                                                 id.number),
                       id.slice.factor = id.slice / large$id.number,
                       id.slice.of     = large$id,
-                      id.slice.net    = large$network.Gbps * id.slice.factor) }) %>%
+                      id.slice.net    = large$network.Gbps * id.slice.factor,
+                      id.slice.sto    = large$storage.count) }) %>%
       dplyr::ungroup()
 }
 
