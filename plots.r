@@ -23,7 +23,7 @@ plots.m1.timing.fn <- function(.query, .inst) {
 
 plots.m1.all.draw <- function() {
   .n.points <- 100
-  .value.range <- seq(10, 60, length.out = .n.points)
+  .value.range <- seq(0, 60, length.out = .n.points)
   .xlim <- tail(.value.range, n = 1)
   .query <- data.frame(
     time.cpu  = .value.range,
@@ -72,14 +72,14 @@ plots.m1.all.draw <- function() {
     annotate(geom = "text", label = "x1e", x = 22.7, y = 14.3, color = "grey") +
     theme(plot.margin=grid::unit(c(1,1,1,1), "mm"),
           legend.position = "none") +
-    coord_cartesian(xlim = c(10, 67), ylim = c(0, 15)) +
+    coord_cartesian(xlim = c(1, 69), ylim = c(0, 15)) +
     labs(x = "CPU Hours", y = "Workload Cost ($)")
 }
 
 # plots.m1.all.draw()
-## ggsave(plots.mkpath("m1-cost-cpu-all.pdf"), plots.m1.all.draw(),
-##        width = 3.6, height = 2.5, units = "in",
-##        device = cairo_pdf)
+ ggsave(plots.mkpath("m1-cost-cpu-all.pdf"), plots.m1.all.draw(),
+        width = 3.6, height = 2.2, units = "in",
+        device = cairo_pdf)
 
 
 ## ---------------------------------------------------------------------------------------------- ##
@@ -120,7 +120,7 @@ plots.m2.spool.draw <- function() {
 
 #  plots.m2.spool.draw()
  ggsave(plots.mkpath("m2-spool-best.pdf"), plots.m2.spool.draw(),
-        width = 2.5, height = 2.5, units = "in",
+        width = 2.2, height = 2.5, units = "in",
         device = cairo_pdf)
 
 
@@ -318,8 +318,11 @@ plots.mh.history.cost.draw <- function() {
     labs(x = "Date", y = "Normalized Workload Cost", color = "Workload") +
     theme_bw() +
     scale_y_continuous(limits = c(0, 1)) +
-    theme(legend.position = "bottom")
+    theme(legend.position = "none")
 
 }
 
 plots.mh.history.cost.draw()
+ggsave(plots.mkpath("mh-date-cost.pdf"), plots.mh.history.cost.draw(),
+       width = 3.6, height = 2.6, units = "in",
+       device = cairo_pdf)
