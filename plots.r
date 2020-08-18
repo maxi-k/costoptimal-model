@@ -73,7 +73,7 @@ plots.m1.all.draw <- function() {
     theme(plot.margin=grid::unit(c(1,1,1,1), "mm"),
           legend.position = "none") +
     coord_cartesian(xlim = c(10, 70), ylim = c(0, 15)) +
-    labs(x = "CPU Hours", y = "Workload Cost ($) [log]")
+    labs(x = "CPU Hours", y = "Workload Cost ($)")
 }
 
 # plots.m1.all.draw()
@@ -110,7 +110,7 @@ plots.m2.spool.draw <- function() {
                   labels = c("100GB", "1TB", "10TB", "100TB")) +
     theme(legend.position = "bottom") +
     labs(
-      x = "Data Scanned [log]",
+      x = "Scanned Data [log]",
       y = "Materialization Fraction")
 }
 
