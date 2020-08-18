@@ -67,12 +67,12 @@ plots.m1.all.draw <- function() {
     theme_bw() +
     geom_point(data = .transitions, shape = 4, color = "black") +
     geom_vline(data = .transitions, aes(xintercept=x), color = "black", linetype = "dashed", size = 0.2) +
-    geom_text(data = .flanks, aes(y = min(y) / 2, x = x + 0.35 * max(x), label = paste(label, "best"))) +
-    geom_text(data = .labeled, aes(x = max(x) + 1, label = label),
-              hjust = 0) +
+    geom_text(data = .flanks, aes(y = y, x = x + 0.35 * max(x), label = paste(label, "best"))) +
+    geom_text(data = .labeled, aes(x = max(x) + 1, label = label), hjust = 0) +
+    annotate(geom = "text", label = "x1e", x = 22.7, y = 14.3, color = "grey") +
     theme(plot.margin=grid::unit(c(1,1,1,1), "mm"),
           legend.position = "none") +
-    coord_cartesian(xlim = c(10, 70), ylim = c(0, 15)) +
+    coord_cartesian(xlim = c(10, 67), ylim = c(0, 15)) +
     labs(x = "CPU Hours", y = "Workload Cost ($)")
 }
 
@@ -151,9 +151,11 @@ plots.m3.time.cost.draw <- function() {
     .time.period = 2^30
   )
 
-  .inst <- rbind(aws.data.current.large.relevant,
-                 aws.data.current %>% dplyr::filter(id == "c5d.2xlarge") %>% dplyr::mutate(id = "snowflake"))
-  .inst.id <- c("c5d", "snowflake", "x1")
+  .inst <- rbind(
+    aws.data.current.large.relevant,
+    aws.data.current %>% dplyr::filter(id == "c5d.2xlarge") %>% dplyr::mutate(id = "snowflake")
+  )
+  .inst.id <- c("c5d", "snowflake")
 
   .cost.all <- model.calc.costs(.query, .inst, .time.fn)
   .frontier <- model.calc.frontier(.cost.all,
@@ -179,12 +181,13 @@ plots.m3.time.cost.draw <- function() {
     dplyr::group_by(group) %>%
     dplyr::filter(stat.price.sum == max(stat.price.sum))
 
+
   ggplot(.df, aes(x = stat.time.sum, y = stat.price.sum, color = group, label = group)) +
     scale_color_manual(values = .palette, limits = .levels) +
-    geom_point(data = .greys, size = 0.7) +
+    geom_point(data = .greys, size = 1) +
     geom_point(data = .colored, size = 1) +
     geom_text(data = .labels, nudge_x = -0.15, nudge_y = 0.08) +
-    scale_x_log10(limits = c(30, 1e05)) +
+    scale_x_log10(limits = c(30, 6e03)) +
     scale_y_log10() +
     labs(y = "Workload Cost ($) [log]",
          x = "Workload Execution Time (s) [log]",
@@ -198,3 +201,5 @@ plots.m3.time.cost.draw <- function() {
 ggsave(plots.mkpath("m3-time-cost.pdf"), plots.m3.time.cost.draw(),
        width = 3.6, height = 2.6, units = "in",
        device = cairo_pdf)
+
+## TODO: dedicated snowflake plot?
