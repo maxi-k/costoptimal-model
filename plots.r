@@ -103,23 +103,25 @@ plots.m2.spool.draw <- function() {
                        label = str_replace(id.name, "xlarge", ""))) +
     scale_fill_manual(values = palette) +
     geom_tile(aes(fill = id.prefix)) +
-    scale_y_continuous(expand = c(0, 0)) +
+    scale_y_continuous(expand = c(0, 0),
+                       breaks = seq(0, 1.0, 0.2),
+                       labels = c("0", ".2", ".4", ".6", ".8", "1")) +
     scale_x_log10(expand = c(0, 0), breaks = c(100, 1024, 10 * 1024, 100 * 1024),
                   labels = c("100GB", "1TB", "10TB", "100TB")) +
     theme_bw() +
     theme(
-      plot.margin=grid::unit(c(1,1,1,1), "mm"),
+      plot.margin=grid::unit(c(1,0,1,1), "mm"),
       legend.position = "none") +
     labs(
       x = "Scanned Data [log]",
       y = "Materialization Fraction") +
-    facet_grid(cols = vars(param.cpuh), labeller = function(x) { "Best instance" })
+    facet_grid(cols = vars(param.cpuh), labeller = function(x) { "Best Instance" })
 }
 
-## plots.m2.spool.draw()
-## ggsave(plots.mkpath("m2-spool-best.pdf"), plots.m2.spool.draw(),
-##        width = 2.5, height = 2.5, units = "in",
-##        device = cairo_pdf)
+#  plots.m2.spool.draw()
+ ggsave(plots.mkpath("m2-spool-best.pdf"), plots.m2.spool.draw(),
+        width = 2.5, height = 2.5, units = "in",
+        device = cairo_pdf)
 
 
 plots.m2.draw.diff.for <- function(.id) {
@@ -129,12 +131,13 @@ plots.m2.draw.diff.for <- function(.id) {
     .best <- dplyr::filter(group, rank == 1)
     .self <-  dplyr::filter(group, id.name %in% .id)
     dplyr::mutate(.self,
+                  id.short = str_replace(id.name, "xlarge", ""),
                   price.diff.absolute = stat.price.sum - .best$stat.price.sum,
                   price.diff.fraction = stat.price.sum / .best$stat.price.sum,
                   price.diff.fractext = sprintf("%.2f", price.diff.fraction),
                   price.diff.fracdisc = ifelse(price.diff.fraction != 1 & price.diff.fraction < 1.1,
                                                 "1.0x",
-                                                sprintf("%.1f", pmin(2.5, price.diff.fraction))))
+                                               sprintf("%.1f", pmin(2.5, price.diff.fraction))))
   })
 
   palette <- styles.color.palette.temperature
@@ -143,7 +146,7 @@ plots.m2.draw.diff.for <- function(.id) {
                     label = price.diff.fractext, fill = price.diff.fracdisc)) +
     scale_fill_manual(values = palette) +
     geom_tile() +
-    geom_text(size = 2.2) +
+    geom_text(size = 2) +
     scale_y_continuous(expand = c(0, 0)) +
     scale_x_log10(expand = c(0, 0), breaks = c(100, 1024, 10 * 1024, 100 * 1024),
                   labels = c("100GB", "1TB", "10TB", "100TB")) +
@@ -152,15 +155,16 @@ plots.m2.draw.diff.for <- function(.id) {
           axis.title.y = element_blank(),
           axis.text.y  = element_blank(),
           axis.ticks.y = element_blank(),
-          plot.margin=grid::unit(c(1,1,1,1), "mm")) +
+          plot.margin=grid::unit(c(1,1,1,0), "mm")) +
     labs(x = "Scanned Data [log]", y = "Materialization Fraction") +
-    facet_grid(cols = vars(id.name))
+    facet_grid(cols = vars(id.short))
 }
 
-plots.m2.diff.inst <- c("c5n.18xlarge", "c5d.24xlarge", "i3.16xlarge")
-## ggsave(plots.mkpath("m2-spool-diff.pdf"), plots.m2.draw.diff.for(plots.m2.diff.inst),
-##        width = 3 * 2.5, height = 2.5, units = "in",
-##        device = cairo_pdf)
+# TODO: fix width so that they are as wide as the 'best' plot
+plots.m2.diff.inst <- c("c5n.18xlarge", "c5d.24xlarge", "i3.16xlarge", "c5.24xlarge")
+ggsave(plots.mkpath("m2-spool-diff.pdf"), plots.m2.draw.diff.for(plots.m2.diff.inst),
+       width = 3 * 2.5, height = 2.5, units = "in",
+       device = cairo_pdf)
 
 ## ---------------------------------------------------------------------------------------------- ##
                                         # M3: Scale Out & Down #
@@ -245,3 +249,77 @@ plots.m3.time.cost.draw <- function() {
 ##        device = cairo_pdf)
 
 ## TODO: dedicated snowflake plot?
+
+## ---------------------------------------------------------------------------------------------- ##
+                                        # MH: History #
+## ---------------------------------------------------------------------------------------------- ##
+##
+history.mkdata <- memoize(function() {
+  .wl1 <- data.frame(
+    cpu.hours  = 5,
+    data.scan  = 10000,
+    max.count  = 1,
+    cache.skew = 0.001,
+    spool.skew = 0.001,
+    spool.frac = 0.3,
+    scale.fact = 0.95,
+    load.first = FALSE,
+    max.period = 2^30)
+  .wl2 <- dplyr::mutate(.wl1, data.scan = data.scan * 100)
+  .wl3 <- dplyr::mutate(.wl1, cpu.hours = cpu.hours * 1000)
+  #
+  .def1 <- model.gen.workload(.wl1)
+  .def2 <- model.gen.workload(.wl2)
+  .def3 <- model.gen.workload(.wl3)
+  #
+  .filtered <- c("m6g")
+  .inst <- aws.data.all.by.date %>% dplyr::filter(!(id.prefix %in% .filtered))
+  .cost <- dplyr::group_modify(.inst, function(.slice, date) {
+    .large <- aws.data.filter.large(.slice)
+    .recom <- rbind(
+      model.calc.costs(.def1$query, .large, .def1$time.fn) %>%
+      model.recommend.from.timings.arr(.def1$query, .) %>%
+      dplyr::mutate(workload.id = "A"),
+      #
+      model.calc.costs(.def2$query, .large, .def2$time.fn) %>%
+      model.recommend.from.timings.arr(.def2$query, .) %>%
+      dplyr::mutate(workload.id = "B"),
+      #
+      model.calc.costs(.def3$query, .large, .def3$time.fn) %>%
+      model.recommend.from.timings.arr(.def3$query, .) %>%
+      dplyr::mutate(workload.id = "C")
+    )
+    dplyr::inner_join(.large, .recom, by = c("id" = "id.name")) %>%
+      dplyr::mutate(configuration = id.y)
+  })
+  #
+  .cost %>%
+    dplyr::mutate(label = paste(count, "×", str_replace(id, "xlarge", ""), sep=" "))
+})
+
+                                        # TODO: annotate text with aws 'introduces ...'
+                                        # - 100Gbit network
+                                        # - 25Gibt network
+                                        # - cpu cost doesn't decrease much
+                                        # - fast nvme ssds
+plots.mh.history.cost.draw <- function() {
+  .df <- history.mkdata() %>%
+    dplyr::group_by(workload.id) %>%
+    dplyr::group_modify(function(group, key) {
+      .first <- dplyr::filter(group, commit.date == min(commit.date))
+      dplyr::mutate(group,
+                    stat.price.change = stat.price.sum / .first$stat.price.sum
+                    )
+    })
+  ggplot(.df, aes(x = meta.join.time, y = stat.price.change, label = label, color = workload.id)) +
+    geom_line(aes(group = workload.id), linetype = "dashed") +
+    geom_line(aes(group = paste(workload.id, id)), size = 1.5) +
+    geom_text(nudge_y = 0.01, nudge_x = 0.2) +
+    labs(x = "Date", y = "Normalized Workload Cost", color = "Workload") +
+    theme_bw() +
+    scale_y_continuous(limits = c(0, 1)) +
+    theme(legend.position = "bottom")
+
+}
+
+plots.mh.history.cost.draw()

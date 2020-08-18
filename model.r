@@ -302,3 +302,27 @@ model.calc.frontier <- function(data, x = "x", y = "y", id = "id",
     zz[order(zz[, 1L], zz[, 2L], decreasing = decreasing), ]
   }
 }
+
+model.gen.workload <- function(p) {
+  .distr.cache <- purrr::map(1:p$max.count, function(count) {
+    model.make.distr.fn(p$cache.skew)(round(p$data.scan / count))
+  })
+  .distr.spool <- purrr::map(1:p$max.count, function(count) {
+    model.make.distr.fn(p$spool.skew)(round(p$spool.frac * p$data.scan / count))
+  })
+  .time.fn <- model.make.timing.fn(
+    .distr.list.caching  = .distr.cache,
+    .distr.list.spooling = .distr.spool,
+    .max.count = p$max.count,
+    .eff.fn = model.make.scaling.fn(list(p = p$scale.fact)),
+    .distr.caching.split.fn = model.distr.split.fn(p$load.first),
+    .time.period = p$max.period
+  )
+  list(
+    query = data.frame(
+      time.cpu  = p$cpu.hours,
+      data.read = p$data.scan
+    ),
+    time.fn = .time.fn
+  )
+}

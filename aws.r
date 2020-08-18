@@ -83,7 +83,8 @@ aws.data.historical.new.load <- function() {
              processorName                     = physical_processor,
              clockSpeed.text                   = clock_speed_ghz,
              region.name                       = "us-east-1",
-             join.entry                        = entry - 1
+             join.entry                        = entry - 1,
+             join.time                         = time
            )
   aws.data.historical.new
 }
@@ -175,6 +176,7 @@ aws.data.normalize <- function(df, commits = aws.data.commits) {
                    cost.usdph        = cost.ondemand.value.usdph,
                    meta.region.name  = region.name,
                    meta.join.entry   = join.entry,
+                   meta.join.time    = join.time,
                    loading.comment      = ""
                ) %>%
         aws.data.cleanup() %>%
