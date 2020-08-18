@@ -77,9 +77,9 @@ plots.m1.all.draw <- function() {
 }
 
 # plots.m1.all.draw()
-ggsave(plots.mkpath("m1-cost-cpu-all.pdf"), plots.m1.all.draw(),
-       width = 3.6, height = 2.5, units = "in",
-       device = cairo_pdf)
+## ggsave(plots.mkpath("m1-cost-cpu-all.pdf"), plots.m1.all.draw(),
+##        width = 3.6, height = 2.5, units = "in",
+##        device = cairo_pdf)
 
 
 ## ---------------------------------------------------------------------------------------------- ##
@@ -97,9 +97,7 @@ plots.m2.spool.draw <- function() {
   res <- all.params
   plotdata <- res %>%
     dplyr::filter(rank == 1) %>%
-    dplyr::mutate(
-             id.prefix = sub("^([A-Za-z1-9-]+)\\..*", "\\1", id)
-           )
+    dplyr::mutate(id.prefix = sub("^([A-Za-z1-9-]+)\\..*", "\\1", id))
   palette <- styles.color.palette.light
   ggplot(plotdata, aes(x = param.scanned, y = param.spool.frac,
                        label = str_replace(id.name, "xlarge", ""))) +
@@ -108,17 +106,61 @@ plots.m2.spool.draw <- function() {
     scale_y_continuous(expand = c(0, 0)) +
     scale_x_log10(expand = c(0, 0), breaks = c(100, 1024, 10 * 1024, 100 * 1024),
                   labels = c("100GB", "1TB", "10TB", "100TB")) +
-    theme(legend.position = "bottom") +
+    theme_bw() +
+    theme(
+      plot.margin=grid::unit(c(1,1,1,1), "mm"),
+      legend.position = "none") +
     labs(
       x = "Scanned Data [log]",
-      y = "Materialization Fraction")
+      y = "Materialization Fraction") +
+    facet_grid(cols = vars(param.cpuh), labeller = function(x) { "Best instance" })
 }
 
 ## plots.m2.spool.draw()
-ggsave(plots.mkpath("m2-spool-best.pdf"), plots.m2.spool.draw(),
-       width = 3.6, height = 2.5, units = "in",
-       device = cairo_pdf)
+## ggsave(plots.mkpath("m2-spool-best.pdf"), plots.m2.spool.draw(),
+##        width = 2.5, height = 2.5, units = "in",
+##        device = cairo_pdf)
 
+
+plots.m2.draw.diff.for <- function(.id) {
+  .cost <- all.params %>% dplyr::group_by_at(vars(starts_with("param.")))
+
+  .diff <- dplyr::group_modify(.cost, function(group, keys) {
+    .best <- dplyr::filter(group, rank == 1)
+    .self <-  dplyr::filter(group, id.name %in% .id)
+    dplyr::mutate(.self,
+                  price.diff.absolute = stat.price.sum - .best$stat.price.sum,
+                  price.diff.fraction = stat.price.sum / .best$stat.price.sum,
+                  price.diff.fractext = sprintf("%.2f", price.diff.fraction),
+                  price.diff.fracdisc = ifelse(price.diff.fraction != 1 & price.diff.fraction < 1.1,
+                                                "1.0x",
+                                                sprintf("%.1f", pmin(2.5, price.diff.fraction))))
+  })
+
+  palette <- styles.color.palette.temperature
+
+  ggplot(.diff, aes(x = param.scanned, y = param.spool.frac,
+                    label = price.diff.fractext, fill = price.diff.fracdisc)) +
+    scale_fill_manual(values = palette) +
+    geom_tile() +
+    geom_text(size = 2.2) +
+    scale_y_continuous(expand = c(0, 0)) +
+    scale_x_log10(expand = c(0, 0), breaks = c(100, 1024, 10 * 1024, 100 * 1024),
+                  labels = c("100GB", "1TB", "10TB", "100TB")) +
+    theme_bw() +
+    theme(legend.position = "none",
+          axis.title.y = element_blank(),
+          axis.text.y  = element_blank(),
+          axis.ticks.y = element_blank(),
+          plot.margin=grid::unit(c(1,1,1,1), "mm")) +
+    labs(x = "Scanned Data [log]", y = "Materialization Fraction") +
+    facet_grid(cols = vars(id.name))
+}
+
+plots.m2.diff.inst <- c("c5n.18xlarge", "c5d.24xlarge", "i3.16xlarge")
+## ggsave(plots.mkpath("m2-spool-diff.pdf"), plots.m2.draw.diff.for(plots.m2.diff.inst),
+##        width = 3 * 2.5, height = 2.5, units = "in",
+##        device = cairo_pdf)
 
 ## ---------------------------------------------------------------------------------------------- ##
                                         # M3: Scale Out & Down #
@@ -198,8 +240,8 @@ plots.m3.time.cost.draw <- function() {
 }
 
 ## plots.m3.time.cost.draw()
-ggsave(plots.mkpath("m3-time-cost.pdf"), plots.m3.time.cost.draw(),
-       width = 3.6, height = 2.6, units = "in",
-       device = cairo_pdf)
+## ggsave(plots.mkpath("m3-time-cost.pdf"), plots.m3.time.cost.draw(),
+##        width = 3.6, height = 2.6, units = "in",
+##        device = cairo_pdf)
 
 ## TODO: dedicated snowflake plot?

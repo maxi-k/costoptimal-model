@@ -43,6 +43,17 @@ util.style.fonts.setup <- function() {
 
 util.style.fonts.setup()
 
+styles.draw.palette <- function(colors) {
+  df <- data.frame(y = 1:length(colors), x = 1)
+  ggplot(df, aes(x = x, y = y, fill = colors, label = colors)) +
+    scale_fill_identity() +
+    geom_tile() +
+    geom_text() +
+    scale_x_continuous(expand = c(0, 0)) +
+    scale_x_continuous(expand = c(0, 0)) +
+    theme(legend.position = "none")
+}
+
 ## From https://github.com/arcticicestudio/nord
 styles.color.palette1 <- c(
     "#a3be8c",
@@ -71,6 +82,25 @@ styles.color.palette.light <- c(
     "#88c0d0"
 )
 
+styles.color.palette.temparature <- c(
+  "1.0"  = "#64CF17",
+  "1.0x" = "#64EE17",
+  "1.1"  = "#76FF03",
+  "1.2"  = "#C6FF00",
+  "1.3"  = "#EEFF41",
+  "1.4"  = "#F4FF81",
+  "1.5"  = "#FFF176",
+  "1.6"  = "#FFEB3B",
+  "1.7"  = "#FBC02D",
+  "1.8"  = "#FF8F00",
+  "1.9"  = "#FF6F00",
+  "2.0"  = "#E65100",
+  "2.1"  = "#DF3D00",
+  "2.2"  = "#DD2C00",
+  "2.3"  = "#CF1C0C",
+  "2.4"  = "#BE1C0F",
+  "2.5"  = "#AD0D0D"
+)
 
 ## ---------------------------------------------------------------------------------------------- ##
                                         # Other Utilities
