@@ -289,6 +289,8 @@ plot.elastic.recoms <- function(.wl, .costs) {
   .joined <- dplyr::inner_join(.wl, .split, by = c("window.id" = "window.start")) %>%
     dplyr::group_by(window.start.orig) %>%
     dplyr::mutate(
+             id.prefix = sub("^([A-Za-z1-9-]+)\\..*", "\\1", id),
+             id.short = str_replace(id.name, "large", "l"),
              time.cpu.window.max = max(time.cpu.x),
              time.cpu.window.avg = mean(time.cpu.x)
            ) %>%
@@ -296,7 +298,6 @@ plot.elastic.recoms <- function(.wl, .costs) {
 
   .joined.text <- .joined %>% dplyr::filter(window.start.orig == window.id) %>%
     dplyr::mutate(
-             id.short = str_replace(id.name, "large", "l"),
              label = paste(count, "×", id.short),
              label.debug = paste(label, "(switch:", stat.price.switch, ", stay:", stat.price.stay, ")")
            )
@@ -304,7 +305,8 @@ plot.elastic.recoms <- function(.wl, .costs) {
   .labels.x <- as.character(c(.wl$window.id - 1, max(.wl$window.id)))
   .labels.x[1:length(.labels.x) %% 2 == 0] <- ""
 
-  ggplot(.joined, aes(x = window.id, y = time.cpu.x, color = id.name)) +
+  ggplot(.joined, aes(x = window.id, y = time.cpu.x, color = id.prefix)) +
+    scale_color_manual(values = style.instance.colors.vibrant) +
     geom_line(color = "black") +
     geom_segment(aes(x = window.id - 0.5, xend = window.end + 0.5,
                      y = time.cpu.window.avg,
@@ -314,7 +316,7 @@ plot.elastic.recoms <- function(.wl, .costs) {
     geom_text(data = .joined.text, aes(y = time.cpu.window.avg, label = label,
                                        x = (window.end.orig + window.start.orig) / 2),
               angle = .joined.text$angle,
-              size = 2.2,
+              size = 2.8,
               nudge_y = 0.05 * .maxval,
               hjust = 0
               ) +
@@ -322,7 +324,7 @@ plot.elastic.recoms <- function(.wl, .costs) {
       breaks = c(.wl$window.id - 0.5, max(.wl$window.id) + 0.5),
       labels = .labels.x,
       minor_breaks = c()) +
-    scale_y_continuous(limits = c(0, .maxval * 1.4)) +
+    scale_y_continuous(limits = c(0, .maxval * 1.47)) +
     labs(
       x = "Hour",
       y = "Workload"
