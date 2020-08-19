@@ -103,6 +103,7 @@ plots.m2.spool.draw <- function() {
                        label = str_replace(id.name, "xlarge", ""))) +
     scale_fill_manual(values = palette) +
     geom_tile(aes(fill = id.prefix)) +
+    geom_text() +
     scale_y_continuous(expand = c(0, 0),
                        breaks = seq(0, 1.0, 0.2),
                        labels = c("0", ".2", ".4", ".6", ".8", "1")) +
@@ -118,10 +119,10 @@ plots.m2.spool.draw <- function() {
     facet_grid(cols = vars(param.cpuh), labeller = function(x) { "Best Instance" })
 }
 
-#  plots.m2.spool.draw()
- ggsave(plots.mkpath("m2-spool-best.pdf"), plots.m2.spool.draw(),
-        width = 2.2, height = 2.5, units = "in",
-        device = cairo_pdf)
+ plots.m2.spool.draw()
+##  ggsave(plots.mkpath("m2-spool-best.pdf"), plots.m2.spool.draw(),
+##         width = 2.2, height = 2.5, units = "in",
+##         device = cairo_pdf)
 
 
 plots.m2.draw.diff.for <- function(.id) {
@@ -140,6 +141,8 @@ plots.m2.draw.diff.for <- function(.id) {
                                                sprintf("%.1f", pmin(2.5, price.diff.fraction))))
   })
 
+  .diff$id.factor <- factor(.diff$id.short, levels = str_replace(.id, "xlarge", ""))
+
   palette <- styles.color.palette.temperature
 
   ggplot(.diff, aes(x = param.scanned, y = param.spool.frac,
@@ -157,11 +160,10 @@ plots.m2.draw.diff.for <- function(.id) {
           axis.ticks.y = element_blank(),
           plot.margin=grid::unit(c(1,1,1,0), "mm")) +
     labs(x = "Scanned Data [log]", y = "Materialization Fraction") +
-    facet_grid(cols = vars(id.short))
+    facet_grid(cols = vars(id.factor))
 }
 
-# TODO: fix width so that they are as wide as the 'best' plot
-plots.m2.diff.inst <- c("c5n.18xlarge", "c5d.24xlarge", "i3.16xlarge", "c5.24xlarge")
+plots.m2.diff.inst <- c("c5.24xlarge", "c5d.24xlarge", "i3.16xlarge","c5n.18xlarge")
 ggsave(plots.mkpath("m2-spool-diff.pdf"), plots.m2.draw.diff.for(plots.m2.diff.inst),
        width = 3 * 2.5, height = 2.5, units = "in",
        device = cairo_pdf)
