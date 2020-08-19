@@ -227,12 +227,12 @@ plots.m3.time.cost.draw <- function() {
     dplyr::group_by(group) %>%
     dplyr::filter(stat.price.sum == max(stat.price.sum))
 
-
   ggplot(.df, aes(x = stat.time.sum, y = stat.price.sum, color = group, label = group)) +
     scale_color_manual(values = .palette, limits = .levels) +
     geom_point(data = .greys, size = 1) +
-    geom_point(data = .colored, size = 1) +
+    # geom_point(data = .colored, size = 1) +
     geom_text(data = .labels, nudge_x = -0.15, nudge_y = 0.08) +
+    geom_text(data = .colored, aes(label = count)) +
     scale_x_log10(limits = c(30, 6e03)) +
     scale_y_log10() +
     labs(y = "Workload Cost ($) [log]",
@@ -243,7 +243,7 @@ plots.m3.time.cost.draw <- function() {
           legend.position = "none")
 }
 
-## plots.m3.time.cost.draw()
+plots.m3.time.cost.draw()
 ## ggsave(plots.mkpath("m3-time-cost.pdf"), plots.m3.time.cost.draw(),
 ##        width = 3.6, height = 2.6, units = "in",
 ##        device = cairo_pdf)
@@ -266,7 +266,7 @@ history.mkdata <- memoize(function() {
     load.first = FALSE,
     max.period = 2^30)
   .wl2 <- dplyr::mutate(.wl1, data.scan = data.scan * 100)
-  .wl3 <- dplyr::mutate(.wl1, cpu.hours = cpu.hours * 1000)
+  .wl3 <- dplyr::mutate(.wl1, cpu.hours = cpu.hours * 100000)
   #
   .def1 <- model.gen.workload(.wl1)
   .def2 <- model.gen.workload(.wl2)
@@ -313,16 +313,16 @@ plots.mh.history.cost.draw <- function() {
     })
   ggplot(.df, aes(x = meta.join.time, y = stat.price.change, label = label, color = workload.id)) +
     geom_line(aes(group = workload.id), linetype = "dashed") +
+    geom_text(data = dplyr::filter(.df, workload.id == "A"), nudge_y = 0.01, nudge_x = 0.2) +
     geom_line(aes(group = paste(workload.id, id)), size = 1.5) +
-    geom_text(nudge_y = 0.01, nudge_x = 0.2) +
     labs(x = "Date", y = "Normalized Workload Cost", color = "Workload") +
     theme_bw() +
-    scale_y_continuous(limits = c(0, 1)) +
+    scale_y_continuous(limits = c(0, 1.5)) +
     theme(legend.position = "none")
 
 }
 
 plots.mh.history.cost.draw()
-ggsave(plots.mkpath("mh-date-cost.pdf"), plots.mh.history.cost.draw(),
-       width = 3.6, height = 2.6, units = "in",
-       device = cairo_pdf)
+# ggsave(plots.mkpath("mh-date-cost.pdf"), plots.mh.history.cost.draw(),
+#        width = 3.6, height = 2.6, units = "in",
+#        device = cairo_pdf)
