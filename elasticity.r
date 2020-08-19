@@ -5,8 +5,8 @@ model.modulate.workload <- function(.workload, .mod.fn, .duration, .window) {
   purrr::map_dfr(1:.num.windows, function(.window.id) {
     dplyr::mutate(.mod.fn(.workload, .window.id, .num.windows),
                   window.id = .window.id,
-                  window.duration <- .window,
-                  window.seconds <- lubridate::dseconds(.window)
+                  window.duration = .window,
+                  window.seconds = lubridate::dseconds(.window)
                   )
   })
 }
@@ -22,6 +22,42 @@ model.modulator.sin.other <- function(.w, .window, .num) {
   dplyr::mutate(.w,
                 time.cpu = time.cpu * .factor / .num,
                 data.read = data.read * .factor / .num)
+}
+
+model.modulator.snowflake <- function(.df, .window, .num) {
+  ## warehouse 4089697793760189952
+  ## one day
+  .multipliers <- c(
+    0,  # 1
+    0,  # 2
+    0,  # 3
+    20, # 4
+    16, # 5
+    28, # 6
+    25, # 7
+    50, # 8
+    18, # 9
+    22, # 10
+    19, # 11
+    4,  # 12
+    5,  # 13
+    6,  # 14
+    4,  # 15
+    5,  # 16
+    4,  # 17
+    3,  # 18
+    2,  # 19
+    0,  # 20
+    0,  # 21
+    0,  # 22
+    0,  # 23
+    0   # 24
+  )
+  .mult <- .multipliers[.window]
+  data.frame(
+    time.cpu  = .df$time.cpu  * .mult,
+    data.read = .df$data.read * .mult
+  )
 }
 
 plot.modulated.workload <- function(.mod) {
@@ -64,6 +100,7 @@ model.merge.window.costs <- function(.recom.cur, .recom.nxt) {
                 stat.price.max    = stat.price.max    + .recom.nxt$stat.price.max,
                 stat.price.period = stat.price.period + .recom.nxt$stat.price.period,
                 stat.price.switch = stat.price.switch,
+                stat.price.stay   = stat.price.stay,
 
                 window.start      = .recom.cur$window.start,
                 window.end        = .recom.nxt$window.start,
@@ -104,7 +141,7 @@ model.scale.down.distrs <- function(.distrs, .factor) {
 ##   period.size = duration(1, "week")
 ##   max.latency = duration(1, "hour")
 ## )
-model.elastic.costs <- function(.inst, .params) {
+model.elastic.costs <- function(.inst, .params, .mod.fn = model.modulator.sin.other) {
   stopifnot(nrow(.inst) > 0)
   .wl <- data.frame(
     time.cpu  = .params$time.cpu,
@@ -136,11 +173,12 @@ model.elastic.costs <- function(.inst, .params) {
       dplyr::mutate(window.start = .w$window.id,
                     window.end = .w$window.id,
                     stat.time.switch = 0,
+                    stat.price.stay = 0,
                     stat.price.switch = 0)
   }
   best <- function(.w) head(.w, n = 1)
 
-  .mod <- model.modulate.workload(.wl, model.modulator.sin.other, .params$period.size, .params$window.size)
+  .mod <- model.modulate.workload(.wl, .mod.fn, .params$period.size, .params$window.size)
   .split <- split(.mod, f = 1:nrow(.mod))
   .init <- list(best(costs.for.window(.split[[1]])))
   .stats <- list("same best" = 0, "switch" = 0, "stay" = 0, "phony" = 0)
@@ -172,12 +210,15 @@ model.elastic.costs <- function(.inst, .params) {
     .switch.candidate <- best(dplyr::filter(.costs.cur, stat.time.sum + .time.switch <= .window.sec))
     .can.switch <- nrow(.switch.candidate) > 0
     .can.stay <- .recom.prv$id %in% .costs.cur$id
+    .cost.stay <- 0
     if(.can.stay) {
       .prv.incur <- .costs.cur %>% dplyr::filter(id == .recom.prv$id) %>% best()
       .cost.stay <- .prv.incur$stat.price.period - best(.costs.cur)$stat.price.period
       if (!.can.switch || .cost.stay < .cost.switch * (1 + .params$min.cost.frac)) {
         addstat("stay")
-        .acc[[length(.acc)]] <- model.merge.window.costs(.recom.prv, .prv.incur)
+        .acc[[length(.acc)]] <- model.merge.window.costs(.recom.prv, .prv.incur) %>%
+          dplyr::mutate(stat.price.stay = stat.price.stay + .cost.stay,
+                        stat.price.switch = stat.price.switch + .cost.switch)
         return(.acc)
       }
     }
@@ -190,6 +231,7 @@ model.elastic.costs <- function(.inst, .params) {
     addstat("switch")
     .acc[[length(.acc) + 1]] <- .switch.candidate %>%
       dplyr::mutate(stat.time.switch = .time.switch,
+                    stat.price.stay  = .cost.stay,
                     stat.price.switch = .cost.switch)
     .acc
   }) %>% bind_rows()
@@ -199,19 +241,100 @@ model.elastic.costs <- function(.inst, .params) {
 
 ## --------------------------------------------------------------------------------
 .params <- list(
-  time.cpu    = 24 * 7 * 5,
-  data.read   = 24 * 7 * 1000,
+  time.cpu    = 1,
+  data.read   = 3000,
   cache.skew  = 0.1,
   spool.frac  = 0.1,
   spool.skew  = 0.8,
   scale.eff   = 0.9,
   max.inst    = 32,
   window.size = duration(1, "hour"),
-  period.size = duration(1, "week"),
+  period.size = duration(1, "day"),
   max.latency = duration(0.5, "hour"),
   min.cost.frac = 0.3
 )
-.recoms <- model.elastic.costs(aws.data.current.relevant, .params)
+.recoms <- model.elastic.costs(aws.data.current.relevant, .params, .mod.fn = model.modulator.snowflake)
+## --------------------------------------------------------------------------------
+
+plot.elastic.recoms <- function(.wl, .costs) {
+  .maxval <- max(.wl$time.cpu)
+  .split <- slider::slide_dfr(.costs, function(.recom) {
+    .start <- .recom$window.start
+    .end <- .recom$window.end
+    .n <- .end - .start + 1
+    purrr::map_dfr(1:.n, function(i) {
+      .recom %>% dplyr::mutate(
+                          window.start = .start + i - 1,
+                          window.end = .start + i - 1,
+                          window.start.orig = .start,
+                          window.end.orig = .end,
+                          angle = ifelse(window.start.orig == window.end.orig, 90, 0))
+    })
+  })
+  .joined <- dplyr::inner_join(.wl, .split, by = c("window.id" = "window.start")) %>%
+    dplyr::group_by(window.start.orig) %>%
+    dplyr::mutate(time.cpu.window.max = max(time.cpu.x)) %>%
+    dplyr::ungroup()
+
+  .joined.text <- .joined %>% dplyr::filter(window.start.orig == window.id) %>%
+    dplyr::mutate(
+             label = paste(count, "×", id.name),
+             label.debug = paste(label, "(switch:", stat.price.switch, ", stay:", stat.price.stay, ")")
+           )
+  ggplot(.joined, aes(x = window.id, y = time.cpu.x, color = id.name)) +
+    geom_line(color = "black") +
+    geom_segment(aes(x = window.id - 0.5, xend = window.end + 0.5, yend = time.cpu.x), size = 2) +
+    geom_text(data = .joined.text, aes(y = time.cpu.window.max, label = label,
+                                       x = (window.end.orig + window.start.orig) / 2),
+              angle = .joined.text$angle,
+              size = 3.5,
+              nudge_y = 0.08 * .maxval) +
+    scale_x_continuous(
+      breaks = c(.wl$window.id - 0.5, max(.wl$window.id) + 0.5),
+      labels = c(.wl$window.id - 1, max(.wl$window.id)),
+      minor_breaks = c()) +
+    scale_y_continuous(limits = c(0, .maxval + 5)) +
+    labs(
+      x = "Hour",
+      y = "Workload"
+    ) +
+    theme_bw() +
+    theme(legend.position = "none")
+}
+## --------------------------------------------------------------------------------
+
+.mod.workload <- model.modulate.workload(
+    data.frame(
+      time.cpu  = .params$time.cpu,
+      data.read = .params$data.read
+    ),
+  model.modulator.snowflake, .params$period.size, .params$window.size
+)
+
+plot.elastic.recoms(.mod.workload, .recoms)
+
+# write.csv(.recoms, "data/elasticity.data.csv")
+# ggsave("../figures/m5-elasticity-initial.pdf")
+
+.params.snowflake <- list(
+  time.cpu    = 1,
+  data.read   = 3000,
+  cache.skew  = 0.1,
+  spool.frac  = 0.1,
+  spool.skew  = 0.8,
+  scale.eff   = 1.0, ## !
+  max.inst    = 128,
+  window.size = duration(1, "hour"),
+  period.size = duration(1, "day"),
+  max.latency = duration(1, "hour"),  ## !
+  min.cost.frac = 0.3
+)
+.inst.snowflake <- head(dplyr::filter(aws.data.current.relevant, id == "c5d.2xlarge"), n = 1)
+.recoms.snowflake <- model.elastic.costs(.inst.snowflake, .params.snowflake, .mod.fn = model.modulator.snowflake)
+
+plot.elastic.recoms(.mod.workload, .recoms.snowflake)
+
+## --------------------------------------------------------------------------------
 
 local({
   .wl <- data.frame(
@@ -234,38 +357,9 @@ local({
     dplyr::filter(round(stat.time.sum) <= int_length(.params$max.latency) * .nwindows) %>%
     top_n(-1, wt = stat.price.sum) %>%
     head(n = 1)
+  #
   print(paste("Baseline with", .baseline.recom$id, "costs", .baseline.recom$stat.price.period))
   print(paste("Split workload costs ", sum(.recoms$stat.price.period)))
   .price.diff <- .baseline.recom$stat.price.period - sum(.recoms$stat.price.period)
   print(paste("Difference: ", .price.diff))
 })
-## --------------------------------------------------------------------------------
-
-plot.elastic.recoms <- function(.wl, .costs) {
-  .maxval <- max(.wl$time.cpu)
-  ggplot(.wl, aes(x = window.start)) +
-    geom_line(aes(x = window.id, y = time.cpu,  color = "cpuh")) +
-    geom_line(aes(x = window.id, y = data.read / 2000, color = "scan")) +
-    # geom_line(data = .costs, aes(x = window.start, y = stat.price.sum, color = "$")) +
-    geom_segment(data=.costs,
-                 aes(x = window.start, xend = window.end + 1,
-                     y = .maxval, yend = .maxval,
-                     color = id.name), size = 3) +
-    geom_text(data=.costs, aes(label = count,
-                               x = (window.start + window.end) / 2,
-                               y = .maxval),
-              size = 3.5)
-}
-
-plot.elastic.recoms(
-  model.modulate.workload(
-    data.frame(
-      time.cpu  = .params$time.cpu,
-      data.read = .params$data.read
-    ),
-    model.modulator.sin.other, .params$period.size, .params$window.size),
-  .recoms
-)
-
-write.csv(.recoms, "data/elasticity.data.csv")
-ggsave("../figures/m5-elasticity-initial.pdf")
