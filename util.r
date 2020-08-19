@@ -83,7 +83,7 @@ styles.color.palette.light <- c(
 )
 
 styles.color.palette.temparature <- c(
-  ""  = "#64CF17",
+  "1.0"  = "#64CF17",
   "1.0x" = "#64EE17",
   "1.1"  = "#76FF03",
   "1.2"  = "#C6FF00",

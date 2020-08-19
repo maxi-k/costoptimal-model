@@ -76,10 +76,10 @@ plots.m1.all.draw <- function() {
     labs(x = "CPU Hours", y = "Workload Cost ($)")
 }
 
-# plots.m1.all.draw()
- ggsave(plots.mkpath("m1-cost-cpu-all.pdf"), plots.m1.all.draw(),
-        width = 3.6, height = 2.2, units = "in",
-        device = cairo_pdf)
+## plots.m1.all.draw()
+## ggsave(plots.mkpath("m1-cost-cpu-all.pdf"), plots.m1.all.draw(),
+##        width = 3.6, height = 2.2, units = "in",
+##        device = cairo_pdf)
 
 
 ## ---------------------------------------------------------------------------------------------- ##
@@ -119,7 +119,7 @@ plots.m2.spool.draw <- function() {
     facet_grid(cols = vars(param.cpuh), labeller = function(x) { "Best Instance" })
 }
 
- plots.m2.spool.draw()
+## plots.m2.spool.draw()
 ##  ggsave(plots.mkpath("m2-spool-best.pdf"), plots.m2.spool.draw(),
 ##         width = 2.2, height = 2.5, units = "in",
 ##         device = cairo_pdf)
@@ -163,10 +163,10 @@ plots.m2.draw.diff.for <- function(.id) {
     facet_grid(cols = vars(id.factor))
 }
 
-plots.m2.diff.inst <- c("c5.24xlarge", "c5d.24xlarge", "i3.16xlarge","c5n.18xlarge")
-ggsave(plots.mkpath("m2-spool-diff.pdf"), plots.m2.draw.diff.for(plots.m2.diff.inst),
-       width = 3 * 2.5, height = 2.5, units = "in",
-       device = cairo_pdf)
+## plots.m2.diff.inst <- c("c5.24xlarge", "c5d.24xlarge", "i3.16xlarge","c5n.18xlarge")
+## ggsave(plots.mkpath("m2-spool-diff.pdf"), plots.m2.draw.diff.for(plots.m2.diff.inst),
+##        width = 3 * 2.5, height = 2.5, units = "in",
+##        device = cairo_pdf)
 
 ## ---------------------------------------------------------------------------------------------- ##
                                         # M3: Scale Out & Down #
@@ -245,7 +245,7 @@ plots.m3.time.cost.draw <- function() {
           legend.position = "none")
 }
 
-plots.m3.time.cost.draw()
+## plots.m3.time.cost.draw()
 ## ggsave(plots.mkpath("m3-time-cost.pdf"), plots.m3.time.cost.draw(),
 ##        width = 3.6, height = 2.6, units = "in",
 ##        device = cairo_pdf)
@@ -324,7 +324,7 @@ plots.mh.history.cost.draw <- function() {
 
 }
 
-plots.mh.history.cost.draw()
+## plots.mh.history.cost.draw()
 # ggsave(plots.mkpath("mh-date-cost.pdf"), plots.mh.history.cost.draw(),
 #        width = 3.6, height = 2.6, units = "in",
 #        device = cairo_pdf)
