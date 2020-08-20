@@ -320,7 +320,7 @@ plot.elastic.recoms <- function(.wl, .costs) {
   .labels.x[1:length(.labels.x) %% 2 == 0] <- ""
 
   ggplot(.joined, aes(x = window.id, y = stat.multiplier, color = id.prefix)) +
-    # scale_color_manual(values = style.instance.colors.vibrant) +
+    scale_color_manual(values = style.instance.colors.vibrant) +
     geom_line(color = "black") +
     geom_segment(aes(x = window.id - 0.5, xend = window.end + 0.5,
                      y = mult.avg, yend = mult.avg),
