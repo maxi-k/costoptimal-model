@@ -78,7 +78,7 @@ plots.m1.all.draw <- function() {
 
 ## plots.m1.all.draw()
 ## ggsave(plots.mkpath("m1-cost-cpu-all.pdf"), plots.m1.all.draw(),
-##        width = 3.6, height = 2.2, units = "in",
+##        width = 3.6, height = 2.3, units = "in",
 ##        device = cairo_pdf)
 
 
@@ -315,16 +315,18 @@ plots.mh.history.cost.draw <- function() {
     })
   ggplot(.df, aes(x = meta.join.time, y = stat.price.change, label = label, color = workload.id)) +
     geom_line(aes(group = workload.id), linetype = "dashed") +
-    geom_text(data = dplyr::filter(.df, workload.id == "A"), nudge_y = 0.01, nudge_x = 0.2) +
+    ## geom_text(data = dplyr::filter(.df, workload.id == "A"), nudge_y = 0.01, nudge_x = 0.2) +
     geom_line(aes(group = paste(workload.id, id)), size = 1.5) +
     labs(x = "Date", y = "Normalized Workload Cost", color = "Workload") +
     theme_bw() +
-    scale_y_continuous(limits = c(0, 1.5)) +
-    theme(legend.position = "none")
-
+    scale_y_continuous(limits = c(0, 1.1),
+                       breaks = seq(0, 1, 0.2),
+                       labels = c("0", ".2", ".4", ".6", ".8", "1")) +
+    theme(legend.position = "none",
+          plot.margin=grid::unit(c(1,1,1,1), "mm"))
 }
 
 ## plots.mh.history.cost.draw()
-# ggsave(plots.mkpath("mh-date-cost.pdf"), plots.mh.history.cost.draw(),
-#        width = 3.6, height = 2.6, units = "in",
-#        device = cairo_pdf)
+ggsave(plots.mkpath("mh-date-cost.pdf"), plots.mh.history.cost.draw(),
+       width = 3.6, height = 2.3, units = "in",
+       device = cairo_pdf)
