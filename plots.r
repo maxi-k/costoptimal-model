@@ -29,12 +29,11 @@ plots.m1.all.draw <- function() {
     time.cpu  = .value.range,
     data.read = 3000
   )
-  .ids <- c("c5n", "c5", "c5d", "m5dn", "i3en", "other")
+  .ids <- c("c5n", "c5", "c5d", "m5dn", "i3", "i3en", "other")
 
   .inst <- aws.data.current.large.relevant
 
   palette <- style.instance.colors.vibrant
-  names(palette) <- .ids
   palette["other"] <- "#cccccc"
 
   .costs <- model.calc.costs(.query, .inst, plots.m1.timing.fn)
@@ -98,12 +97,12 @@ plots.m2.spool.draw <- function() {
   plotdata <- res %>%
     dplyr::filter(rank == 1) %>%
     dplyr::mutate(id.prefix = sub("^([A-Za-z1-9-]+)\\..*", "\\1", id))
-  palette <- styles.color.palette.light
+  palette <- style.instance.colors
   ggplot(plotdata, aes(x = param.scanned, y = param.spool.frac,
                        label = str_replace(id.name, "xlarge", ""))) +
     scale_fill_manual(values = palette) +
     geom_tile(aes(fill = id.prefix)) +
-    geom_text() +
+    ## geom_text() +
     scale_y_continuous(expand = c(0, 0),
                        breaks = seq(0, 1.0, 0.2),
                        labels = c("0", ".2", ".4", ".6", ".8", "1")) +
@@ -120,9 +119,9 @@ plots.m2.spool.draw <- function() {
 }
 
 ## plots.m2.spool.draw()
-##  ggsave(plots.mkpath("m2-spool-best.pdf"), plots.m2.spool.draw(),
-##         width = 2.2, height = 2.5, units = "in",
-##         device = cairo_pdf)
+## ggsave(plots.mkpath("m2-spool-best.pdf"), plots.m2.spool.draw(),
+##        width = 2.2, height = 2.5, units = "in",
+##        device = cairo_pdf)
 
 
 plots.m2.draw.diff.for <- function(.id) {

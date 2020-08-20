@@ -375,14 +375,26 @@ aws.data.current.large.s3join <- s3.benchmark.dvassallo.join(aws.data.current.la
                                         # STYLES
 ## ---------------------------------------------------------------------------------------------- ##
 
-style.instance.colored <- c(
-  "c5", "c5n", "c5d", "m5", "i3", "x1", "m5n"
+style.instance.colors <- c(
+  # + m3 plot
+  "c5n"  = "#b48ead",
+  "c5d"  = "#a3be8c",
+  "m5n"  = "#ebcb8b",
+  "r5n"  = "#8fbcbb",
+  # + m2 plot
+  "c5"   = "#d8dee9",
+  "i3"   = "#81a1c1",
+  "m5"   = "#d08770",
+  "m5d"  = "#bf616a",
+  "m5dn" = "#4c566a",
+  "r5"   = "#88c0d0",
+  # + m1-all plot
+  "i3en" = "#5e81ac",
+  # + m3 plot
+  "c5d.2" = "#5e81ac"
 )
-
-## TODO: better palettes
-## - c*, i3, m5
-style.instance.colors <- styles.color.palette.light[1:length(style.instance.colored)]
+style.instance.colored <- names(style.instance.colors)
 style.instance.colors.vibrant <- as.character(shades::saturation(style.instance.colors, delta(0.5)))
-
-names(style.instance.colors) <- style.instance.colored
 names(style.instance.colors.vibrant) <- style.instance.colored
+
+## styles.draw.palette(style.instance.colors)

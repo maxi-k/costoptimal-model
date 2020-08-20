@@ -44,13 +44,14 @@ util.style.fonts.setup <- function() {
 util.style.fonts.setup()
 
 styles.draw.palette <- function(colors) {
-  df <- data.frame(y = 1:length(colors), x = 1)
-  ggplot(df, aes(x = x, y = y, fill = colors, label = colors)) +
+  df <- data.frame(y = 1:length(colors), x = 1,
+                   name = paste(names(colors), " (", colors, ")", sep = ""))
+  ggplot(df, aes(x = x, y = y, fill = colors, label = name)) +
     scale_fill_identity() +
     geom_tile() +
     geom_text() +
     scale_x_continuous(expand = c(0, 0)) +
-    scale_x_continuous(expand = c(0, 0)) +
+    scale_y_continuous(expand = c(0, 0)) +
     theme(legend.position = "none")
 }
 
