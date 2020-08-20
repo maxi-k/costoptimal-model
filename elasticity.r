@@ -30,35 +30,36 @@ model.modulator.snowflake <- function(.df, .window, .num) {
   ## warehouse 4089697793760189952
   ## one day
   .multipliers <- c(
+    0,  # 0
     0,  # 1
     0,  # 2
     0,  # 3
-    20, # 4
-    16, # 5
-    28, # 6
-    25, # 7
-    50, # 8
-    18, # 9
-    22, # 10
-    19, # 11
-    4,  # 12
-    5,  # 13
-    6,  # 14
-    4,  # 15
+    0,  # 4
+    0,  # 5
+    0,  # 6
+    0,  # 7
+    20, # 8
+    16, # 9
+    28, # 10
+    25, # 11
+    50, # 12
+    18, # 13
+    21, # 14
+    17, # 15
     5,  # 16
-    4,  # 17
-    3,  # 18
-    2,  # 19
-    0,  # 20
-    0,  # 21
-    0,  # 22
-    0,  # 23
-    0   # 24
+    7,  # 17
+    7,  # 18
+    7,  # 19
+    16, # 20
+    8,  # 21
+    4,  # 22
+    2   # 23
   )
   .mult <- .multipliers[.window] / .num
   data.frame(
     time.cpu  = .df$time.cpu  * .mult,
-    data.read = .df$data.read * .mult
+    data.read = .df$data.read * .mult,
+    stat.multiplier = .multipliers[.window]
   )
 }
 
@@ -195,6 +196,9 @@ model.elastic.costs <- function(.inst, .params, .mod.fn = model.modulator.sin.ot
     if(nrow(.costs.cur) == 0) {
       stop("no instance satisfies time constraint")
     }
+    if (.recom.prv$count > 12) {
+      browser()
+    }
     ## browser()
     if (.recom.prv$id == best(.costs.cur)$id) { # best stays the same
       addstat("same best")
@@ -246,13 +250,13 @@ model.elastic.costs <- function(.inst, .params, .mod.fn = model.modulator.sin.ot
 
 ## --------------------------------------------------------------------------------
 .params <- list(
-  time.cpu    = 0.2,
+  time.cpu    = 0.5,
   data.read   = 1000,
-  cache.skew  = 0.4,
-  spool.frac  = 0.2,
-  spool.skew  = 0.1,
-  scale.eff   = 0.9,
-  max.inst    = 16,
+  cache.skew  = 0.6,
+  spool.frac  = 1.0,
+  spool.skew  = 0.4,
+  scale.eff   = 0.8,
+  max.inst    = 32,
   window.size = duration(1, "hour"),
   period.size = duration(1, "day"),
   max.latency = duration(1, "hour"),
@@ -261,29 +265,29 @@ model.elastic.costs <- function(.inst, .params, .mod.fn = model.modulator.sin.ot
 .recoms <- model.elastic.costs(aws.data.current.relevant, .params, .mod.fn = model.modulator.snowflake)
 
 
-.inst.c5n <- dplyr::filter(aws.data.current.relevant, str_detect(id, "c5n"))
-.recoms.c5n <- model.elastic.costs(.inst.c5n, .params, .mod.fn = model.modulator.snowflake)
+## .inst.c5n <- dplyr::filter(aws.data.current.relevant, str_detect(id, "c5n"))
+## .recoms.c5n <- model.elastic.costs(.inst.c5n, .params, .mod.fn = model.modulator.snowflake)
 
-.params.snowflake <- .params
-.params.snowflake[["max.latency"]] <- duration(1, "hour")
-.params.snowflake[["scale.eff"]] <- 1
-.inst.snowflake <- dplyr::filter(aws.data.current.relevant, id == "c5d.2xlarge")
-.recoms.snowflake <- model.elastic.costs(.inst.snowflake, .params.snowflake, .mod.fn = model.modulator.snowflake)
+## .params.snowflake <- .params
+## .params.snowflake[["max.latency"]] <- duration(1, "hour")
+## .params.snowflake[["scale.eff"]] <- 1
+## .inst.snowflake <- dplyr::filter(aws.data.current.relevant, id == "c5d.2xlarge")
+## .recoms.snowflake <- model.elastic.costs(.inst.snowflake, .params.snowflake, .mod.fn = model.modulator.snowflake)
 ## --------------------------------------------------------------------------------
 
 plot.elastic.recoms <- function(.wl, .costs) {
-  .maxval <- max(.wl$time.cpu)
+  .maxval <- max(.wl$stat.multiplier)
   .split <- slider::slide_dfr(.costs, function(.recom) {
     .start <- .recom$window.start
-    .end <- .recom$window.end
+
+  .end <- .recom$window.end
     .n <- .end - .start + 1
     purrr::map_dfr(1:.n, function(i) {
       .recom %>% dplyr::mutate(
                           window.start = .start + i - 1,
                           window.end = .start + i - 1,
                           window.start.orig = .start,
-                          window.end.orig = .end,
-                          angle = ifelse(window.start.orig == window.end.orig, 90, 90))
+                          window.end.orig = .end)
     })
   })
   .joined <- dplyr::inner_join(.wl, .split, by = c("window.id" = "window.start")) %>%
@@ -292,45 +296,55 @@ plot.elastic.recoms <- function(.wl, .costs) {
              id.prefix = sub("^([A-Za-z1-9-]+)\\..*", "\\1", id),
              id.short = str_replace(id.name, "large", "l"),
              time.cpu.window.max = max(time.cpu.x),
-             time.cpu.window.avg = mean(time.cpu.x)
+             time.cpu.window.avg = mean(time.cpu.x),
+             mult.max = max(stat.multiplier),
+             mult.avg = mean(stat.multiplier)
            ) %>%
     dplyr::ungroup()
 
-  .joined.text <- .joined %>% dplyr::filter(window.start.orig == window.id) %>%
+  .joined.text <- .joined %>%
+    dplyr::filter(window.start.orig == window.id) %>%
     dplyr::mutate(
              label = paste(count, "×", id.short),
-             label.debug = paste(label, "(switch:", stat.price.switch, ", stay:", stat.price.stay, ")")
+             label.debug = paste(label, "(switch:", stat.price.switch, ", stay:", stat.price.stay, ")"),
+             angle = ifelse(window.end.orig - window.start.orig > 2 |
+                            (stat.multiplier - dplyr::lag(.)$stat.multiplier > 0.25 * .maxval &
+                                                        stat.multiplier- dplyr::lead(.)$stat.multiplier > 0.25 * .maxval),
+                            0, 90),
+             angle = ifelse(is.na(angle), 90, angle),
+             hjust = ifelse(angle == 0, 0.5, 0),
+             nudge.y = ifelse(angle == 0, .maxval * 0.08, .maxval * 0.05)
            )
 
   .labels.x <- as.character(c(.wl$window.id - 1, max(.wl$window.id)))
   .labels.x[1:length(.labels.x) %% 2 == 0] <- ""
 
-  ggplot(.joined, aes(x = window.id, y = time.cpu.x, color = id.prefix)) +
-    scale_color_manual(values = style.instance.colors.vibrant) +
+  ggplot(.joined, aes(x = window.id, y = stat.multiplier, color = id.prefix)) +
+    # scale_color_manual(values = style.instance.colors.vibrant) +
     geom_line(color = "black") +
     geom_segment(aes(x = window.id - 0.5, xend = window.end + 0.5,
-                     y = time.cpu.window.avg,
-                     yend = time.cpu.window.avg),
+                     y = mult.avg, yend = mult.avg),
                  size = 1.2,
                  alpha = 0.8) +
-    geom_text(data = .joined.text, aes(y = time.cpu.window.avg, label = label,
+    geom_text(data = .joined.text, aes(y = mult.avg, label = label,
                                        x = (window.end.orig + window.start.orig) / 2),
               angle = .joined.text$angle,
-              size = 2.8,
-              nudge_y = 0.05 * .maxval,
-              hjust = 0
+              size = 2.5,
+              nudge_y = .joined.text$nudge.y,
+              hjust = .joined.text$hjust
               ) +
     scale_x_continuous(
       breaks = c(.wl$window.id - 0.5, max(.wl$window.id) + 0.5),
       labels = .labels.x,
       minor_breaks = c()) +
-    scale_y_continuous(limits = c(0, .maxval * 1.47)) +
+    scale_y_continuous() +
     labs(
       x = "Hour",
-      y = "Workload"
+      y = "Workload Multiplier"
     ) +
     theme_bw() +
-    theme(legend.position = "none")
+    theme(plot.margin=grid::unit(c(1,1,1,1), "mm"),
+          legend.position = "none")
 }
 ## --------------------------------------------------------------------------------
 
@@ -343,19 +357,19 @@ plot.elastic.recoms <- function(.wl, .costs) {
 )
 ## plot.elastic.recoms(.mod.workload, .recoms)
 ggsave(plots.mkpath("m4-time-workload-best.pdf"), plot.elastic.recoms(.mod.workload, .recoms),
-       width = 3.6, height = 2.6, units = "in",
+       width = 3.6, height = 2.3, units = "in",
        device = cairo_pdf)
 
 ## plot.elastic.recoms(.mod.workload, .recoms.c5n)
-ggsave(plots.mkpath("m4-time-workload-best-c5n.pdf"), plot.elastic.recoms(.mod.workload, .recoms.c5n),
-       width = 3.6, height = 2.6, units = "in",
-       device = cairo_pdf)
+## ggsave(plots.mkpath("m4-time-workload-best-c5n.pdf"), plot.elastic.recoms(.mod.workload, .recoms.c5n),
+##        width = 3.6, height = 2.6, units = "in",
+##        device = cairo_pdf)
 
 ## ggsave(plots.mkpath("m4-time-workload-best-snowflake.pdf"), plot.elastic.recoms(.mod.workload, .recoms.snowflake),
 ##        width = 3.6, height = 2.6, units = "in",
 ##        device = cairo_pdf)
 
-write.csv(.recoms, "data/elasticity.data.csv")
+## write.csv(.recoms, "data/elasticity.data.csv")
 ## ggsave("../figures/m5-elasticity-initial.pdf")
 
 ## plot.elastic.recoms(.mod.workload, .recoms.snowflake)
