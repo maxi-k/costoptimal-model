@@ -294,7 +294,7 @@ plot.elastic.recoms <- function(.wl, .costs) {
     dplyr::group_by(window.start.orig) %>%
     dplyr::mutate(
              id.prefix = sub("^([A-Za-z1-9-]+)\\..*", "\\1", id),
-             id.short = str_replace(id.name, "large", "l"),
+             id.short = str_replace(id.name, "xlarge", ""),
              time.cpu.window.max = max(time.cpu.x),
              time.cpu.window.avg = mean(time.cpu.x),
              mult.max = max(stat.multiplier),
@@ -338,10 +338,7 @@ plot.elastic.recoms <- function(.wl, .costs) {
       labels = .labels.x,
       minor_breaks = c()) +
     scale_y_continuous() +
-    labs(
-      x = "Hour",
-      y = "Workload Multiplier"
-    ) +
+    labs(x = "Hour", y = "Workload Multiplier") +
     theme_bw() +
     theme(plot.margin=grid::unit(c(1,1,1,1), "mm"),
           legend.position = "none")
