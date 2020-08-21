@@ -135,19 +135,24 @@ plots.m2.draw.diff.for <- function(.id) {
                   id.title = paste(sub("^([A-Za-z1-9-]+)\\..*", "\\1", id.name), "versus best"),
                   price.diff.absolute = stat.price.sum - .best$stat.price.sum,
                   price.diff.fraction = stat.price.sum / .best$stat.price.sum,
-                  price.diff.fractext = sprintf("%.2f", price.diff.fraction),
+                  price.diff.fractext = ifelse(price.diff.fraction != 1 & price.diff.fraction < 1.1,
+                                               "1.ε",
+                                               sprintf("%.1f", price.diff.fraction)),
                   price.diff.fracdisc = ifelse(price.diff.fraction != 1 & price.diff.fraction < 1.1,
                                                 "1.0x",
                                                sprintf("%.1f", pmin(2.5, price.diff.fraction))))
   })
 
-  .diff$id.factor <- factor(.diff$id.short, levels = str_replace(.id, "xlarge", ""))
+  id.levels <- paste(sub("^([A-Za-z1-9-]+)\\..*", "\\1", .id), "versus best")
+  .diff$id.factor <- factor(.diff$id.title, levels = )
 
   palette <- styles.color.palette.temperature
   texts <- purrr::map(styles.color.palette.temperature, function(c) {
-    #shades::brightness("#000000", delta(1 - shades::brightness(c)))
-    shades::complement(c)
+    b <- shades::brightness(c)
+    print(b)
+    if(b > 0.93) { "#000000" } else { "#ffffff" }
   })
+  print(texts)
 
   ggplot(.diff, aes(x = param.scanned, y = param.spool.frac,
                     label = price.diff.fractext, fill = price.diff.fracdisc,
@@ -155,7 +160,7 @@ plots.m2.draw.diff.for <- function(.id) {
     scale_fill_manual(values = palette) +
     geom_tile() +
     scale_color_manual(values = texts) +
-    geom_text(size = 2) +
+    geom_text(size = 2.5) +
     scale_y_continuous(expand = c(0, 0)) +
     scale_x_log10(expand = c(0, 0), breaks = c(100, 1024, 10 * 1024, 100 * 1024),
                   labels = c("100GB", "1TB", "10TB", "100TB")) +
@@ -164,9 +169,10 @@ plots.m2.draw.diff.for <- function(.id) {
           axis.title.y = element_blank(),
           axis.text.y  = element_blank(),
           axis.ticks.y = element_blank(),
+          axis.title.x = element_text(hjust = 0.3475),
           plot.margin=grid::unit(c(1,1,1,0), "mm")) +
     labs(x = "Scanned Data [log]", y = "Materialization Fraction") +
-    facet_grid(cols = vars(id.factor))
+    facet_grid(cols = vars(id.title))
 }
 
 plots.m2.diff.inst <- c("c5.24xlarge", "c5d.24xlarge", "i3.16xlarge","c5n.18xlarge")
