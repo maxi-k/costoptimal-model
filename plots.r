@@ -132,6 +132,7 @@ plots.m2.draw.diff.for <- function(.id) {
     .self <-  dplyr::filter(group, id.name %in% .id)
     dplyr::mutate(.self,
                   id.short = str_replace(id.name, "xlarge", ""),
+                  id.title = paste(sub("^([A-Za-z1-9-]+)\\..*", "\\1", id.name), "versus best"),
                   price.diff.absolute = stat.price.sum - .best$stat.price.sum,
                   price.diff.fraction = stat.price.sum / .best$stat.price.sum,
                   price.diff.fractext = sprintf("%.2f", price.diff.fraction),
@@ -143,11 +144,17 @@ plots.m2.draw.diff.for <- function(.id) {
   .diff$id.factor <- factor(.diff$id.short, levels = str_replace(.id, "xlarge", ""))
 
   palette <- styles.color.palette.temperature
+  texts <- purrr::map(styles.color.palette.temperature, function(c) {
+    #shades::brightness("#000000", delta(1 - shades::brightness(c)))
+    shades::complement(c)
+  })
 
   ggplot(.diff, aes(x = param.scanned, y = param.spool.frac,
-                    label = price.diff.fractext, fill = price.diff.fracdisc)) +
+                    label = price.diff.fractext, fill = price.diff.fracdisc,
+                    color = price.diff.fracdisc)) +
     scale_fill_manual(values = palette) +
     geom_tile() +
+    scale_color_manual(values = texts) +
     geom_text(size = 2) +
     scale_y_continuous(expand = c(0, 0)) +
     scale_x_log10(expand = c(0, 0), breaks = c(100, 1024, 10 * 1024, 100 * 1024),
@@ -162,10 +169,10 @@ plots.m2.draw.diff.for <- function(.id) {
     facet_grid(cols = vars(id.factor))
 }
 
-## plots.m2.diff.inst <- c("c5.24xlarge", "c5d.24xlarge", "i3.16xlarge","c5n.18xlarge")
-## ggsave(plots.mkpath("m2-spool-diff.pdf"), plots.m2.draw.diff.for(plots.m2.diff.inst),
-##        width = 3 * 2.5, height = 2.5, units = "in",
-##        device = cairo_pdf)
+plots.m2.diff.inst <- c("c5.24xlarge", "c5d.24xlarge", "i3.16xlarge","c5n.18xlarge")
+ggsave(plots.mkpath("m2-spool-diff.pdf"), plots.m2.draw.diff.for(plots.m2.diff.inst),
+       width = 3 * 2.5, height = 2.5, units = "in",
+       device = cairo_pdf)
 
 ## ---------------------------------------------------------------------------------------------- ##
                                         # M3: Scale Out & Down #
