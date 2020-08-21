@@ -379,17 +379,17 @@ style.instance.colors <- c(
   # + m3 plot
   "c5n"  = "#b48ead",
   "c5d"  = "#a3be8c",
-  "m5n"  = "#ebcb8b",
+  "m5n"  = "#81a1c1",
   "r5n"  = "#8fbcbb",
   # + m2 plot
-  "c5"   = "#d8dee9",
-  "i3"   = "#81a1c1",
-  "m5"   = "#d08770",
+  "c5"   = "#5e81ac",
+  "i3"   = "#ebcb8b",
+  "m5"   = "#4c566a",
   "m5d"  = "#bf616a",
-  "m5dn" = "#4c566a",
+  "m5dn" = "#d08770",
   "r5"   = "#88c0d0",
   # + m1-all plot
-  "i3en" = "#5e81ac",
+  "i3en" = "#d8dee9",
   # + m3 plot
   "c5d.2" = "#5e81ac"
 )
@@ -397,4 +397,4 @@ style.instance.colored <- names(style.instance.colors)
 style.instance.colors.vibrant <- as.character(shades::saturation(style.instance.colors, delta(0.5)))
 names(style.instance.colors.vibrant) <- style.instance.colored
 
-## styles.draw.palette(style.instance.colors)
+styles.draw.palette(style.instance.colors.vibrant)
