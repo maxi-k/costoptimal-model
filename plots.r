@@ -135,8 +135,8 @@ plots.m2.draw.diff.for <- function(.id) {
                   id.title = paste(sub("^([A-Za-z1-9-]+)\\..*", "\\1", id.name), "versus best"),
                   price.diff.absolute = stat.price.sum - .best$stat.price.sum,
                   price.diff.fraction = stat.price.sum / .best$stat.price.sum,
-                  price.diff.fractext = ifelse(price.diff.fraction == 1,
-                                              "+",
+                  price.diff.fractext = ifelse(price.diff.fraction != 1 & price.diff.fraction < 1.1,
+                                              "≈1",
                                               sprintf("%.1f", price.diff.fraction)),
                   price.diff.fracdisc = ifelse(price.diff.fraction != 1 & price.diff.fraction < 1.1,
                                                 "1.0x",
@@ -149,7 +149,7 @@ plots.m2.draw.diff.for <- function(.id) {
   palette <- styles.color.palette.temperature
   texts <- purrr::map(styles.color.palette.temperature, function(c) {
     b <- shades::brightness(c)
-    if(b > 0.8) { "#000000" } else { "#ffffff" }
+    if(b > 0.85) { "#000000" } else { "#ffffff" }
   })
 
   ggplot(.diff, aes(x = param.scanned, y = param.spool.frac,
@@ -174,9 +174,9 @@ plots.m2.draw.diff.for <- function(.id) {
 }
 
 plots.m2.diff.inst <- c("c5.24xlarge", "c5d.24xlarge", "i3.16xlarge","c5n.18xlarge")
-ggsave(plots.mkpath("m2-spool-diff.pdf"), plots.m2.draw.diff.for(plots.m2.diff.inst),
-       width = 3 * 2.5, height = 2.5, units = "in",
-       device = cairo_pdf)
+## ggsave(plots.mkpath("m2-spool-diff.pdf"), plots.m2.draw.diff.for(plots.m2.diff.inst),
+##        width = 3 * 2.5, height = 2.5, units = "in",
+##        device = cairo_pdf)
 
 ## ---------------------------------------------------------------------------------------------- ##
                                         # M3: Scale Out & Down #
@@ -337,6 +337,6 @@ plots.mh.history.cost.draw <- function() {
 }
 
 ## plots.mh.history.cost.draw()
-ggsave(plots.mkpath("mh-date-cost.pdf"), plots.mh.history.cost.draw(),
-       width = 3.6, height = 2.3, units = "in",
-       device = cairo_pdf)
+## ggsave(plots.mkpath("mh-date-cost.pdf"), plots.mh.history.cost.draw(),
+##        width = 3.6, height = 2.3, units = "in",
+##        device = cairo_pdf)
