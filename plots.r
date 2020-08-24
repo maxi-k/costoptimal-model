@@ -102,7 +102,7 @@ plots.m2.spool.draw <- function() {
                        label = str_replace(id.name, "xlarge", ""))) +
     scale_fill_manual(values = palette) +
     geom_tile(aes(fill = id.prefix)) +
-    ## geom_text() +
+    geom_text() +
     scale_y_continuous(expand = c(0, 0),
                        breaks = seq(0, 1.0, 0.2),
                        labels = c("0", ".2", ".4", ".6", ".8", "1")) +
@@ -174,6 +174,7 @@ plots.m2.draw.diff.for <- function(.id) {
 }
 
 plots.m2.diff.inst <- c("c5.24xlarge", "c5d.24xlarge", "i3.16xlarge","c5n.18xlarge")
+## plots.m2.draw.diff.for(plots.m2.diff.inst)
 ## ggsave(plots.mkpath("m2-spool-diff.pdf"), plots.m2.draw.diff.for(plots.m2.diff.inst),
 ##        width = 3 * 2.5, height = 2.5, units = "in",
 ##        device = cairo_pdf)
@@ -340,3 +341,62 @@ plots.mh.history.cost.draw <- function() {
 ## ggsave(plots.mkpath("mh-date-cost.pdf"), plots.mh.history.cost.draw(),
 ##        width = 3.6, height = 2.3, units = "in",
 ##        device = cairo_pdf)
+
+plots.mh.spot.prices.draw <- function() {
+  .df <- aws.data.spot.by.date
+  .inst <- "c5d.2xlarge"
+  .df <- .df %>% dplyr::filter(id == .inst)
+  print(head(.df)$parsed.date)
+  ggplot(.df, aes(x = parsed.date)) +
+    geom_line(aes(y = cost.usdph), color = "blue") +
+    geom_line(aes(y = SpotPrice), color = "red")
+}
+
+## plots.mh.spot.prices.draw()
+##
+plots.mh.spot.gen.data <- memoize(function(.def) {
+  .wl <- model.gen.workload(.def)
+  .inst.ondemand <- aws.data.current
+  .cost.ondemand <- model.calc.costs(.wl$query, .inst.ondemand, .wl$time.fn)
+  .recm.ondemand <- model.recommend.from.timings.arr(.wl$query, .cost.ondemand)
+  .recm.ondemand$group <- "ondemand"
+  #
+  .inst.spot <- aws.data.spot.joined  %>%
+    dplyr::mutate(cost.usdph = SpotPrice) %>%
+    dplyr::group_by(parsed.date)
+  #
+  .recm.spot <- dplyr::group_modify(.inst.spot, function(.inst.group, time) {
+    .cost <- model.calc.costs(.wl$query, .inst.group, .wl$time.fn)
+    .recm <- model.recommend.from.timings.arr(.wl$query, .cost)
+  }) %>% dplyr::ungroup()
+  .recm.spot$group <- "spot"
+  #
+  .df <- rbind(
+    dplyr::mutate(.recm.ondemand, parsed.date = min(.recm.spot$parsed.date)),
+    dplyr::mutate(.recm.ondemand, parsed.date = max(.recm.spot$parsed.date)),
+    .recm.spot
+  )
+})
+
+plots.mh.spot.cost.draw <- function() {
+  .wl <- data.frame(
+    cpu.hours  = 5,
+    data.scan  = 10^4,
+    max.count  = 1,
+    cache.skew = 0.001,
+    spool.skew = 0.001,
+    spool.frac = 0.3,
+    scale.fact = 0.95,
+    load.first = FALSE,
+    max.period = 2^30
+  )
+
+  .df <- plots.mh.spot.gen.data(.wl)
+
+  ggplot(.df, aes(x = parsed.date, y = stat.price.sum,
+                  label = id, group = group)) +
+    geom_line() +
+    geom_text(angle = 90)
+}
+
+plots.mh.spot.cost.draw()

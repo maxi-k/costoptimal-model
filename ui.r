@@ -1102,7 +1102,7 @@ client <- function(request) {
         h3("M2: Caching"),
         helpText("How is data cached on instances between queries?"),
         hr(),
-        sliderInput("locality", "Caching Data Distribution Factor", min=1e-8, max=1 - 1e-8, value=0.1),
+        sliderInput("locality", "Caching Data Distribution Factor", min=1e-8, max=2 - 1e-8, value=0.1),
         helpText("Zipf distribution factor for simulating read locality. Higher values produce higher locality."),
         checkboxInput("distr.caching.load.first", "First Read is from S3", value = FALSE),
         helpText("Whether the first read in the access distribution is a read from S3 (vs an optimal read)"),

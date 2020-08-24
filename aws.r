@@ -321,6 +321,33 @@ aws.spot.price.history.averages <- aws.spot.price.history.load() %>%
                      meta.time.max = max(Timestamp)) %>%
     dplyr::rename(id = InstanceType)
 
+aws.data.spot.by.date <- aws.spot.price.history %>%
+  dplyr::mutate(parsed.date = lubridate::round_date(Timestamp, unit = "hour")) %>%
+  dplyr::group_by(parsed.date, InstanceType) %>%
+  dplyr::summarise(SpotPrice = mean(SpotPrice)) %>%
+  dplyr::rename(id = InstanceType) %>%
+  dplyr::arrange(parsed.date)
+
+aws.data.spot.min.date <- min(aws.data.spot.by.date$parsed.date) - lubridate::days(1)
+
+aws.data.spot.filled <- aws.data.spot.by.date %>%
+  dplyr::group_by(parsed.date) %>%
+  dplyr::group_split() %>%
+  purrr::reduce(.init = setNames(list(dplyr::transmute(aws.data.current,
+                                                       SpotPrice = cost.usdph,
+                                                       id = id,
+                                                       parsed.date = aws.data.spot.min.date)),
+                                 aws.data.spot.min.date),
+               function(acc, row) {
+                 prev <- acc[[length(acc)]]
+                 acc[[length(acc) + 1]] <- rbind(row, dplyr::anti_join(prev, row, "id"))
+                 acc
+               }) %>%
+  bind_rows() %>%
+  group_by(parsed.date)
+
+aws.data.spot.joined <- dplyr::inner_join(aws.data.current, aws.data.spot.filled, by = "id")
+
 ## Filter functions
 
 aws.data.filter.spot.price <- function(df) {
@@ -335,9 +362,7 @@ aws.data.filter.spot.price <- function(df) {
                                         # DVASSALLO S3 MEASUREMENT DATA
 ## ---------------------------------------------------------------------------------------------- ##
 
-s3.benchmark.dvassallo.raw.load()
-
-s3.benchmark.dvassallo.data.max.obj.size <- s3.benchmark.dvassallo.raw.data %>%
+s3.benchmark.dvassallo.data.max.obj.size <- s3.benchmark.dvassallo.raw.load() %>%
     dplyr::group_by(id) %>%
     dplyr::top_n(1, wt = object.size) %>%
     dplyr::mutate(
@@ -397,4 +422,4 @@ style.instance.colored <- names(style.instance.colors)
 style.instance.colors.vibrant <- as.character(shades::saturation(style.instance.colors, delta(0.5)))
 names(style.instance.colors.vibrant) <- style.instance.colored
 
-styles.draw.palette(style.instance.colors.vibrant)
+## styles.draw.palette(style.instance.colors.vibrant)
