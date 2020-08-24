@@ -34,9 +34,9 @@ SELECT s.warehouseId,
 
 row <- snowset.warehouse.sample()
 
-snowflake.instance <- dplyr::filter(aws.data.current, id == "c5d.2xlarge")
+snowflake.instance <- dplyr::filter(aws.data.current, id == "c5d.2xlarge") %>% model.with.speeds()
 
-snowset.row.est.skew <- function(row) {
+snowset.row.est.cache.skew <- function(row) {
   .inst <- model.with.speeds(snowflake.instance)
   .scanned <- (row$scans3 + row$scancache) / row$warehousesize / 1024^3
   .tail <- row$scans3 / row$warehousesize / 1024^3
@@ -49,7 +49,6 @@ snowset.row.est.skew <- function(row) {
   .skew <- 0.00001
   .error <- 1
   .iter <- 0
-  # TODO: fix error update condition
   while(.error > 0.01 && .iter < 100 && .skew > 0) {
     dist.est <- model.make.distr.fn(.skew)(round(.scanned))
     pack <- model.distr.pack(.bins, dist.est) %>% as.data.frame()
@@ -58,26 +57,43 @@ snowset.row.est.skew <- function(row) {
     }
     err.abs <- pack$data.s3 - .tail
     .error <- abs(err.abs / .tail)
-    .skew <- .skew + sign(err.abs) * min(0.1, .error)
+    .skew <- .skew + sign(err.abs) * min(0.1, .error / (.iter * 0.5))
     .iter <- .iter + 1
   }
   if (.iter >= 100) {
-    warning("Aborted after 100 iterations, skew might not be very accurate")
-    print(.skew)
+    print(c("Aborted after 100 iterations, skew might not be very accurate", .skew))
   }
-  if (.skew >= 0) {
-    warning("Skew < 0, this is a weird row.")
-    print(.skew)
+  if (.skew <= 0) {
+    print(c("Skew < 0, this is a weird row.", .skew))
   }
   data.frame(
-    cache.skew = .skew
+    wh.id = row$warehouseid,
+    data.scan = .scanned,
+    cache.skew.tail = .tail,
+    cache.skew = .skew,
+    cache.skew.error = .error,
+    cache.skew.iter = .iter
   )
 }
 
-relevant <- dplyr::filter(row, scans3 + scancache > warehousesize * (300 * 1024^3))
-print(head(relevant, n = 1)$scans3 / 1024^3)
 
-cache.skews <- slider::slide_dfr(relevant, snowset.row.est.skew)
+relevant <- row %>%
+  dplyr::filter(
+           scans3 != 0,
+           scancache > (snowflake.instance$calc.sto.caching + snowflake.instance$calc.mem.caching) * 1024^3,
+           scans3 + scancache > warehousesize * (300 * 1024^3)) %>%
+  dplyr::arrange(scans3 + scancache)
+
+cache.skews <- slider::slide_dfr(head(relevant, n = 10), snowset.row.est.cache.skew)
+
+# TODO
+snowset.row.est.spool.frac <- function(row) {
+
+}
+
+snowset.row.est.spool.skew <- function(row) {
+
+}
 
 snowset.row.to.model <- function(row) {
 

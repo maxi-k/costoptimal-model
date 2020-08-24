@@ -247,10 +247,25 @@ aws.data.filter.large <- function(df) {
         dplyr::ungroup()
 }
 
+aws.data.filter.large2 <- function(df) {
+    df %>%
+        dplyr::group_by(id.prefix) %>%
+        dplyr::top_n(1, wt = id.number) %>%
+        dplyr::ungroup()
+}
+
+aws.data.filter.small2 <- function(df) {
+    dplyr::anti_join(df, aws.data.filter.large2(df), "id")
+}
+
 aws.data.filter.relevant.family <- function(df) {
     df %>%
         aws.data.with.prefixes() %>%
         dplyr::filter(!(id.prefix %in% aws.data.prefixes.irrelevant))
+}
+
+aws.data.filter.relevant.family2 <- function(df) {
+    dplyr::filter(df, !(id.prefix %in% aws.data.prefixes.irrelevant))
 }
 
 ## Precomputed filtered sets
@@ -324,7 +339,7 @@ aws.spot.price.history.averages <- aws.spot.price.history.load() %>%
 aws.data.spot.by.date <- aws.spot.price.history %>%
   dplyr::mutate(parsed.date = lubridate::round_date(Timestamp, unit = "hour")) %>%
   dplyr::group_by(parsed.date, InstanceType) %>%
-  dplyr::summarise(SpotPrice = mean(SpotPrice)) %>%
+  dplyr::summarise(SpotPrice = min(SpotPrice)) %>%
   dplyr::rename(id = InstanceType) %>%
   dplyr::arrange(parsed.date)
 
@@ -340,7 +355,9 @@ aws.data.spot.filled <- aws.data.spot.by.date %>%
                                  aws.data.spot.min.date),
                function(acc, row) {
                  prev <- acc[[length(acc)]]
-                 acc[[length(acc) + 1]] <- rbind(row, dplyr::anti_join(prev, row, "id"))
+                 diff <- dplyr::anti_join(prev, row, "id") %>%
+                   dplyr::mutate(parsed.date = head(row, n = 1)$parsed.date)
+                 acc[[length(acc) + 1]] <- rbind(row, diff)
                  acc
                }) %>%
   bind_rows() %>%

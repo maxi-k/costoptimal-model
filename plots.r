@@ -356,12 +356,16 @@ plots.mh.spot.prices.draw <- function() {
 ##
 plots.mh.spot.gen.data <- memoize(function(.def) {
   .wl <- model.gen.workload(.def)
-  .inst.ondemand <- aws.data.current
+  .inst.ondemand <- aws.data.current.large.relevant
   .cost.ondemand <- model.calc.costs(.wl$query, .inst.ondemand, .wl$time.fn)
   .recm.ondemand <- model.recommend.from.timings.arr(.wl$query, .cost.ondemand)
   .recm.ondemand$group <- "ondemand"
   #
   .inst.spot <- aws.data.spot.joined  %>%
+    dplyr::ungroup() %>%
+    aws.data.filter.relevant.family2() %>%
+    ## aws.data.filter.large2() %>%
+    aws.data.filter.small2() %>%
     dplyr::mutate(cost.usdph = SpotPrice) %>%
     dplyr::group_by(parsed.date)
   #
@@ -380,22 +384,29 @@ plots.mh.spot.gen.data <- memoize(function(.def) {
 
 plots.mh.spot.cost.draw <- function() {
   .wl <- data.frame(
-    cpu.hours  = 5,
-    data.scan  = 10^4,
+    cpu.hours  = 1,
+    data.scan  = 4 * 10^3, # 4
     max.count  = 1,
     cache.skew = 0.001,
     spool.skew = 0.001,
-    spool.frac = 0.3,
+    spool.frac = 0.5,
     scale.fact = 0.95,
     load.first = FALSE,
     max.period = 2^30
   )
 
-  .df <- plots.mh.spot.gen.data(.wl)
+  .df <- plots.mh.spot.gen.data(.wl) %>%
+    dplyr::mutate(id.prefix = sub("^([A-Za-z1-9-]+)\\..*", "\\1", id.name)) %>%
+    dplyr::filter(group != "ondemand")
+  .text <- .df %>%
+    dplyr::arrange(parsed.date) %>%
+    dplyr::mutate(day = lubridate::round_date(parsed.date, unit = "week")) %>%
+    dplyr::filter(group == "ondemand" | id != dplyr::lag(id) | day != dplyr::lag(day)) %>%
+    tail(n = nrow(.) - 2)
 
-  ggplot(.df, aes(x = parsed.date, y = stat.price.sum,
-                  label = id, group = group)) +
-    geom_line() +
+  ggplot(.text, aes(x = parsed.date, y = stat.price.sum,
+                  label = paste(id, " (", cost.usdph, ")", sep = ""), group = group, color = group)) +
+    geom_point() +
     geom_text(angle = 90)
 }
 
