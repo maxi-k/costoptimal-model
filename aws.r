@@ -338,6 +338,7 @@ aws.spot.price.history.averages <- aws.spot.price.history.load() %>%
 
 aws.data.spot.by.date <- aws.spot.price.history %>%
   dplyr::mutate(parsed.date = lubridate::round_date(Timestamp, unit = "hour")) %>%
+  dplyr::select(-Timestamp, -ProductDescription) %>%
   dplyr::group_by(parsed.date, InstanceType) %>%
   dplyr::summarise(SpotPrice = min(SpotPrice)) %>%
   dplyr::rename(id = InstanceType) %>%
@@ -351,6 +352,7 @@ aws.data.spot.filled <- aws.data.spot.by.date %>%
   purrr::reduce(.init = setNames(list(dplyr::transmute(aws.data.current,
                                                        SpotPrice = cost.usdph,
                                                        id = id,
+                                                       ## AvailabilityZone = "eu-central-1a",
                                                        parsed.date = aws.data.spot.min.date)),
                                  aws.data.spot.min.date),
                function(acc, row) {

@@ -343,16 +343,15 @@ plots.mh.history.cost.draw <- function() {
 ##        device = cairo_pdf)
 
 plots.mh.spot.prices.draw <- function() {
-  .df <- aws.data.spot.by.date
-  .inst <- "c5d.2xlarge"
-  .df <- .df %>% dplyr::filter(id == .inst)
+  .df <- aws.data.spot.joined %>% aws.data.filter.large2()
   print(head(.df)$parsed.date)
   ggplot(.df, aes(x = parsed.date)) +
-    geom_line(aes(y = cost.usdph), color = "blue") +
-    geom_line(aes(y = SpotPrice), color = "red")
+    geom_line(aes(y = SpotPrice), color = "red") +
+    facet_grid(rows = vars(id), scales = "free")
 }
 
 ## plots.mh.spot.prices.draw()
+
 ##
 plots.mh.spot.gen.data <- memoize(function(.def) {
   .wl <- model.gen.workload(.def)
@@ -365,7 +364,7 @@ plots.mh.spot.gen.data <- memoize(function(.def) {
     dplyr::ungroup() %>%
     aws.data.filter.relevant.family2() %>%
     ## aws.data.filter.large2() %>%
-    aws.data.filter.small2() %>%
+    ## aws.data.filter.small2() %>%
     dplyr::mutate(cost.usdph = SpotPrice) %>%
     dplyr::group_by(parsed.date)
   #
@@ -396,8 +395,8 @@ plots.mh.spot.cost.draw <- function() {
   )
 
   .df <- plots.mh.spot.gen.data(.wl) %>%
-    dplyr::mutate(id.prefix = sub("^([A-Za-z1-9-]+)\\..*", "\\1", id.name)) %>%
-    dplyr::filter(group != "ondemand")
+    dplyr::mutate(id.prefix = sub("^([A-Za-z1-9-]+)\\..*", "\\1", id.name),
+                  id.short  = str_replace(id.name, "xlarge", ""))
   .text <- .df %>%
     dplyr::arrange(parsed.date) %>%
     dplyr::mutate(day = lubridate::round_date(parsed.date, unit = "week")) %>%
@@ -405,9 +404,11 @@ plots.mh.spot.cost.draw <- function() {
     tail(n = nrow(.) - 2)
 
   ggplot(.text, aes(x = parsed.date, y = stat.price.sum,
-                  label = paste(id, " (", cost.usdph, ")", sep = ""), group = group, color = group)) +
+                    label = id.short, label.debug = paste(id, " (", cost.usdph, ")", sep = ""),
+                    group = group, color = group)) +
+    geom_line(data = .df %>% dplyr::filter(group == "ondemand")) +
     geom_point() +
-    geom_text(angle = 90)
+    geom_text(angle = 90, nudge_y = 0.01, hjust = 0)
 }
 
-plots.mh.spot.cost.draw()
+## plots.mh.spot.cost.draw()
