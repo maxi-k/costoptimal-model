@@ -140,13 +140,74 @@ snowset.gen.for.model <- function() {
   testset <- head(relevant, n = 30)
   frames <- dplyr::transmute(testset,
                              wh.id = warehouseid,
-                             cpu.hours = cpuMicros / 10^6 / 60)
+                             cpu.hours = cpumicros / 10^6 / 60^2)
 
   workload <- frames %>%
     slider::slide2_dfr(testset, ., snowset.row.est.cache.skew) %>% # cache skew
     snowset.row.est.spool.frac(testset, .) %>%                     # spool frac
     slider::slide2_dfr(testset, ., snowset.row.est.spool.skew)     # spool skew
-  workload
+
+  workload %>%
+    dplyr::filter(
+             cache.skew.iter != 100,
+             spool.skew.iter != 100)
 }
 
-snowset.gen.for.model()
+plots.m3.time.cost.draw <- function() {
+  .gen <-  snowset.gen.for.model() %>%
+    dplyr::filter(cache.skew.iter != 100, spool.skew.iter != 0)
+  print(.gen)
+  .wl <- gen %>%
+    head(n = 1) %>%
+    dplyr::mutate(
+             max.count = 128,
+             scale.fact = 0.95,
+             load.first = FALSE
+           )
+  .def <- model.gen.workload(.wl)
+  .query <- .def$query
+  .time.fn <- .def$time.fn
+
+  .inst <- rbind(
+    aws.data.current.large.relevant,
+    aws.data.current %>% dplyr::filter(id == "c5d.2xlarge") %>% dplyr::mutate(id = "snowflake")
+  )
+  .inst.id <- c("c5d", "snowflake")
+
+  .cost.all <- model.calc.costs(.query, .inst, .time.fn)
+  .frontier <- model.calc.frontier(.cost.all,
+                                   x = "stat.time.sum", y = "stat.price.sum",
+                                   id = "id", quadrant = "bottom.left")
+  .df <- .cost.all %>% dplyr::mutate(
+                                id.prefix = sub("^([A-Za-z1-9-]+)\\..*", "\\1", id.name),
+                                group = ifelse(id %in% .frontier$id | id.prefix %in% .inst.id, id.prefix, "other"))
+
+  .groups <- unique(.df$group)
+  .levels <- intersect(unique(.inst$id.prefix), .groups)
+  .levels <- c(.levels, "snowflake", "other")
+
+  .palette <- styles.color.palette1[1:length(.levels)]
+  names(.palette) <- .levels
+  .palette["other"] <- "#eeeeee"
+  .palette <- rev(.palette)
+
+  .colored <- .df %>% dplyr::filter(group != "other")
+  .greys <- .df %>% dplyr::filter(group == "other")
+
+  .labels <- .colored %>%
+    dplyr::group_by(group) %>%
+    dplyr::filter(stat.price.sum == max(stat.price.sum))
+
+  ggplot(.df, aes(x = stat.time.sum, y = stat.price.sum, color = group, label = group)) +
+    scale_color_manual(values = .palette, limits = .levels) +
+    geom_point(data = .greys) +
+    geom_point(data = .colored) +
+    geom_text(data = .labels, nudge_x = -0.15, nudge_y = 0.08) +
+    # geom_text(data = .colored, aes(label = count)) +
+    scale_x_log10() +
+    labs(y = "Workload Cost ($) [log]",
+         x = "Workload Execution Time (s) [log]",
+         color = "Instance")
+  }
+
+## plots.m3.time.cost.draw()

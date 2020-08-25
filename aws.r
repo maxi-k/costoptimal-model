@@ -116,7 +116,7 @@ aws.spot.interruption.frequencies.load <- function(path = aws.data.folder,
     result
 }
 
-aws.spot.price.history.load <- function(path = aws.data.folder, filename = "spotprices.csv") {
+aws.spot.price.history.load <- function(path = aws.data.folder, filename = "spothistory/spotprices-us-east-1.csv") {
     full.path <- paste(path, filename, sep="/")
     result <- read_csv(full.path)
     aws.spot.price.history <<- result
