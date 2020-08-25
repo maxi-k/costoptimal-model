@@ -1,3 +1,4 @@
+SPOT_URL="https://spot-bid-advisor.s3.amazonaws.com/spot-advisor-data.json"
 
 clean:
 	rm -f spotprices-us-east-1.csv
@@ -9,7 +10,8 @@ spotprices-us-east-1.csv:
 
 fetch-interruptions:
 	mkdir -p interruption-frequencies
-	wget https://spot-bid-advisor.s3.amazonaws.com/spot-advisor-data.json -O interruption-frequencies/spot-data-$(shell date -I"seconds").json
+	curl ${SPOT_URL} -I >> interruption-frequencies/heads
+	wget ${SPOT_URL} -O interruption-frequencies/spot-data-$(shell date -I"seconds").json
 
 all: clean spotprices-us-east-1.csv
 
