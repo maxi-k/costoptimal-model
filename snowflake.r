@@ -235,4 +235,31 @@ GROUP BY s.warehouseid
 )
 
 
-plots.m3.time.cost.draw(large.row)
+## plots.m3.time.cost.draw(large.row)
+
+large.avgs <- snowset.q(
+"
+WITH large AS(
+     SELECT warehouseid
+     FROM week1
+     WHERE persistentwritebytess3 = 0
+       AND count(*) > 10
+       AND avg(persistentreadbytess3) / POWER(1024, 3) > 300
+     GROUP BY warehouseid
+     ORDER BY avg(persistentreadbytess3) DESC;
+)
+SELECT s.warehouseid,
+       sum(systemCpuTime) + sum(userCpuTime) AS cpuMicros,
+       sum(persistentReadBytesS3)            AS scanS3,
+       sum(persistentReadBytesCache)         AS scanCache,
+       sum(intDataReadBytesLocalSSD)         AS spoolSSD,
+       sum(intDataReadBytesS3)               AS spoolS3,
+       avg(warehousesize)                    AS warehousesize
+FROM snowset s
+JOIN wh ON large.warehouseid = s.warehouseid
+GROUP BY s.warehouseid
+"
+)
+
+
+plots.m3.time.cost.draw(large.avgs)

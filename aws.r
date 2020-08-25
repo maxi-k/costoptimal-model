@@ -400,8 +400,8 @@ aws.data.filter.spot.price <- function(df) {
         dplyr::select(-cost.usdph.avg)
 }
 
-aws.data.filter.spot.price.inter.freq <- function(df) {
-  freq.filter <- aws.data.mkfilter.spot.inter.freq(5)
+aws.data.filter.spot.price.inter.freq <- function(df, freq = 5) {
+  freq.filter <- aws.data.mkfilter.spot.inter.freq(freq)
   spot <- df %>%
     freq.filter() %>%
     aws.data.filter.spot.price() %>%

@@ -254,8 +254,6 @@ plots.m3.time.cost.draw()
 ##        width = 3.6, height = 2.6, units = "in",
 ##        device = cairo_pdf)
 
-## TODO: dedicated snowflake plot?
-
 ## ---------------------------------------------------------------------------------------------- ##
                                         # MH: History #
 ## ---------------------------------------------------------------------------------------------- ##
@@ -303,11 +301,6 @@ history.mkdata <- memoize(function() {
     dplyr::mutate(label = paste(count, "×", str_replace(id, "xlarge", ""), sep=" "))
 })
 
-                                        # TODO: annotate text with aws 'introduces ...'
-                                        # - 100Gbit network
-                                        # - 25Gibt network
-                                        # - cpu cost doesn't decrease much
-                                        # - fast nvme ssds
 plots.mh.history.cost.draw <- function() {
   .df <- history.mkdata() %>%
     dplyr::group_by(workload.id) %>%
@@ -335,19 +328,19 @@ plots.mh.history.cost.draw <- function() {
 ##        width = 3.6, height = 2.3, units = "in",
 ##        device = cairo_pdf)
 ##
-  .df <- aws.data.spot.by.date.az %>%
-    aws.data.filter.large() %>%
-    aws.data.filter.relevant.family() %>%
-    dplyr::filter(!(id.prefix %in% c("t2", "t3", "c4", "i2", "t3a", "inf1", "m3", "f1", "g2", "g4dn")))
+spot.prices <- aws.data.spot.by.date.az %>%
+  aws.data.filter.large() %>%
+  aws.data.filter.relevant.family() %>%
+  dplyr::filter(!(id.prefix %in% c("t2", "t3", "c4", "i2", "t3a", "inf1", "m3", "f1", "g2", "g4dn")))
 
 plots.mh.spot.prices.draw <- function() {
-  ggplot(.df, aes(x = parsed.date)) +
+  ggplot(spot.prices, aes(x = parsed.date)) +
     geom_line(aes(y = SpotPrice), color = "red") +
     expand_limits(y = 0) +
     facet_grid(rows = vars(id.prefix), cols = vars(AvailabilityZone), scales = "free")
 }
 
-plots.mh.spot.prices.draw()
+## plots.mh.spot.prices.draw()
 
 ##
 plots.mh.spot.gen.data <- memoize(function(.def) {
