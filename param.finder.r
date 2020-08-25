@@ -52,8 +52,7 @@ try.params <- function(.insts = aws.data.current.large.relevant) {
         })
       })
     })
-  }) %>%
-    dplyr::inner_join(.inst.meta, by = c("id.name" = "id"))
+  }) %>% dplyr::inner_join(.inst.meta, by = c("id.name" = "id"))
 }
 
 ##  system.time({

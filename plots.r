@@ -91,7 +91,7 @@ plots.m1.all.draw <- function() {
 ## Config where chaning the materialization fraction changes from c5 -> c5d -> c5n
 ## http://127.0.0.1:3030/?_inputs_&instance.count.max=32&locality=0.8&timings.plot.budget.ticks.at.limits=true&instSet.details.show=0&instanceFilter=%22Paper%20Table%201%22&timings.plot.budget.step.digits=3&instance=%22%22&spooling.fraction=0.4&tables.frontier.show=false&plotly_relayout-A=%22%7B%5C%22width%5C%22%3A1242%2C%5C%22height%5C%22%3A9220%7D%22&instances.plot.display.frontier=true&time.cpu=20&instances.plot.frontier.quadrant=%22top.left%22&data.read=1998&instance.type.opt.include=%22frontier%22&instFilter.details.show=0&config.options.show=0&instances.plot.display.frontier.only=false&spooling.shape=0.1&instances.plot.x=%22stat.time.sum%22&time.period.num=1&plotly_hover-A=%22%5B%7B%5C%22curveNumber%5C%22%3A0%2C%5C%22pointNumber%5C%22%3A86%2C%5C%22x%5C%22%3A285.5405361662%2C%5C%22y%5C%22%3A0.28472599407325%7D%5D%22&timings.plot.budget.step=100&timings.plot.budget.duplicates.filter=true&timings.plot.budget.limits.logarithmic=true&recommendationColumn=%22stat.price.sum%22&instances.plot.scale.y=%22Linear%22&scaling.efficiency.param.%20p=0.98&.clientValue-default-plotlyCrosstalkOpts=%7B%22on%22%3A%22plotly_click%22%2C%22persistent%22%3Afalse%2C%22dynamic%22%3Afalse%2C%22selectize%22%3Afalse%2C%22opacityDim%22%3A0.2%2C%22selected%22%3A%7B%22opacity%22%3A1%7D%2C%22debounce%22%3A0%2C%22color%22%3A%5B%5D%7D&plotly_afterplot-A=%22%5C%22instances.plot.queriesPerDollar%5C%22%22&timings.plot.budget.col.cost=%22stat.price.sum%22&instances.plot.y=%22col.recom.inv%22&instances.plot.scale.x=%22Linear%22&user.notes=%22%22&time.period.unit=%22Weeks%22&timings.plot.budget.col.optim=%22stat.time.sum%22&instanceSet=%222019-11-30%20%7C%20101%20%7C%20website%22&timings.plot.budget.limits.display=true&comparison.count=1&distr.caching.load.first=false
 
-all.params <- try.params(aws.data.current.large.relevant %>% aws.data.filter.spot.price.inter.freq())
+all.params <- try.params(aws.data.current.large.relevant.spot.lt5)
 
 plots.m2.spool.draw <- function() {
   res <- all.params
@@ -189,51 +189,42 @@ plots.m2.draw.diff.for <- function(.id) {
 ## http://127.0.0.1:3030/?_inputs_&instance.count.max=32&locality=0.2&timings.plot.budget.ticks.at.limits=true&instSet.details.show=0&instanceFilter=%22Paper%20Table%201%22&timings.plot.budget.step.digits=3&instance=%22c5d.24xlarge%22&spooling.fraction=0.4&tables.frontier.show=false&plotly_relayout-A=%22%7B%5C%22width%5C%22%3A1242%2C%5C%22height%5C%22%3A9600%7D%22&instances.plot.display.frontier=true&time.cpu=25&instances.plot.frontier.quadrant=%22top.left%22&data.read=2008&plotly_doubleclick-A=%22%5C%22instances.plot%5C%22%22&instance.type.opt.include=%22all%22&plotly_click-A=%22%5B%7B%5C%22curveNumber%5C%22%3A0%2C%5C%22pointNumber%5C%22%3A4%2C%5C%22x%5C%22%3A2383.80703584345%2C%5C%22y%5C%22%3A0.116526956083714%7D%5D%22&instFilter.details.show=0&config.options.show=0&instances.plot.display.frontier.only=false&spooling.shape=0.1&instances.plot.x=%22stat.time.sum%22&time.period.num=1&plotly_hover-A=null&timings.plot.budget.step=100&timings.plot.budget.duplicates.filter=true&timings.plot.budget.limits.logarithmic=true&recommendationColumn=%22stat.price.sum%22&instances.plot.scale.y=%22Linear%22&scaling.efficiency.param.%20p=0.98&.clientValue-default-plotlyCrosstalkOpts=%7B%22on%22%3A%22plotly_click%22%2C%22persistent%22%3Afalse%2C%22dynamic%22%3Afalse%2C%22selectize%22%3Afalse%2C%22opacityDim%22%3A0.2%2C%22selected%22%3A%7B%22opacity%22%3A1%7D%2C%22debounce%22%3A0%2C%22color%22%3A%5B%5D%7D&plotly_afterplot-A=%22%5C%22instances.plot.queriesPerDollar%5C%22%22&timings.plot.budget.col.cost=%22stat.price.sum%22&instances.plot.y=%22col.recom.inv%22&instances.plot.scale.x=%22Linear%22&user.notes=%22%22&time.period.unit=%22Weeks%22&timings.plot.budget.col.optim=%22stat.time.sum%22&instanceSet=%222019-11-30%20%7C%20101%20%7C%20website%22&timings.plot.budget.limits.display=true&comparison.count=1&distr.caching.load.first=false
 
 plots.m3.time.cost.draw <- function() {
-  .read <- 10000
-  .query <- data.frame(
-    time.cpu  = 5,
-    data.read = .read
-  )
-  .max.count <- 128
-  .distr.cache <- purrr::map(1:.max.count, function(count) {
-    model.make.distr.fn(0.001)(round(.read / count))
-  })
-  .distr.spool <- purrr::map(1:.max.count, function(count) {
-    model.make.distr.fn(0.001)(round(0.3 * .read / count))
-  })
-  .scaling.fac <- 0.95
+  .wl1 <- data.frame(
+    cpu.hours  = 5,
+    data.scan  = 10000,
+    max.count  = 128,
+    cache.skew = 0.001,
+    spool.skew = 0.001,
+    spool.frac = 0.3,
+    scale.fact = 0.95,
+    load.first = FALSE,
+    max.period = 2^30)
+  #
+  .def <- model.gen.workload(.wl1)
+  .query <- .def$query
+  .time.fn <- .def$time.fn
 
-  .time.fn <- model.make.timing.fn(
-    .distr.list.caching  = .distr.cache,
-    .distr.list.spooling = .distr.spool,
-    .max.count = .max.count,
-    .eff.fn = model.make.scaling.fn(list(p = .scaling.fac)),
-    .distr.caching.split.fn = model.distr.split.fn(FALSE),
-    .time.period = 2^30
-  )
+  ## .inst <- rbind(
+  ##   aws.data.current.large.relevant,
+  ##   aws.data.current %>% dplyr::filter(id == "c5d.2xlarge") %>% dplyr::mutate(id = "snowflake")
+  ## )
+  .inst <- aws.data.current.large.relevant.spot.lt5
+  .palette <- style.instance.colors
 
-  .inst <- rbind(
-    aws.data.current.large.relevant,
-    aws.data.current %>% dplyr::filter(id == "c5d.2xlarge") %>% dplyr::mutate(id = "snowflake")
-  )
-  .inst.id <- c("c5d", "snowflake")
-
-  .cost.all <- model.calc.costs(.query, .inst, .time.fn)
+  .cost.all <- model.calc.costs(.query, .inst, .time.fn) %>%
+    dplyr::inner_join(select(.inst, id, starts_with("meta.")), by = c("id.name" = "id"))
   .frontier <- model.calc.frontier(.cost.all,
                                    x = "stat.time.sum", y = "stat.price.sum",
                                    id = "id", quadrant = "bottom.left")
   .df <- .cost.all %>% dplyr::mutate(
                                 id.prefix = sub("^([A-Za-z1-9-]+)\\..*", "\\1", id.name),
-                                group = ifelse(id %in% .frontier$id | id.prefix %in% .inst.id, id.prefix, "other"))
+                                group = ifelse(id %in% .frontier$id | id.prefix %in% names(.palette), id.prefix, "other"),
+                                name = paste(group, ifelse(meta.uses.spot.price, "-S", "-D"), sep=""))
 
   .groups <- unique(.df$group)
-  .levels <- intersect(unique(.inst$id.prefix), .groups)
-  .levels <- c(.levels, "snowflake", "other")
 
-  .palette <- styles.color.palette1[1:length(.levels)]
-  names(.palette) <- .levels
   .palette["other"] <- "#eeeeee"
-  .palette <- rev(.palette)
+  .palette["frontier"] <- "#ff0000"
 
   .colored <- .df %>% dplyr::filter(group != "other")
   .greys <- .df %>% dplyr::filter(group == "other")
@@ -242,12 +233,12 @@ plots.m3.time.cost.draw <- function() {
     dplyr::group_by(group) %>%
     dplyr::filter(stat.price.sum == max(stat.price.sum))
 
-  ggplot(.df, aes(x = stat.time.sum, y = stat.price.sum, color = group, label = group)) +
-    scale_color_manual(values = .palette, limits = .levels) +
+  ggplot(.df, aes(x = stat.time.sum, y = stat.price.sum, color = group, label = name)) +
+    scale_color_manual(values = .palette) +
     geom_point(data = .greys, size = 1) +
-    # geom_point(data = .colored, size = 1) +
+    geom_point(data = .colored, size = 1) +
     geom_text(data = .labels, nudge_x = -0.15, nudge_y = 0.08) +
-    geom_text(data = .colored, aes(label = count)) +
+    ## geom_text(data = .colored, aes(label = count)) +
     scale_x_log10(limits = c(30, 6e03)) +
     scale_y_log10() +
     labs(y = "Workload Cost ($) [log]",
@@ -258,7 +249,7 @@ plots.m3.time.cost.draw <- function() {
           legend.position = "none")
 }
 
-## plots.m3.time.cost.draw()
+plots.m3.time.cost.draw()
 ## ggsave(plots.mkpath("m3-time-cost.pdf"), plots.m3.time.cost.draw(),
 ##        width = 3.6, height = 2.6, units = "in",
 ##        device = cairo_pdf)

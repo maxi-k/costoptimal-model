@@ -412,6 +412,19 @@ aws.data.filter.spot.price.inter.freq <- function(df) {
   )
 }
 
+## Precomputed sets
+
+aws.data.current.large.relevant.spot.lt5 <- aws.data.current.large.relevant %>% aws.data.filter.spot.price.inter.freq()
+
+## large instances w/ <5% in us-east-1
+##
+## aws.spot.interruption.frequencies %>%
+##   rename(id = instance.type) %>%
+##   aws.data.filter.large() %>%
+##   aws.data.filter.relevant.family() %>%
+##   filter(freq.num == 5, region.id == "us-east-1") %>%
+##   select(id, freq.text)
+
 ## ---------------------------------------------------------------------------------------------- ##
                                         # DVASSALLO S3 MEASUREMENT DATA
 ## ---------------------------------------------------------------------------------------------- ##
