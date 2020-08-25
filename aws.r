@@ -186,26 +186,30 @@ aws.data.normalize <- function(df, commits = aws.data.commits) {
                )
 }
 
+aws.data.enhance.ids <- function(df) {
+  dplyr::mutate(df,
+                id.prefix = sub("^([A-Za-z1-9-]+)\\..*", "\\1", id),
+                id.numstr = sub("^[A-Za-z1-9-]+\\.([1-9]*).*", "\\1", id),
+                id.number = id.numstr %>% as.numeric %>% replace(is.na(.), 0)
+                )
+}
+
 aws.data.with.prefixes <- function(df) {
-    df %>%
-        dplyr::mutate(
-                   id.prefix = sub("^([A-Za-z1-9-]+)\\..*", "\\1", id),
-                   id.numstr = sub("^[A-Za-z1-9-]+\\.([1-9]*).*", "\\1", id),
-                   id.number = id.numstr %>% as.numeric %>% replace(is.na(.), 0)
-               ) %>%
-      dplyr::group_by(id.prefix) %>%
-      dplyr::group_modify(function(df, group) {
-        large <- top_n(df, 1, wt = id.number)
-        dplyr::mutate(df,
-                      id.slice        = if_else(id.number == 0,
-                                                if_else(str_detect(id, "metal"), large$id.number,
-                                                        if_else(str_detect(id, "xlarge"), 1, 0.5)),
-                                                id.number),
-                      id.slice.factor = id.slice / large$id.number,
-                      id.slice.of     = large$id,
-                      id.slice.net    = large$network.Gbps * id.slice.factor,
-                      id.slice.sto    = large$storage.count) }) %>%
-      dplyr::ungroup()
+  df %>%
+    aws.data.enhance.ids() %>%
+    dplyr::group_by(id.prefix) %>%
+    dplyr::group_modify(function(df, group) {
+      large <- top_n(df, 1, wt = id.number)
+      dplyr::mutate(df,
+                    id.slice        = if_else(id.number == 0,
+                                              if_else(str_detect(id, "metal"), large$id.number,
+                                                      if_else(str_detect(id, "xlarge"), 1, 0.5)),
+                                              id.number),
+                    id.slice.factor = id.slice / large$id.number,
+                    id.slice.of     = large$id,
+                    id.slice.net    = large$network.Gbps * id.slice.factor,
+                    id.slice.sto    = large$storage.count) }) %>%
+    dplyr::ungroup()
 }
 
 
@@ -241,7 +245,7 @@ aws.data.prefixes.irrelevant <- c(
 
 aws.data.filter.large <- function(df) {
     df %>%
-        aws.data.with.prefixes() %>%
+        aws.data.enhance.ids() %>%
         dplyr::group_by(id.prefix) %>%
         dplyr::top_n(1, wt = id.number) %>%
         dplyr::ungroup()
@@ -260,8 +264,8 @@ aws.data.filter.small2 <- function(df) {
 
 aws.data.filter.relevant.family <- function(df) {
     df %>%
-        aws.data.with.prefixes() %>%
-        dplyr::filter(!(id.prefix %in% aws.data.prefixes.irrelevant))
+      aws.data.enhance.ids() %>%
+      dplyr::filter(!(id.prefix %in% aws.data.prefixes.irrelevant))
 }
 
 aws.data.filter.relevant.family2 <- function(df) {
@@ -306,6 +310,7 @@ aws.spot.interruption.frequencies.plot <- function() {
              y = "Avg Interruption Frequeny")
 }
 
+
 ## Filter functions
 
 aws.data.mkfilter.spot.inter.freq <- function(perc) {
@@ -335,6 +340,13 @@ aws.spot.price.history.averages <- aws.spot.price.history.load() %>%
                      meta.time.min = min(Timestamp),
                      meta.time.max = max(Timestamp)) %>%
     dplyr::rename(id = InstanceType)
+
+aws.data.spot.by.date.az <- aws.spot.price.history %>%
+  dplyr::mutate(parsed.date = lubridate::round_date(Timestamp, unit = "hour")) %>%
+  dplyr::select(-Timestamp, -ProductDescription) %>%
+  dplyr::group_by(parsed.date, InstanceType) %>%
+  dplyr::rename(id = InstanceType) %>%
+  dplyr::arrange(parsed.date)
 
 aws.data.spot.by.date <- aws.spot.price.history %>%
   dplyr::mutate(parsed.date = lubridate::round_date(Timestamp, unit = "hour")) %>%
@@ -367,6 +379,18 @@ aws.data.spot.filled <- aws.data.spot.by.date %>%
 
 aws.data.spot.joined <- dplyr::inner_join(aws.data.current, aws.data.spot.filled, by = "id")
 
+aws.data.spot.with.intfreq <- aws.data.spot.joined %>%
+  aws.data.mkfilter.spot.inter.freq(5)() %>%
+                                     dplyr::mutate(
+                                              cost.usdph = SpotPrice,
+                                              uses.spot.price = TRUE) %>%
+                                     dplyr::select(-meta.freq.avg) %>%
+                                     rbind(
+                                       dplyr::anti_join(aws.data.spot.joined, ., by = "id") %>% dplyr::mutate(uses.spot.price = FALSE),
+                                       .
+                                     )
+
+
 ## Filter functions
 
 aws.data.filter.spot.price <- function(df) {
@@ -376,6 +400,17 @@ aws.data.filter.spot.price <- function(df) {
         dplyr::select(-cost.usdph.avg)
 }
 
+aws.data.filter.spot.price.inter.freq <- function(df) {
+  freq.filter <- aws.data.mkfilter.spot.inter.freq(5)
+  spot <- df %>%
+    freq.filter() %>%
+    aws.data.filter.spot.price() %>%
+    dplyr::select(-meta.time.max, -meta.time.min, -meta.freq.avg)
+  rbind(
+    dplyr::anti_join(df, spot, by = "id") %>% dplyr::mutate(meta.uses.spot.price = FALSE),
+    spot %>% dplyr::mutate(meta.uses.spot.price = TRUE)
+  )
+}
 
 ## ---------------------------------------------------------------------------------------------- ##
                                         # DVASSALLO S3 MEASUREMENT DATA

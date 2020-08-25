@@ -91,7 +91,8 @@ plots.m1.all.draw <- function() {
 ## Config where chaning the materialization fraction changes from c5 -> c5d -> c5n
 ## http://127.0.0.1:3030/?_inputs_&instance.count.max=32&locality=0.8&timings.plot.budget.ticks.at.limits=true&instSet.details.show=0&instanceFilter=%22Paper%20Table%201%22&timings.plot.budget.step.digits=3&instance=%22%22&spooling.fraction=0.4&tables.frontier.show=false&plotly_relayout-A=%22%7B%5C%22width%5C%22%3A1242%2C%5C%22height%5C%22%3A9220%7D%22&instances.plot.display.frontier=true&time.cpu=20&instances.plot.frontier.quadrant=%22top.left%22&data.read=1998&instance.type.opt.include=%22frontier%22&instFilter.details.show=0&config.options.show=0&instances.plot.display.frontier.only=false&spooling.shape=0.1&instances.plot.x=%22stat.time.sum%22&time.period.num=1&plotly_hover-A=%22%5B%7B%5C%22curveNumber%5C%22%3A0%2C%5C%22pointNumber%5C%22%3A86%2C%5C%22x%5C%22%3A285.5405361662%2C%5C%22y%5C%22%3A0.28472599407325%7D%5D%22&timings.plot.budget.step=100&timings.plot.budget.duplicates.filter=true&timings.plot.budget.limits.logarithmic=true&recommendationColumn=%22stat.price.sum%22&instances.plot.scale.y=%22Linear%22&scaling.efficiency.param.%20p=0.98&.clientValue-default-plotlyCrosstalkOpts=%7B%22on%22%3A%22plotly_click%22%2C%22persistent%22%3Afalse%2C%22dynamic%22%3Afalse%2C%22selectize%22%3Afalse%2C%22opacityDim%22%3A0.2%2C%22selected%22%3A%7B%22opacity%22%3A1%7D%2C%22debounce%22%3A0%2C%22color%22%3A%5B%5D%7D&plotly_afterplot-A=%22%5C%22instances.plot.queriesPerDollar%5C%22%22&timings.plot.budget.col.cost=%22stat.price.sum%22&instances.plot.y=%22col.recom.inv%22&instances.plot.scale.x=%22Linear%22&user.notes=%22%22&time.period.unit=%22Weeks%22&timings.plot.budget.col.optim=%22stat.time.sum%22&instanceSet=%222019-11-30%20%7C%20101%20%7C%20website%22&timings.plot.budget.limits.display=true&comparison.count=1&distr.caching.load.first=false
 
-all.params <- try.params()
+all.params <- try.params(aws.data.current.large.relevant %>% aws.data.filter.spot.price.inter.freq())
+
 plots.m2.spool.draw <- function() {
   res <- all.params
   plotdata <- res %>%
@@ -99,7 +100,8 @@ plots.m2.spool.draw <- function() {
     dplyr::mutate(id.prefix = sub("^([A-Za-z1-9-]+)\\..*", "\\1", id))
   palette <- style.instance.colors
   ggplot(plotdata, aes(x = param.scanned, y = param.spool.frac,
-                       label = str_replace(id.name, "xlarge", ""))) +
+                       label = paste(str_replace(id.name, "xlarge", ""),
+                                     ifelse(meta.uses.spot.price, "-S", "-D"), sep=""))) +
     scale_fill_manual(values = palette) +
     geom_tile(aes(fill = id.prefix)) +
     geom_text() +
@@ -173,7 +175,7 @@ plots.m2.draw.diff.for <- function(.id) {
     facet_grid(cols = vars(id.factor))
 }
 
-plots.m2.diff.inst <- c("c5.24xlarge", "c5d.24xlarge", "i3.16xlarge","c5n.18xlarge")
+## plots.m2.diff.inst <- c("c5.24xlarge", "c5d.24xlarge", "i3.16xlarge","c5n.18xlarge")
 ## plots.m2.draw.diff.for(plots.m2.diff.inst)
 ## ggsave(plots.mkpath("m2-spool-diff.pdf"), plots.m2.draw.diff.for(plots.m2.diff.inst),
 ##        width = 3 * 2.5, height = 2.5, units = "in",
@@ -341,16 +343,20 @@ plots.mh.history.cost.draw <- function() {
 ## ggsave(plots.mkpath("mh-date-cost.pdf"), plots.mh.history.cost.draw(),
 ##        width = 3.6, height = 2.3, units = "in",
 ##        device = cairo_pdf)
+##
+  .df <- aws.data.spot.by.date.az %>%
+    aws.data.filter.large() %>%
+    aws.data.filter.relevant.family() %>%
+    dplyr::filter(!(id.prefix %in% c("t2", "t3", "c4", "i2", "t3a", "inf1", "m3", "f1", "g2", "g4dn")))
 
 plots.mh.spot.prices.draw <- function() {
-  .df <- aws.data.spot.joined %>% aws.data.filter.large2()
-  print(head(.df)$parsed.date)
   ggplot(.df, aes(x = parsed.date)) +
     geom_line(aes(y = SpotPrice), color = "red") +
-    facet_grid(rows = vars(id), scales = "free")
+    expand_limits(y = 0) +
+    facet_grid(rows = vars(id.prefix), cols = vars(AvailabilityZone), scales = "free")
 }
 
-## plots.mh.spot.prices.draw()
+plots.mh.spot.prices.draw()
 
 ##
 plots.mh.spot.gen.data <- memoize(function(.def) {
@@ -411,4 +417,4 @@ plots.mh.spot.cost.draw <- function() {
     geom_text(angle = 90, nudge_y = 0.01, hjust = 0)
 }
 
-## plots.mh.spot.cost.draw()
+plots.mh.spot.cost.draw()

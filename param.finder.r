@@ -1,7 +1,7 @@
 source("./model.r")
 source("./aws.r")
 
-try.params <- function() {
+try.params <- function(.insts = aws.data.current.large.relevant) {
 
   .range.scan  <- 16*2^(2:11) # ?
   .range.cache <- c(0.001)
@@ -10,7 +10,7 @@ try.params <- function() {
   .range.cpu   <- c(1)
   .range.split <- c(FALSE)
 
-  .insts <- aws.data.current.large.relevant
+  .inst.meta <- .insts %>% dplyr::select(id, starts_with("meta."))
 
   purrr::map_dfr(.range.scan, function(.scanned) {
     purrr::map_dfr(.range.cache, function(.cache.skew) {
@@ -52,10 +52,11 @@ try.params <- function() {
         })
       })
     })
-  })
+  }) %>%
+    dplyr::inner_join(.inst.meta, by = c("id.name" = "id"))
 }
 
 ##  system.time({
-##    tested.params <- try.params()
-##    write.csv(res, "tested.params.with.split.csv")
+##    tested.params <- try.params(aws.data.current.large.relevant %>% aws.data.filter.spot.price.inter.freq())
+##    write.csv(tested.params, "tested.params.spot.freq<5.csv")
 ##  })
