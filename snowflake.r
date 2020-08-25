@@ -32,7 +32,9 @@ SELECT s.warehouseId,
 ", fraction)
 }
 
-row <- snowset.warehouse.sample()
+system.time({
+  sample.row <- snowset.warehouse.sample()
+})
 
 snowflake.instance <- dplyr::filter(aws.data.current, id == "c5d.2xlarge") %>% model.with.speeds()
 
@@ -129,7 +131,7 @@ snowset.row.est.spool.skew <- function(row, df) {
                 spool.skew.iter  = .iter)
 }
 
-snowset.gen.for.model <- function() {
+snowset.gen.for.model <- function(row = sample.row) {
   relevant <- row %>%
     dplyr::filter(
              scans3 != 0,
@@ -153,11 +155,10 @@ snowset.gen.for.model <- function() {
              spool.skew.iter != 100)
 }
 
-plots.m3.time.cost.draw <- function() {
-  .gen <-  snowset.gen.for.model() %>%
+plots.m3.time.cost.draw <- function(.row = sample.row) {
+  .gen <-  snowset.gen.for.model(.row) %>%
     dplyr::filter(cache.skew.iter != 100, spool.skew.iter != 0)
-  print(.gen)
-  .wl <- gen %>%
+  .wl <- .gen %>%
     head(n = 1) %>%
     dplyr::mutate(
              max.count = 128,
@@ -210,4 +211,28 @@ plots.m3.time.cost.draw <- function() {
          color = "Instance")
   }
 
-## plots.m3.time.cost.draw()
+
+large.row <- snowset.q(
+"
+WITH wh AS(
+     SELECT warehouseid
+     FROM snowset
+     WHERE persistentwritebytess3 = 0
+     ORDER BY persistentreadbytess3 desc
+     LIMIT 20
+)
+SELECT s.warehouseid,
+       sum(systemCpuTime) + sum(userCpuTime) AS cpuMicros,
+       sum(persistentReadBytesS3)            AS scanS3,
+       sum(persistentReadBytesCache)         AS scanCache,
+       sum(intDataReadBytesLocalSSD)         AS spoolSSD,
+       sum(intDataReadBytesS3)               AS spoolS3,
+       avg(warehousesize)                    AS warehousesize
+FROM snowset s
+JOIN wh ON wh.warehouseid = s.warehouseid
+GROUP BY s.warehouseid
+"
+)
+
+
+plots.m3.time.cost.draw(large.row)
