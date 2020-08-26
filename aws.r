@@ -352,6 +352,7 @@ aws.data.spot.by.date <- aws.spot.price.history %>%
   dplyr::mutate(parsed.date = lubridate::round_date(Timestamp, unit = "hour")) %>%
   dplyr::select(-Timestamp, -ProductDescription) %>%
   dplyr::group_by(parsed.date, InstanceType) %>%
+  dplyr::filter(AvailabilityZone == "us-east-1a")
   dplyr::summarise(SpotPrice = min(SpotPrice)) %>%
   dplyr::rename(id = InstanceType) %>%
   dplyr::arrange(parsed.date)

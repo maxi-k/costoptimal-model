@@ -249,7 +249,7 @@ plots.m3.time.cost.draw <- function() {
           legend.position = "none")
 }
 
-plots.m3.time.cost.draw()
+## plots.m3.time.cost.draw()
 ## ggsave(plots.mkpath("m3-time-cost.pdf"), plots.m3.time.cost.draw(),
 ##        width = 3.6, height = 2.6, units = "in",
 ##        device = cairo_pdf)
@@ -340,65 +340,94 @@ plots.mh.spot.prices.draw <- function() {
     facet_grid(rows = vars(id.prefix), cols = vars(AvailabilityZone), scales = "free")
 }
 
-## plots.mh.spot.prices.draw()
+plots.mh.spot.prices.draw()
 
 ##
-plots.mh.spot.gen.data <- memoize(function(.def) {
+plots.mh.spot.gen.data <- memoize(function(.def, .freqs) {
   .wl <- model.gen.workload(.def)
-  .inst.ondemand <- aws.data.current.large.relevant
-  .cost.ondemand <- model.calc.costs(.wl$query, .inst.ondemand, .wl$time.fn)
-  .recm.ondemand <- model.recommend.from.timings.arr(.wl$query, .cost.ondemand)
-  .recm.ondemand$group <- "ondemand"
+  .freq <- aws.spot.interruption.frequencies %>%
+    dplyr::filter(region.id == "us-east-1") %>%
+    dplyr::group_by(instance.type) %>%
+    dplyr::summarise(meta.freq.avg = mean(freq.num), .groups = "drop")
   #
-  .inst.spot <- aws.data.spot.joined  %>%
-    dplyr::ungroup() %>%
+  .inst <- aws.data.spot.joined %>%
+    aws.data.filter.large2() %>%
     aws.data.filter.relevant.family2() %>%
-    ## aws.data.filter.large2() %>%
-    ## aws.data.filter.small2() %>%
-    dplyr::mutate(cost.usdph = SpotPrice) %>%
-    dplyr::group_by(parsed.date)
+    dplyr::filter(lubridate::month(parsed.date) == 8) %>%
+    inner_join(.freq, by = c("id" = "instance.type"))
   #
-  .recm.spot <- dplyr::group_modify(.inst.spot, function(.inst.group, time) {
-    .cost <- model.calc.costs(.wl$query, .inst.group, .wl$time.fn)
-    .recm <- model.recommend.from.timings.arr(.wl$query, .cost)
-  }) %>% dplyr::ungroup()
-  .recm.spot$group <- "spot"
+  .inst.for.freq <- function(.freq) {
+    .spot.priced <- .inst %>%
+      dplyr::filter(meta.freq.avg <= .freq) %>%
+      dplyr::mutate(cost.usdph = SpotPrice)
+    rbind(
+      dplyr::anti_join(.inst, .spot.priced, by = "id") %>% dplyr::mutate(meta.uses.spot.price = FALSE),
+      .spot.priced %>% dplyr::mutate(meta.uses.spot.price = TRUE)
+    )
+  }
   #
-  .df <- rbind(
-    dplyr::mutate(.recm.ondemand, parsed.date = min(.recm.spot$parsed.date)),
-    dplyr::mutate(.recm.ondemand, parsed.date = max(.recm.spot$parsed.date)),
-    .recm.spot
-  )
+  .recoms <- furrr::future_map_dfr(.freqs, function(.freq) {
+    .inst.freq <- .inst.for.freq(.freq) %>% group_by(parsed.date)
+    group_split(.inst.freq) %>% furrr::future_map_dfr(function(.inst.group) {
+      .cost <- model.calc.costs(.wl$query, .inst.group, .wl$time.fn)
+      .recm <- model.recommend.from.timings.arr(.wl$query, .cost) %>%
+        dplyr::mutate(group = paste("<", .freq, "%", sep=""),
+                      parsed.date = head(.inst.group, n = 1)$parsed.date)
+    })
+  })
+  .recoms
 })
 
 plots.mh.spot.cost.draw <- function() {
-  .wl <- data.frame(
-    cpu.hours  = 1,
-    data.scan  = 4 * 10^3, # 4
-    max.count  = 1,
-    cache.skew = 0.001,
-    spool.skew = 0.001,
-    spool.frac = 0.5,
-    scale.fact = 0.95,
-    load.first = FALSE,
-    max.period = 2^30
+  .recoms <- plots.mh.spot.gen.data(
+    data.frame(
+      cpu.hours  = 1,
+      data.scan  = 4 * 10^3,
+      max.count  = 1,
+      cache.skew = 0.001,
+      spool.skew = 0.001,
+      spool.frac = 0.2,
+      scale.fact = 0.95,
+      load.first = FALSE,
+      max.period = 2^30
+    ),
+    c(0, 5, 25)
   )
 
-  .df <- plots.mh.spot.gen.data(.wl) %>%
+  .df <- .recoms %>%
     dplyr::mutate(id.prefix = sub("^([A-Za-z1-9-]+)\\..*", "\\1", id.name),
-                  id.short  = str_replace(id.name, "xlarge", ""))
+                  id.short  = str_replace(id.name, "xlarge", "")) %>%
+    dplyr::ungroup()
+
   .text <- .df %>%
     dplyr::arrange(parsed.date) %>%
-    dplyr::mutate(day = lubridate::round_date(parsed.date, unit = "week")) %>%
-    dplyr::filter(group == "ondemand" | id != dplyr::lag(id) | day != dplyr::lag(day)) %>%
-    tail(n = nrow(.) - 2)
+    dplyr::group_by(group) %>%
+    dplyr::filter(row_number() == 1 | id != dplyr::lag(id)) %>%
+    dplyr::ungroup()
 
-  ggplot(.text, aes(x = parsed.date, y = stat.price.sum,
-                    label = id.short, label.debug = paste(id, " (", cost.usdph, ")", sep = ""),
-                    group = group, color = group)) +
-    geom_line(data = .df %>% dplyr::filter(group == "ondemand")) +
-    geom_point() +
-    geom_text(angle = 90, nudge_y = 0.01, hjust = 0)
+  .vcenter = median(.df$parsed.date)
+
+  plot <- ggplot(.df, aes(x = parsed.date,
+                            y = stat.price.sum,
+                            label = group, group = group, color = id.prefix)) +
+    scale_color_manual(values = style.instance.colors.vibrant) +
+    geom_line() +
+    # geom_text(data = .text, angle = 90, nudge_y = 0.01, hjust = 0) +
+    scale_y_continuous(expand = c(0, 0), limits = c(0, 0.685)) +
+    annotate(geom = "text", x = .vcenter, y = 0.645, label = "On Demand: i3 is best", color = style.instance.colors.vibrant["i3"]) +
+    annotate(geom = "text", x = .vcenter, y = 0.335, label = "< 5% interruptions: m5n is best", color = style.instance.colors.vibrant["m5n"]) +
+    annotate(geom = "text", x = .vcenter, y = 0.135, label = "> 20% interruptions: i3 is best", color = style.instance.colors.vibrant["i3"]) +
+    labs(y = "Workload Cost ($)", x = "Date") +
+    theme_bw() +
+    theme(legend.position = "none",
+          plot.margin=grid::unit(c(1,1,1,1), "mm"))
+    # geom_point(data = .df) +
+  # browser()
+  plot
 }
 
 plots.mh.spot.cost.draw()
+util.notify()
+ggsave(plots.mkpath("mh-spot-prices.pdf"), plots.mh.spot.cost.draw(),
+       width = 3.6, height = 2.3, units = "in",
+       device = cairo_pdf)

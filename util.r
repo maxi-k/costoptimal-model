@@ -27,6 +27,11 @@ util.packages.basic.setup <- function() {
 
 util.packages.basic.setup()
 
+
+util.notify <- function() {
+  system('notify-send -u normal "R" "I am done computing!"')
+}
+
 ## ---------------------------------------------------------------------------------------------- ##
                                         # Font Setup
 ## ---------------------------------------------------------------------------------------------- ##
@@ -39,6 +44,7 @@ util.style.fonts.setup <- function() {
              bolditalic = paste(mainfont,"style=Bold Italic,BoldItalic",sep=":"))
   pdf <- CairoPDF
   png <- CairoPNG
+  X11.options(type = "cairo")
 }
 
 util.style.fonts.setup()
