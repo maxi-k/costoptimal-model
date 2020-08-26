@@ -125,6 +125,7 @@ plots.m2.spool.draw <- function() {
 ##        width = 2.2, height = 2.5, units = "in",
 ##        device = cairo_pdf)
 
+## ---------------------------------------------------------------------------------------------- ##
 
 plots.m2.draw.diff.for <- function(.id) {
   .cost <- all.params %>% dplyr::group_by_at(vars(starts_with("param.")))
@@ -257,7 +258,7 @@ plots.m3.time.cost.draw <- function() {
 ## ---------------------------------------------------------------------------------------------- ##
                                         # MH: History #
 ## ---------------------------------------------------------------------------------------------- ##
-##
+
 history.mkdata <- memoize(function() {
   .wl1 <- data.frame(
     cpu.hours  = 5,
@@ -327,7 +328,9 @@ plots.mh.history.cost.draw <- function() {
 ## ggsave(plots.mkpath("mh-date-cost.pdf"), plots.mh.history.cost.draw(),
 ##        width = 3.6, height = 2.3, units = "in",
 ##        device = cairo_pdf)
-##
+
+## ---------------------------------------------------------------------------------------------- ##
+
 spot.prices <- aws.data.spot.by.date.az %>%
   aws.data.filter.large() %>%
   aws.data.filter.relevant.family() %>%
@@ -340,9 +343,10 @@ plots.mh.spot.prices.draw <- function() {
     facet_grid(rows = vars(id.prefix), cols = vars(AvailabilityZone), scales = "free")
 }
 
-plots.mh.spot.prices.draw()
+## plots.mh.spot.prices.draw()
 
-##
+## ---------------------------------------------------------------------------------------------- ##
+
 plots.mh.spot.gen.data <- memoize(function(.def, .freqs) {
   .wl <- model.gen.workload(.def)
   .freq <- aws.spot.interruption.frequencies %>%
@@ -421,13 +425,11 @@ plots.mh.spot.cost.draw <- function() {
     theme_bw() +
     theme(legend.position = "none",
           plot.margin=grid::unit(c(1,1,1,1), "mm"))
-    # geom_point(data = .df) +
-  # browser()
   plot
 }
 
-plots.mh.spot.cost.draw()
-util.notify()
-ggsave(plots.mkpath("mh-spot-prices.pdf"), plots.mh.spot.cost.draw(),
-       width = 3.6, height = 2.3, units = "in",
-       device = cairo_pdf)
+## plots.mh.spot.cost.draw()
+## util.notify()
+## ggsave(plots.mkpath("mh-spot-prices.pdf"), plots.mh.spot.cost.draw(),
+##        width = 3.6, height = 2.3, units = "in",
+##        device = cairo_pdf)
