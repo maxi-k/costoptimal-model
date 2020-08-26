@@ -413,7 +413,7 @@ plots.mh.spot.cost.draw <- function() {
     scale_color_manual(values = style.instance.colors.vibrant) +
     geom_line() +
     # geom_text(data = .text, angle = 90, nudge_y = 0.01, hjust = 0) +
-    scale_y_continuous(expand = c(0, 0), limits = c(0, 0.685)) +
+    scale_y_continuous(expand = c(0, 0), limits = c(0, 0.685), breaks = seq(0, 1, 0.1)) +
     annotate(geom = "text", x = .vcenter, y = 0.645, label = "On Demand: i3 is best", color = style.instance.colors.vibrant["i3"]) +
     annotate(geom = "text", x = .vcenter, y = 0.335, label = "< 5% interruptions: m5n is best", color = style.instance.colors.vibrant["m5n"]) +
     annotate(geom = "text", x = .vcenter, y = 0.135, label = "> 20% interruptions: i3 is best", color = style.instance.colors.vibrant["i3"]) +
