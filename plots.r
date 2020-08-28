@@ -411,6 +411,12 @@ plots.mh.spot.cost.draw <- function() {
 
   .vcenter = median(.df$parsed.date)
 
+  od <- mean(filter(.df, group == "<0%")$stat.price.sum)
+  c5 <- mean(filter(.df, group == "<5%")$stat.price.sum)
+  c20 <- mean(filter(.df, group == "<25%")$stat.price.sum)
+  print(c("<%5", c5, od, c5 / od))
+  print(c("<%25", c20, od, c20 / od))
+
   plot <- ggplot(.df, aes(x = parsed.date,
                             y = stat.price.sum,
                             label = group, group = group, color = id.prefix)) +
@@ -428,7 +434,7 @@ plots.mh.spot.cost.draw <- function() {
   plot
 }
 
-## plots.mh.spot.cost.draw()
+plots.mh.spot.cost.draw()
 ## util.notify()
 ## ggsave(plots.mkpath("mh-spot-prices.pdf"), plots.mh.spot.cost.draw(),
 ##        width = 3.6, height = 2.3, units = "in",
