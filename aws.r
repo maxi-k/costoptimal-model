@@ -479,6 +479,7 @@ style.instance.colors <- c(
   "m5d"  = "#bf616a",
   "m5dn" = "#d08770",
   "r5"   = "#88c0d0",
+  "r5n"  = "#d8dee9",
   # + m1-all plot
   "i3en" = "#d8dee9",
   # + m3 plot
