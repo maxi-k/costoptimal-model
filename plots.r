@@ -91,7 +91,7 @@ plots.m1.all.draw <- function() {
 ## Config where chaning the materialization fraction changes from c5 -> c5d -> c5n
 ## http://127.0.0.1:3030/?_inputs_&instance.count.max=32&locality=0.8&timings.plot.budget.ticks.at.limits=true&instSet.details.show=0&instanceFilter=%22Paper%20Table%201%22&timings.plot.budget.step.digits=3&instance=%22%22&spooling.fraction=0.4&tables.frontier.show=false&plotly_relayout-A=%22%7B%5C%22width%5C%22%3A1242%2C%5C%22height%5C%22%3A9220%7D%22&instances.plot.display.frontier=true&time.cpu=20&instances.plot.frontier.quadrant=%22top.left%22&data.read=1998&instance.type.opt.include=%22frontier%22&instFilter.details.show=0&config.options.show=0&instances.plot.display.frontier.only=false&spooling.shape=0.1&instances.plot.x=%22stat.time.sum%22&time.period.num=1&plotly_hover-A=%22%5B%7B%5C%22curveNumber%5C%22%3A0%2C%5C%22pointNumber%5C%22%3A86%2C%5C%22x%5C%22%3A285.5405361662%2C%5C%22y%5C%22%3A0.28472599407325%7D%5D%22&timings.plot.budget.step=100&timings.plot.budget.duplicates.filter=true&timings.plot.budget.limits.logarithmic=true&recommendationColumn=%22stat.price.sum%22&instances.plot.scale.y=%22Linear%22&scaling.efficiency.param.%20p=0.98&.clientValue-default-plotlyCrosstalkOpts=%7B%22on%22%3A%22plotly_click%22%2C%22persistent%22%3Afalse%2C%22dynamic%22%3Afalse%2C%22selectize%22%3Afalse%2C%22opacityDim%22%3A0.2%2C%22selected%22%3A%7B%22opacity%22%3A1%7D%2C%22debounce%22%3A0%2C%22color%22%3A%5B%5D%7D&plotly_afterplot-A=%22%5C%22instances.plot.queriesPerDollar%5C%22%22&timings.plot.budget.col.cost=%22stat.price.sum%22&instances.plot.y=%22col.recom.inv%22&instances.plot.scale.x=%22Linear%22&user.notes=%22%22&time.period.unit=%22Weeks%22&timings.plot.budget.col.optim=%22stat.time.sum%22&instanceSet=%222019-11-30%20%7C%20101%20%7C%20website%22&timings.plot.budget.limits.display=true&comparison.count=1&distr.caching.load.first=false
 
-all.params <- try.params(aws.data.current.large.relevant.spot.lt5)
+all.params <- try.params(aws.data.current.large.relevant)
 
 plots.m2.spool.draw <- function() {
   res <- all.params
@@ -119,6 +119,49 @@ plots.m2.spool.draw <- function() {
       y = "Materialization Fraction") +
     facet_grid(cols = vars(param.cpuh), labeller = function(x) { "Best Instance" })
 }
+
+## plots.m2.spool.draw()
+## ggsave(plots.mkpath("m2-spool-best.pdf"), plots.m2.spool.draw(),
+##        width = 2.2, height = 2.5, units = "in",
+##        device = cairo_pdf)
+
+local({
+  # all.params.max <- try.params(aws.data.current.large.relevant, by = stat.price.max)
+  #
+  .diff <- all.params %>%
+    dplyr::group_by_at(vars(starts_with("param."))) %>%
+    mutate(
+      price.diff.absolute = stat.price.sum - min(stat.price.max),
+      price.diff.fraction = stat.price.sum / min(stat.price.max),
+      price.diff.fractext = sprintf("%.2f", price.diff.fraction),
+      price.diff.fracdisc = ifelse(price.diff.fraction != 1 & price.diff.fraction < 1.1,
+                                   "1.0x",
+                                   sprintf("%.1f", pmin(2.5, price.diff.fraction)))
+    ) %>% top_n(-1, wt = stat.price.sum)
+  palette <- styles.color.palette.temperature
+  texts <- purrr::map(styles.color.palette.temperature, function(c) {
+    b <- shades::brightness(c)
+    if(b > 0.85) { "#000000" } else { "#ffffff" }
+  })
+  plot <- ggplot(.diff, aes(x = param.scanned, y = param.spool.frac,
+                    label = price.diff.fractext, fill = price.diff.fracdisc,
+                    color = price.diff.fracdisc)) +
+    scale_fill_manual(values = palette) +
+    geom_tile() +
+    scale_color_manual(values = texts) +
+    geom_text(size = 2.3) +
+    scale_y_continuous(expand = c(0, 0)) +
+    scale_x_log10(expand = c(0, 0), breaks = c(100, 1024, 10 * 1024, 100 * 1024),
+                  labels = c("100GB", "1TB", "10TB", "100TB")) +
+    theme_bw() +
+    theme(plot.title = element_text(size = 5, hjust = 0.5),
+          legend.position = "none",
+          plot.margin=grid::unit(c(1,1,1,0), "mm")) +
+    labs(x = "Scanned Data [log]", y = "Materialization Fraction", title = "Price Sum / Price Max")
+  ggsave(plots.mkpath("m2-spool-sum-max-diff.pdf"), plot,
+         width = 2.5, height = 2.5, units = "in",
+         device = cairo_pdf)
+})
 
 ## plots.m2.spool.draw()
 ## ggsave(plots.mkpath("m2-spool-best.pdf"), plots.m2.spool.draw(),
@@ -434,7 +477,7 @@ plots.mh.spot.cost.draw <- function() {
   plot
 }
 
-plots.mh.spot.cost.draw()
+## plots.mh.spot.cost.draw()
 ## util.notify()
 ## ggsave(plots.mkpath("mh-spot-prices.pdf"), plots.mh.spot.cost.draw(),
 ##        width = 3.6, height = 2.3, units = "in",
