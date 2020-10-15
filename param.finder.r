@@ -1,7 +1,7 @@
 source("./model.r")
 source("./aws.r")
 
-try.params <- function(.insts = aws.data.current.large.relevant) {
+try.params <- function(.insts = aws.data.current.large.relevant, by = stat.price.sum) {
 
   .range.scan  <- 16*2^(2:11) # ?
   .range.cache <- c(0.001)
@@ -11,6 +11,7 @@ try.params <- function(.insts = aws.data.current.large.relevant) {
   .range.split <- c(FALSE)
 
   .inst.meta <- .insts %>% dplyr::select(id, starts_with("meta."))
+  by_var = enquo(by)
 
   purrr::map_dfr(.range.scan, function(.scanned) {
     purrr::map_dfr(.range.cache, function(.cache.skew) {
@@ -36,7 +37,7 @@ try.params <- function(.insts = aws.data.current.large.relevant) {
               )
               .times <- model.calc.costs(.query, .insts, timing.fn = .timer)
               .recom <- .times %>%
-                dplyr::mutate(rank = rank(stat.price.sum)) %>%
+                dplyr::mutate(rank = rank(!! by_var)) %>%
                 dplyr::arrange(rank) %>%
                 dplyr::ungroup()
               dplyr::mutate(.recom,
