@@ -58,5 +58,5 @@ try.params <- function(.insts = aws.data.current.large.relevant, by = stat.price
 
 ##  system.time({
 ##    tested.params <- try.params(aws.data.current.large.relevant %>% aws.data.filter.spot.price.inter.freq())
-##    write.csv(tested.params, "tested.params.spot.freq<5.csv")
+##    write.csv(tested.params, "data/tested.params.spot.freq<5.csv")
 ##  })
