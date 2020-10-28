@@ -1,7 +1,11 @@
 source("./util.r")
 
-## Use parallel evaluation
-future::plan(future::multicore, workers = round(future::availableCores() * 0.75))
+## Use parallel evaluation if possible
+if (util.is.shiny.deployed) {
+  future::plan(future::sequential)
+} else {
+  future::plan(future::multicore, workers = round(future::availableCores() * 0.75))
+}
 
 ## ---------------------------------------------------------------------------------------------- ##
                                         # Model Constants

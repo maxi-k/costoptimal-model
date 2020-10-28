@@ -272,12 +272,8 @@ aws.data.filter.relevant.family2 <- function(df) {
     dplyr::filter(df, !(id.prefix %in% aws.data.prefixes.irrelevant))
 }
 
-## Precomputed filtered sets
+## Only large and new data; commonly used -> precompute
 aws.data.current.large <- aws.data.filter.large(aws.data.current)
-aws.data.current.large.relevant <- aws.data.current %>%
-    aws.data.filter.large() %>%
-    aws.data.filter.relevant.family()
-aws.data.current.relevant <- aws.data.filter.relevant.family(aws.data.current)
 
 paper.inst.ids <- c(
  "c5n.18xlarge", "c5.24xlarge", "z1d.12xlarge", "c5d.24xlarge",
@@ -290,28 +286,13 @@ aws.data.filter.paper <- function(df) {
   dplyr::filter(df, id %in% paper.inst.ids)
 }
 
-aws.data.paper <- aws.data.filter.paper(aws.data.current)
+## aws.data.paper <- aws.data.filter.paper(aws.data.current)
 
 ## ---------------------------------------------------------------------------------------------- ##
                                         # SPOT INTERRUPTION FREQUENCIES
 ## ---------------------------------------------------------------------------------------------- ##
 
 aws.spot.interruption.frequencies.load()
-
-aws.spot.interruption.frequencies.plot <- function() {
-    df <- aws.spot.interruption.frequencies %>%
-        dplyr::group_by(instance.type) %>%
-        dplyr::summarise(freq.avg = mean(freq.num), n = dplyr::n(), .groups = "drop")
-    ggplot(df, aes(x = n, y = freq.avg, label = instance.type)) +
-        geom_point() +
-        geom_label_repel() +
-        labs(title = "Interruption Frequencies",
-             x = "Data points per Instance",
-             y = "Avg Interruption Frequeny")
-}
-
-
-## Filter functions
 
 aws.data.mkfilter.spot.inter.freq <- function(perc) {
     function(df) {
@@ -328,8 +309,6 @@ aws.data.mkfilter.spot.inter.freq <- function(perc) {
     }
 }
 
-## aws.spot.interruption.frequencies.plot()
-
 ## ---------------------------------------------------------------------------------------------- ##
                                         # SPOT PRICES
 ## ---------------------------------------------------------------------------------------------- ##
@@ -340,55 +319,6 @@ aws.spot.price.history.averages <- aws.spot.price.history.load() %>%
                      meta.time.min = min(Timestamp),
                      meta.time.max = max(Timestamp)) %>%
     dplyr::rename(id = InstanceType)
-
-aws.data.spot.by.date.az <- aws.spot.price.history %>%
-  dplyr::mutate(parsed.date = lubridate::round_date(Timestamp, unit = "hour")) %>%
-  dplyr::select(-Timestamp, -ProductDescription) %>%
-  dplyr::group_by(parsed.date, InstanceType) %>%
-  dplyr::rename(id = InstanceType) %>%
-  dplyr::arrange(parsed.date)
-
-aws.data.spot.by.date <- aws.spot.price.history %>%
-  dplyr::mutate(parsed.date = lubridate::round_date(Timestamp, unit = "hour")) %>%
-  dplyr::filter(AvailabilityZone == "us-east-1a") %>%
-  dplyr::select(-Timestamp, -ProductDescription, -AvailabilityZone) %>%
-  dplyr::rename(id = InstanceType) %>%
-  dplyr::arrange(parsed.date)
-
-aws.data.spot.min.date <- min(aws.data.spot.by.date$parsed.date) - lubridate::days(1)
-
-aws.data.spot.filled <- aws.data.spot.by.date %>%
-  dplyr::group_by(parsed.date) %>%
-  dplyr::group_split() %>%
-  purrr::reduce(.init = setNames(list(dplyr::transmute(aws.data.current,
-                                                       SpotPrice = cost.usdph,
-                                                       id = id,
-                                                       ## AvailabilityZone = "eu-central-1a",
-                                                       parsed.date = aws.data.spot.min.date)),
-                                 aws.data.spot.min.date),
-               function(acc, row) {
-                 prev <- acc[[length(acc)]]
-                 diff <- dplyr::anti_join(prev, row, "id") %>%
-                   dplyr::mutate(parsed.date = head(row, n = 1)$parsed.date)
-                 acc[[length(acc) + 1]] <- rbind(row, diff)
-                 acc
-               }) %>%
-  bind_rows() %>%
-  group_by(parsed.date)
-
-aws.data.spot.joined <- dplyr::inner_join(aws.data.current, aws.data.spot.filled, by = "id")
-
-aws.data.spot.with.intfreq <- aws.data.spot.joined %>%
-  aws.data.mkfilter.spot.inter.freq(5)() %>%
-                                     dplyr::mutate(
-                                              cost.usdph = SpotPrice,
-                                              uses.spot.price = TRUE) %>%
-                                     dplyr::select(-meta.freq.avg) %>%
-                                     rbind(
-                                       dplyr::anti_join(aws.data.spot.joined, ., by = "id") %>% dplyr::mutate(uses.spot.price = FALSE),
-                                       .
-                                     )
-
 
 ## Filter functions
 
@@ -410,19 +340,6 @@ aws.data.filter.spot.price.inter.freq <- function(df, freq = 5) {
     spot %>% dplyr::mutate(meta.uses.spot.price = TRUE)
   )
 }
-
-## Precomputed sets
-
-aws.data.current.large.relevant.spot.lt5 <- aws.data.current.large.relevant %>% aws.data.filter.spot.price.inter.freq()
-
-## large instances w/ <5% in us-east-1
-##
-## aws.spot.interruption.frequencies %>%
-##   rename(id = instance.type) %>%
-##   aws.data.filter.large() %>%
-##   aws.data.filter.relevant.family() %>%
-##   filter(freq.num == 5, region.id == "us-east-1") %>%
-##   select(id, freq.text)
 
 ## ---------------------------------------------------------------------------------------------- ##
                                         # DVASSALLO S3 MEASUREMENT DATA
@@ -458,9 +375,92 @@ aws.data.filter.s3join.large <- function(df) {
         s3.benchmark.dvassallo.join()
 }
 
-## Precomputed sets
-aws.data.current.s3join <- s3.benchmark.dvassallo.join(aws.data.current)
-aws.data.current.large.s3join <- s3.benchmark.dvassallo.join(aws.data.current.large)
+## ---------------------------------------------------------------------------------------------- ##
+                                        # PRECOMPUTED SETS
+## ---------------------------------------------------------------------------------------------- ##
+
+## Precompute data for plots / faster computation
+## only do it when not deployed to shiny to preserve memory
+if (!util.is.shiny.deployed) {
+
+  ## newest (2020) data
+  aws.data.current.large.relevant <- aws.data.current %>%
+    aws.data.filter.large() %>%
+    aws.data.filter.relevant.family()
+
+  ## only large instances
+  aws.data.current.relevant <- aws.data.filter.relevant.family(aws.data.current)
+
+  ##
+  ## interruption frequency data
+  ##
+
+  aws.data.current.large.relevant.spot.lt5 <- aws.data.current.large.relevant %>% aws.data.filter.spot.price.inter.freq()
+  aws.spot.interruption.frequencies %>%
+    rename(id = instance.type) %>%
+    aws.data.filter.large() %>%
+    aws.data.filter.relevant.family() %>%
+    filter(freq.num == 5, region.id == "us-east-1") %>%
+    select(id, freq.text)
+
+  ##
+  ## different views on spot price history data
+  ##
+
+  aws.data.spot.by.date.az <- aws.spot.price.history %>%
+    dplyr::mutate(parsed.date = lubridate::round_date(Timestamp, unit = "hour")) %>%
+    dplyr::select(-Timestamp, -ProductDescription) %>%
+    dplyr::group_by(parsed.date, InstanceType) %>%
+    dplyr::rename(id = InstanceType) %>%
+    dplyr::arrange(parsed.date)
+
+  aws.data.spot.by.date <- aws.spot.price.history %>%
+    dplyr::mutate(parsed.date = lubridate::round_date(Timestamp, unit = "hour")) %>%
+    dplyr::filter(AvailabilityZone == "us-east-1a") %>%
+    dplyr::select(-Timestamp, -ProductDescription, -AvailabilityZone) %>%
+    dplyr::rename(id = InstanceType) %>%
+    dplyr::arrange(parsed.date)
+
+  aws.data.spot.min.date <- min(aws.data.spot.by.date$parsed.date) - lubridate::days(1)
+
+  aws.data.spot.filled <- aws.data.spot.by.date %>%
+    dplyr::group_by(parsed.date) %>%
+    dplyr::group_split() %>%
+    purrr::reduce(.init = setNames(list(dplyr::transmute(aws.data.current,
+                                                         SpotPrice = cost.usdph,
+                                                         id = id,
+                                                         ## AvailabilityZone = "eu-central-1a",
+                                                         parsed.date = aws.data.spot.min.date)),
+                                   aws.data.spot.min.date),
+                  function(acc, row) {
+                    prev <- acc[[length(acc)]]
+                    diff <- dplyr::anti_join(prev, row, "id") %>%
+                      dplyr::mutate(parsed.date = head(row, n = 1)$parsed.date)
+                    acc[[length(acc) + 1]] <- rbind(row, diff)
+                    acc
+                  }) %>%
+    bind_rows() %>%
+    group_by(parsed.date)
+
+  aws.data.spot.joined <- dplyr::inner_join(aws.data.current, aws.data.spot.filled, by = "id")
+
+  aws.data.spot.with.intfreq <- aws.data.spot.joined %>%
+    aws.data.mkfilter.spot.inter.freq(5)() %>%
+                                       dplyr::mutate(
+                                                cost.usdph = SpotPrice,
+                                                uses.spot.price = TRUE) %>%
+                                       dplyr::select(-meta.freq.avg) %>%
+                                       rbind(
+                                         dplyr::anti_join(aws.data.spot.joined, ., by = "id") %>% dplyr::mutate(uses.spot.price = FALSE),
+                                         .
+                                       )
+
+  ##
+  ## s3 benchmark data
+  ##
+  aws.data.current.s3join <- s3.benchmark.dvassallo.join(aws.data.current)
+  aws.data.current.large.s3join <- s3.benchmark.dvassallo.join(aws.data.current.large)
+}
 
 ## ---------------------------------------------------------------------------------------------- ##
                                         # STYLES

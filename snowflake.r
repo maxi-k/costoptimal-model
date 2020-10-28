@@ -1,3 +1,8 @@
+## This file requires that a local database with the snowflake workload trace is setup.
+## URL: https://github.com/resource-disaggregation/snowset
+## there also needs to be a 'pgconnect.r' file with a 'snowset.db.connect' function that
+## returns a valid R 'DBI' database connection as described here:
+## URL: https://www.rdocumentation.org/packages/DBI
 source("./aws.r")
 source("./model.r")
 source("./.pgconnect.r")

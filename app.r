@@ -893,6 +893,9 @@ server <- function(input, output, session) {
     furrr::future_map_dfr(ui.instance.sets, function(set) {
       filtered <- set %>% .filter.fn() %>% dplyr::filter(complete.cases(.))
       time <- model.calc.costs(query = .query, inst = filtered, timing.fn = .timing.fn)
+      if (nrow(time) == 0) {
+        return(data.frame())
+      }
       joined <- ui.data.timing.enrich(time, .col.rec) %>%
         dplyr::inner_join(set, benchmark,
                           by = c("id.name" = "id"),
@@ -916,11 +919,10 @@ server <- function(input, output, session) {
       dplyr::filter(id.name == .comp.id & count == .comp.cnt) %>%
       dplyr::mutate(color = "blue")
 
+    included.names <- c("id", "id.name", "stat.price.sum", "stat.time.sum", "meta.group")
     df <- rbind(recom, comp)
     plot <- ggplot(df, aes(x = date, y = col.recom.inv)) +
-      suppressWarnings(
-        geom_point(aes_all(colnames(ui.instance.sets[[1]])), color = df$color)
-      )
+      suppressWarnings(geom_point(aes_all(included.names), color = df$color))
     ggplotly(plot)
   })
 
@@ -1441,6 +1443,7 @@ client <- function(request) {
             "Historical Comparison",
             h3("Recommended Instances"),
             helpText("Recommended Instances in each dataset"),
+            helpText("Note: It is usually a good idea to clear all filters in the top menu because they will likely filter out all instances from older EC2 landscapes."),
             plotlyOutput("history.instances.recommended")
           )
         )
@@ -1456,17 +1459,20 @@ client <- function(request) {
 
 
 ui.run <- function() {
-  ## library(profvis)
-  ## profvis({
-  runApp(
-    shinyApp(client, server, enableBookmarking = "url",
-             options = list(
-               host = "0.0.0.0",
-               port = 3030
-             ))
-  )
-  ##})
+  options <- if(util.is.shiny.deployed) {
+               list()
+             } else {
+               list(host = "0.0.0.0", port = 3030)
+             }
+  app <- shinyApp(client, server, enableBookmarking = "url", options = options)
+  if (util.is.shiny.deployed) {
+    return(app)
+  } else {
+    ## library(profvis)
+    ## profvis({
+    runApp(app)
+    ##})
+  }
 }
-
 
 ui.run()

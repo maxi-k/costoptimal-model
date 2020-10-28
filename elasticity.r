@@ -196,10 +196,6 @@ model.elastic.costs <- function(.inst, .params, .mod.fn = model.modulator.sin.ot
     if(nrow(.costs.cur) == 0) {
       stop("no instance satisfies time constraint")
     }
-    if (.recom.prv$count > 12) {
-      browser()
-    }
-    ## browser()
     if (.recom.prv$id == best(.costs.cur)$id) { # best stays the same
       addstat("same best")
       .acc[[length(.acc)]] <-
@@ -235,7 +231,6 @@ model.elastic.costs <- function(.inst, .params, .mod.fn = model.modulator.sin.ot
       stop("Can neither stay nor switch. stopping.")
       ## addstat("phony")
       ## .switch.candidate <- .costs.cur %>% dplyr::arrange(stat.time.sum, stat.price.sum) %>% best()
-      ## browser()
     }
     addstat("switch")
     .acc[[length(.acc) + 1]] <- .switch.candidate %>%

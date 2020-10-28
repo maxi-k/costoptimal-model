@@ -3,29 +3,53 @@
 ## ---------------------------------------------------------------------------------------------- ##
 
 util.packages.install <- function(pkgs, mirror = "https://cran.uni-muenster.de/")  {
-    pkgs.new <- pkgs[!(pkgs %in% installed.packages()[,"Package"])]
-    if(length(pkgs.new)) install.packages(pkgs.new, repos=mirror)
+  pkgs.new <- pkgs[!(pkgs %in% installed.packages()[,"Package"])]
+  if(length(pkgs.new)) install.packages(pkgs.new, repos=mirror)
 
-    return(pkgs.new)
+  return(pkgs.new)
 }
 
 util.packages.require <- function(pkgs) {
-    for (pkg in pkgs) {
-        library(pkg, character.only = TRUE)
-    }
+  for (pkg in pkgs) {
+    library(pkg, character.only = TRUE)
+  }
 }
 
 util.packages.basic.setup <- function() {
-    base <- c("readr", "tidyverse", "caret", "shiny", "slider", "sqldf",
-              "VGAM", "ggrepel", "plotly", "DT", "Cairo", "RColorBrewer",
-              "lubridate", "memoise", "parallel", "furrr", "shades")
-    modeling <- c("C50", "pls", "gbm")
-    util.packages.install(c(base, modeling))
-    util.packages.require(base)
-    return(base)
+  base <- c("readr", "tidyverse", "caret", "shiny", "slider", "sqldf",
+            "VGAM", "ggrepel", "plotly", "DT", "Cairo", "RColorBrewer",
+            "lubridate", "memoise", "parallel", "furrr", "shades")
+  modeling <- c("C50", "pls", "gbm")
+  util.packages.install(c(base, modeling))
+  util.packages.require(base)
+  return(base)
 }
 
-util.packages.basic.setup()
+util.is.shiny.deployed <- Sys.getenv("R_CONFIG_ACTIVE") == "shinyapps"
+util.packages.included <- FALSE
+if (util.is.shiny.deployed && !util.packages.included) {
+  util.packages.included <<- TRUE
+  ## Shiny automatically detects library() calls to install packages along with the deployment
+  ## so the elaborate auto-installation method from above doesn't work. library() needs to be called
+  ## directly so that the required packages can be detected by shiny.
+  library("readr")
+  library("tidyverse")
+  library("caret")
+  library("shiny")
+  library("slider")
+  library("sqldf")
+  library("furrr")
+  library("lubridate")
+  library("memoise")
+  library("parallel")
+  library("VGAM")
+  library("ggrepel")
+  library("plotly")
+  library("DT")
+  library("shades")
+} else {
+  util.packages.basic.setup()
+}
 
 
 util.notify <- function() {
@@ -47,7 +71,9 @@ util.style.fonts.setup <- function() {
   X11.options(type = "cairo")
 }
 
-util.style.fonts.setup()
+if (!util.is.shiny.deployed) {
+  util.style.fonts.setup()
+}
 
 styles.draw.palette <- function(colors) {
   df <- data.frame(y = 1:length(colors), x = 1,
