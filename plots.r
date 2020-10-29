@@ -76,9 +76,9 @@ plots.m1.all.draw <- function() {
 }
 
 ## plots.m1.all.draw()
-ggsave(plots.mkpath("m1-cost-cpu-all.pdf"), plots.m1.all.draw(),
-       width = 3.6, height = 1.9, units = "in",
-       device = cairo_pdf)
+## ggsave(plots.mkpath("m1-cost-cpu-all.pdf"), plots.m1.all.draw(),
+##        width = 3.6, height = 1.9, units = "in",
+##        device = cairo_pdf)
 
 
 ## ---------------------------------------------------------------------------------------------- ##
@@ -233,7 +233,7 @@ plots.m2.distr.caching <- function(instance, dist, labs.x = "Scanned Data (GB)",
   data$group = if_else(data$x <= instance$calc.mem.caching + instance$calc.sto.caching, "Storage", "S3")
   data$group = if_else(data$x <= instance$calc.mem.caching, "Memory", data$group)
   nudge.x <- 0.03 * max(c(max(instance$calc.mem.caching + instance$calc.sto.caching), nrow(data)))
-  nudge.y <- max(data$y) / 4
+  nudge.y <- max(data$y) / 3
   line.size <- 0.3
   plot <- ggplot(instance) +
     scale_fill_manual(values=styles.color.palette1) +
@@ -260,7 +260,7 @@ cache.distr.plot.with <- function(skew, .inst = "r5d.24xlarge", .read = 8000, .s
                          legend.position = legend.position, font.size = font.size)
 }
 
-ggsave(plots.mkpath("m2-cache-distr.pdf"), cache.distr.plot.with(0.25),
+ggsave(plots.mkpath("m2-cache-distr.pdf"), cache.distr.plot.with(0.25, .read = 3000, .inst = "c5d.24xlarge"),
        width = 3.6, height = 1.9, units = "in",
        device = cairo_pdf)
 
