@@ -76,9 +76,9 @@ plots.m1.all.draw <- function() {
 }
 
 ## plots.m1.all.draw()
-## ggsave(plots.mkpath("m1-cost-cpu-all.pdf"), plots.m1.all.draw(),
-##        width = 3.6, height = 2.3, units = "in",
-##        device = cairo_pdf)
+ggsave(plots.mkpath("m1-cost-cpu-all.pdf"), plots.m1.all.draw(),
+       width = 3.6, height = 1.9, units = "in",
+       device = cairo_pdf)
 
 
 ## ---------------------------------------------------------------------------------------------- ##
@@ -260,9 +260,9 @@ cache.distr.plot.with <- function(skew, .inst = "r5d.24xlarge", .read = 8000, .s
                          legend.position = legend.position, font.size = font.size)
 }
 
-## ggsave(plots.mkpath("m2-cache-distr.pdf"), cache.distr.plot.with(0.25),
-##        width = 3.6, height = 2.3, units = "in",
-##        device = cairo_pdf)
+ggsave(plots.mkpath("m2-cache-distr.pdf"), cache.distr.plot.with(0.25),
+       width = 3.6, height = 1.9, units = "in",
+       device = cairo_pdf)
 
 ## ---------------------------------------------------------------------------------------------- ##
                                         # M3: Scale Out & Down #
