@@ -158,9 +158,9 @@ local({
           legend.position = "none",
           plot.margin=grid::unit(c(1,1,1,0), "mm")) +
     labs(x = "Scanned Data [log]", y = "Materialization Fraction", title = "Price Sum / Price Max")
-  ggsave(plots.mkpath("m2-spool-sum-max-diff.pdf"), plot,
-         width = 2.5, height = 2.5, units = "in",
-         device = cairo_pdf)
+  ## ggsave(plots.mkpath("m2-spool-sum-max-diff.pdf"), plot,
+  ##        width = 2.5, height = 2.5, units = "in",
+  ##        device = cairo_pdf)
 })
 
 ## plots.m2.spool.draw()
@@ -260,10 +260,9 @@ cache.distr.plot.with <- function(skew, .inst = "r5d.24xlarge", .read = 8000, .s
                          legend.position = legend.position, font.size = font.size)
 }
 
-ggsave(plots.mkpath("m2-cache-distr.pdf"), cache.distr.plot.with(0.25),
-       width = 3.6, height = 2.3, units = "in",
-       device = cairo_pdf)
-
+## ggsave(plots.mkpath("m2-cache-distr.pdf"), cache.distr.plot.with(0.25),
+##        width = 3.6, height = 2.3, units = "in",
+##        device = cairo_pdf)
 
 ## ---------------------------------------------------------------------------------------------- ##
                                         # M3: Scale Out & Down #
