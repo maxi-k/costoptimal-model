@@ -286,8 +286,6 @@ aws.data.filter.paper <- function(df) {
   dplyr::filter(df, id %in% paper.inst.ids)
 }
 
-## aws.data.paper <- aws.data.filter.paper(aws.data.current)
-
 ## ---------------------------------------------------------------------------------------------- ##
                                         # SPOT INTERRUPTION FREQUENCIES
 ## ---------------------------------------------------------------------------------------------- ##
@@ -402,6 +400,11 @@ if (!util.is.shiny.deployed) {
     aws.data.filter.relevant.family() %>%
     filter(freq.num == 5, region.id == "us-east-1") %>%
     select(id, freq.text)
+
+  ##
+  ## Instance data reffered to in the costoptimal paper
+  ##
+  aws.data.paper <- aws.data.filter.paper(aws.data.current)
 
   ##
   ## different views on spot price history data

@@ -225,6 +225,46 @@ plots.m2.draw.diff.for <- function(.id) {
 ##        width = 3 * 2.5, height = 2.5, units = "in",
 ##        device = cairo_pdf)
 
+
+plots.m2.distr.caching <- function(instance, dist, labs.x = "Scanned Data (GB)", labs.y = "Number of Accesses", legend.position = "none", font.size = NA) {
+  levels = c("Memory", "Storage", "S3", "S3 Initial Load")
+  initdata <- dist$initial %>% data.frame(y = ., x = 1:length(.), group = "S3 Initial Load")
+  data <- dist$working %>% data.frame(y = . + initdata$y, x = 1:length(.))
+  data$group = if_else(data$x <= instance$calc.mem.caching + instance$calc.sto.caching, "Storage", "S3")
+  data$group = if_else(data$x <= instance$calc.mem.caching, "Memory", data$group)
+  nudge.x <- 0.03 * max(c(max(instance$calc.mem.caching + instance$calc.sto.caching), nrow(data)))
+  nudge.y <- max(data$y) / 4
+  line.size <- 0.3
+  plot <- ggplot(instance) +
+    scale_fill_manual(values=styles.color.palette1) +
+    geom_area(data=data, aes(y = y, x = x, fill = group), stat="identity") +
+    geom_area(data=initdata, aes(y = y, x = x, fill = group), stat="identity") +
+    geom_vline(aes(xintercept=calc.mem.caching), colour="blue", size = line.size) +
+    geom_vline(aes(xintercept=calc.mem.caching + calc.sto.caching), colour="blue", size = line.size) +
+    geom_text(aes(x=calc.mem.caching, y=nudge.y * 2, label="Memory"), colour="blue", angle=90, nudge_x = nudge.x) +
+    geom_text(aes(x=calc.mem.caching + calc.sto.caching, y=nudge.y * 2, label="Storage"), colour="blue", angle=90, nudge_x = nudge.x) +
+    geom_hline(aes(yintercept = 1), linetype = "dashed", size = line.size) +
+    geom_text(aes(x = max(data$x), y = 1, label = "Single Access"), nudge_y = 0.5, hjust = 1) +
+    geom_point(aes(x = 0, y = max(data$y)), shape = 4, color = styles.color.palette1[1]) +
+    labs(x = labs.x, y = labs.y, fill = "Load Type") +
+    theme_bw() +
+    theme(plot.margin=grid::unit(c(1,1,1,1), "mm"),
+          legend.position = legend.position)
+  plot
+}
+
+cache.distr.plot.with <- function(skew, .inst = "r5d.24xlarge", .read = 8000, .split = FALSE, legend.position = "none", font.size = NA) {
+  cache.distr.inst <- aws.data.current.large %>% dplyr::filter(id == .inst) %>% model.with.speeds()
+  cache.distr.read <- .read
+  plots.m2.distr.caching(cache.distr.inst, model.distr.split.fn(.split)(model.make.distr.fn(skew)(cache.distr.read)),
+                         legend.position = legend.position, font.size = font.size)
+}
+
+ggsave(plots.mkpath("m2-cache-distr.pdf"), cache.distr.plot.with(0.25),
+       width = 3.6, height = 2.3, units = "in",
+       device = cairo_pdf)
+
+
 ## ---------------------------------------------------------------------------------------------- ##
                                         # M3: Scale Out & Down #
 ## ---------------------------------------------------------------------------------------------- ##
