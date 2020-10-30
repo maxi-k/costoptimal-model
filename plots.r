@@ -226,42 +226,56 @@ plots.m2.draw.diff.for <- function(.id) {
 ##        device = cairo_pdf)
 
 
-plots.m2.distr.caching <- function(instance, dist, labs.x = "Scanned Data (GB)", labs.y = "Number of Accesses", legend.position = "none", font.size = NA) {
+plots.m2.distr.caching <- function(instance, dist, labs.x = "Scanned Data (TB)", labs.y = "Accesses") {
   levels = c("Memory", "Storage", "S3", "S3 Initial Load")
   initdata <- dist$initial %>% data.frame(y = ., x = 1:length(.), group = "S3 Initial Load")
   data <- dist$working %>% data.frame(y = . + initdata$y, x = 1:length(.))
   data$group = if_else(data$x <= instance$calc.mem.caching + instance$calc.sto.caching, "Storage", "S3")
   data$group = if_else(data$x <= instance$calc.mem.caching, "Memory", data$group)
-  nudge.x <- 0.03 * max(c(max(instance$calc.mem.caching + instance$calc.sto.caching), nrow(data)))
-  nudge.y <- max(data$y) / 3
+  nudge.x <- 0.01 * max(c(max(instance$calc.mem.caching + instance$calc.sto.caching), nrow(data)))
+  nudge.y <- max(data$y) * 0.8
   line.size <- 0.3
+  .mk.txt <- function(name) paste(instance$id.prefix, name, "capacity")
   plot <- ggplot(instance) +
     scale_fill_manual(values=styles.color.palette1) +
     geom_area(data=data, aes(y = y, x = x, fill = group), stat="identity") +
     geom_area(data=initdata, aes(y = y, x = x, fill = group), stat="identity") +
     geom_vline(aes(xintercept=calc.mem.caching), colour="blue", size = line.size) +
     geom_vline(aes(xintercept=calc.mem.caching + calc.sto.caching), colour="blue", size = line.size) +
-    geom_text(aes(x=calc.mem.caching, y=nudge.y * 2, label="Memory"), colour="blue", angle=90, nudge_x = nudge.x) +
-    geom_text(aes(x=calc.mem.caching + calc.sto.caching, y=nudge.y * 2, label="Storage"), colour="blue", angle=90, nudge_x = nudge.x) +
-    geom_hline(aes(yintercept = 1), linetype = "dashed", size = line.size) +
-    geom_text(aes(x = max(data$x), y = 1, label = "Single Access"), nudge_y = 0.5, hjust = 1) +
+    geom_text(aes(x=calc.mem.caching, y=nudge.y, label=.mk.txt("RAM")), colour="blue", nudge_x = nudge.x, hjust = 0, size = 3) +
+    geom_text(aes(x=calc.mem.caching + calc.sto.caching, y=nudge.y, label=.mk.txt("SSD")), colour="blue", nudge_x = nudge.x, hjust = 0, size = 3) +
     geom_point(aes(x = 0, y = max(data$y)), shape = 4, color = styles.color.palette1[1]) +
     labs(x = labs.x, y = labs.y, fill = "Load Type") +
+    coord_cartesian(expand = FALSE) +
+    scale_x_continuous(breaks = seq(0, nrow(data), 1000), labels = seq(0, nrow(data) / 1000)) +
+    scale_y_continuous(breaks = seq(0, max(data$y), 1)) +
     theme_bw() +
-    theme(plot.margin=grid::unit(c(1,1,1,1), "mm"),
-          legend.position = legend.position)
+    theme(plot.margin=grid::unit(rep(0.8, 4), "mm"),
+          axis.title = element_text(size = 9),
+          legend.position = "none")
   plot
 }
 
-cache.distr.plot.with <- function(skew, .inst = "r5d.24xlarge", .read = 8000, .split = FALSE, legend.position = "none", font.size = NA) {
+cache.distr.packed.reads <- function(.distr, .inst) {
+  .bins <- list(
+    data.mem = list(size = round(.inst$calc.mem.caching), prio = .inst$calc.mem.speed),
+    data.sto = list(size = round(.inst$calc.sto.caching), prio = .inst$calc.sto.speed),
+    data.s3  = list(size = rep(length(.distr$working), times = nrow(.inst)),
+                    prio = .inst$calc.net.speed)
+  )
+  model.distr.pack(.bins, .distr$working) %>% as.data.frame()
+}
+cache.distr.plot.with <- function(skew, .inst = "r5d.24xlarge", .read = 8000, .split = FALSE) {
   cache.distr.inst <- aws.data.current.large %>% dplyr::filter(id == .inst) %>% model.with.speeds()
   cache.distr.read <- .read
-  plots.m2.distr.caching(cache.distr.inst, model.distr.split.fn(.split)(model.make.distr.fn(skew)(cache.distr.read)),
-                         legend.position = legend.position, font.size = font.size)
+  .distr <- model.distr.split.fn(.split)(model.make.distr.fn(skew)(cache.distr.read))
+  print(cache.distr.packed.reads(.distr, cache.distr.inst))
+  plots.m2.distr.caching(cache.distr.inst, .distr)
+
 }
 
-ggsave(plots.mkpath("m2-cache-distr.pdf"), cache.distr.plot.with(0.25, .read = 3000, .inst = "c5d.24xlarge"),
-       width = 3.6, height = 1.9, units = "in",
+ggsave(plots.mkpath("m2-cache-distr.pdf"), cache.distr.plot.with(0.2, .read = 3000, .inst = "c5d.24xlarge"),
+       width = 3.6, height = 1, units = "in",
        device = cairo_pdf)
 
 ## ---------------------------------------------------------------------------------------------- ##
