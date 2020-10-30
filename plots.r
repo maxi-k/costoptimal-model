@@ -500,12 +500,12 @@ plots.mh.spot.cost.draw <- function() {
   print(c("<%25", c20, od, c20 / od))
 
   plot <- ggplot(.df, aes(x = parsed.date,
-                            y = stat.price.sum,
-                            label = group, group = group, color = id.prefix)) +
+                          y = stat.price.sum,
+                          label = group, group = group, color = id.prefix)) +
     scale_color_manual(values = style.instance.colors.vibrant) +
     geom_line() +
     # geom_text(data = .text, angle = 90, nudge_y = 0.01, hjust = 0) +
-    scale_y_continuous(expand = c(0, 0), limits = c(0, 0.685), breaks = seq(0, 1, 0.1)) +
+    scale_y_continuous(limits = c(0, 0.685), breaks = seq(0, 1, 0.1)) +
     annotate(geom = "text", x = .vcenter, y = 0.645, label = "On Demand: i3 is best", color = style.instance.colors.vibrant["i3"]) +
     annotate(geom = "text", x = .vcenter, y = 0.335, label = "< 5% interruptions: m5n is best", color = style.instance.colors.vibrant["m5n"]) +
     annotate(geom = "text", x = .vcenter, y = 0.135, label = "> 20% interruptions: i3 is best", color = style.instance.colors.vibrant["i3"]) +
@@ -517,7 +517,7 @@ plots.mh.spot.cost.draw <- function() {
 }
 
 ## plots.mh.spot.cost.draw()
-## util.notify()
 ## ggsave(plots.mkpath("mh-spot-prices.pdf"), plots.mh.spot.cost.draw(),
-##        width = 3.6, height = 2.3, units = "in",
+##        width = 3.6, height = 1.9, units = "in",
 ##        device = cairo_pdf)
+## util.notify()
