@@ -66,7 +66,7 @@ plots.m1.all.draw <- function() {
     theme_bw() +
     geom_point(data = .transitions, shape = 4, color = "black") +
     geom_vline(data = .transitions, aes(xintercept=x), color = "black", linetype = "dashed", size = 0.2) +
-    geom_text(data = .flanks, aes(y = y, x = x + 0.35 * max(x), label = paste(label, "best"))) +
+    geom_text(data = .flanks, aes(y = y, x = x + 0.42 * max(x), label = paste(label, "best"))) +
     geom_text(data = .labeled, aes(x = max(x) + 1, label = label), hjust = 0) +
     annotate(geom = "text", label = "x1e", x = 22.7, y = 14.3, color = "grey") +
     theme(plot.margin=grid::unit(c(1,1,1,1), "mm"),
