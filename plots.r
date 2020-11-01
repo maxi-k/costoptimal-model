@@ -274,9 +274,9 @@ cache.distr.plot.with <- function(skew, .inst = "r5d.24xlarge", .read = 8000, .s
 
 }
 
-ggsave(plots.mkpath("m2-cache-distr.pdf"), cache.distr.plot.with(0.2, .read = 3000, .inst = "c5d.24xlarge"),
-       width = 3.6, height = 1, units = "in",
-       device = cairo_pdf)
+## ggsave(plots.mkpath("m2-cache-distr.pdf"), cache.distr.plot.with(0.2, .read = 3000, .inst = "c5d.24xlarge"),
+##        width = 3.6, height = 1, units = "in",
+##        device = cairo_pdf)
 
 ## ---------------------------------------------------------------------------------------------- ##
                                         # M3: Scale Out & Down #
@@ -519,10 +519,11 @@ plots.mh.spot.cost.draw <- function() {
     scale_color_manual(values = style.instance.colors.vibrant) +
     geom_line() +
     # geom_text(data = .text, angle = 90, nudge_y = 0.01, hjust = 0) +
+    scale_x_continuous(breaks = seq(min(.df$parsed.date), max(.df$parsed.date), length.out = 3)) +
     scale_y_continuous(limits = c(0, 0.685), breaks = seq(0, 1, 0.1)) +
     annotate(geom = "text", x = .vcenter, y = 0.65, label = "On Demand: i3 is best", color = style.instance.colors.vibrant["i3"]) +
-    annotate(geom = "text", x = .vcenter, y = 0.34, label = "< 5% interruptions: m5n is best", color = style.instance.colors.vibrant["m5n"]) +
-    annotate(geom = "text", x = .vcenter, y = 0.13, label = "> 20% interruptions: i3 is best", color = style.instance.colors.vibrant["i3"]) +
+    annotate(geom = "text", x = .vcenter, y = 0.34, label = "spot price with < 5% interruptions: m5n is best", color = style.instance.colors.vibrant["m5n"]) +
+    annotate(geom = "text", x = .vcenter, y = 0.13, label = "spot price with > 20% interruptions: i3 is best", color = style.instance.colors.vibrant["i3"]) +
     labs(y = "Workload Cost ($)", x = "Date") +
     theme_bw() +
     theme(legend.position = "none",
@@ -531,8 +532,8 @@ plots.mh.spot.cost.draw <- function() {
   plot
 }
 
-## plots.mh.spot.cost.draw()
-ggsave(plots.mkpath("mh-spot-prices.pdf"), plots.mh.spot.cost.draw(),
-       width = 3.6, height = 1.6, units = "in",
-       device = cairo_pdf)
-util.notify()
+# plots.mh.spot.cost.draw()
+## ggsave(plots.mkpath("mh-spot-prices.pdf"), plots.mh.spot.cost.draw(),
+##        width = 3.6, height = 1.6, units = "in",
+##        device = cairo_pdf)
+## util.notify()
