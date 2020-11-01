@@ -533,7 +533,7 @@ plots.mh.spot.cost.draw <- function() {
   plot
 }
 
-plots.mh.spot.cost.draw()
+## plots.mh.spot.cost.draw()
 ## ggsave(plots.mkpath("mh-spot-prices.pdf"), plots.mh.spot.cost.draw(),
 ##        width = 3.6, height = 1.6, units = "in",
 ##        device = cairo_pdf)
