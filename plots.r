@@ -510,8 +510,8 @@ plots.mh.spot.cost.draw <- function() {
   od <- mean(filter(.df, group == "<0%")$stat.price.sum)
   c5 <- mean(filter(.df, group == "<5%")$stat.price.sum)
   c20 <- mean(filter(.df, group == "<25%")$stat.price.sum)
-  print(c("<%5", c5, od, c5 / od))
-  print(c("<%25", c20, od, c20 / od))
+
+  .xlims <- .df$parsed.date
 
   plot <- ggplot(.df, aes(x = parsed.date,
                           y = stat.price.sum,
@@ -519,7 +519,7 @@ plots.mh.spot.cost.draw <- function() {
     scale_color_manual(values = style.instance.colors.vibrant) +
     geom_line() +
     # geom_text(data = .text, angle = 90, nudge_y = 0.01, hjust = 0) +
-    scale_x_continuous(breaks = seq(min(.df$parsed.date), max(.df$parsed.date), length.out = 3)) +
+    scale_x_datetime(breaks = c(min(.xlims), median(.xlims), max(.xlims))) +
     scale_y_continuous(limits = c(0, 0.685), breaks = seq(0, 1, 0.1)) +
     annotate(geom = "text", x = .vcenter, y = 0.65, label = "On Demand: i3 is best", color = style.instance.colors.vibrant["i3"]) +
     annotate(geom = "text", x = .vcenter, y = 0.34, label = "spot price with < 5% interruptions: m5n is best", color = style.instance.colors.vibrant["m5n"]) +
@@ -533,7 +533,7 @@ plots.mh.spot.cost.draw <- function() {
 }
 
 # plots.mh.spot.cost.draw()
-## ggsave(plots.mkpath("mh-spot-prices.pdf"), plots.mh.spot.cost.draw(),
-##        width = 3.6, height = 1.6, units = "in",
-##        device = cairo_pdf)
+ggsave(plots.mkpath("mh-spot-prices.pdf"), plots.mh.spot.cost.draw(),
+       width = 3.6, height = 1.6, units = "in",
+       device = cairo_pdf)
 ## util.notify()
