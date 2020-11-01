@@ -511,7 +511,8 @@ plots.mh.spot.cost.draw <- function() {
   c5 <- mean(filter(.df, group == "<5%")$stat.price.sum)
   c20 <- mean(filter(.df, group == "<25%")$stat.price.sum)
 
-  .xlims <- .df$parsed.date
+  .xlims <- c(min(.df$parsed.date), median(.df$parsed.date), max(.df$parsed.date))
+  .xlabs <- lubridate::stamp("Aug 2")(.xlims)
 
   plot <- ggplot(.df, aes(x = parsed.date,
                           y = stat.price.sum,
@@ -519,11 +520,11 @@ plots.mh.spot.cost.draw <- function() {
     scale_color_manual(values = style.instance.colors.vibrant) +
     geom_line() +
     # geom_text(data = .text, angle = 90, nudge_y = 0.01, hjust = 0) +
-    scale_x_datetime(breaks = c(min(.xlims), median(.xlims), max(.xlims))) +
+    scale_x_datetime(breaks = .xlims, labels = .xlabs) +
     scale_y_continuous(limits = c(0, 0.685), breaks = seq(0, 1, 0.1)) +
     annotate(geom = "text", x = .vcenter, y = 0.65, label = "On Demand: i3 is best", color = style.instance.colors.vibrant["i3"]) +
-    annotate(geom = "text", x = .vcenter, y = 0.34, label = "spot price with < 5% interruptions: m5n is best", color = style.instance.colors.vibrant["m5n"]) +
-    annotate(geom = "text", x = .vcenter, y = 0.13, label = "spot price with > 20% interruptions: i3 is best", color = style.instance.colors.vibrant["i3"]) +
+    annotate(geom = "text", x = .vcenter, y = 0.34, label = "spot price, < 5% interruptions: m5n is best", color = style.instance.colors.vibrant["m5n"]) +
+    annotate(geom = "text", x = .vcenter, y = 0.13, label = "spot price, > 20% interruptions: i3 is best", color = style.instance.colors.vibrant["i3"]) +
     labs(y = "Workload Cost ($)", x = "Date") +
     theme_bw() +
     theme(legend.position = "none",
@@ -532,8 +533,8 @@ plots.mh.spot.cost.draw <- function() {
   plot
 }
 
-# plots.mh.spot.cost.draw()
-ggsave(plots.mkpath("mh-spot-prices.pdf"), plots.mh.spot.cost.draw(),
-       width = 3.6, height = 1.6, units = "in",
-       device = cairo_pdf)
+plots.mh.spot.cost.draw()
+## ggsave(plots.mkpath("mh-spot-prices.pdf"), plots.mh.spot.cost.draw(),
+##        width = 3.6, height = 1.6, units = "in",
+##        device = cairo_pdf)
 ## util.notify()
