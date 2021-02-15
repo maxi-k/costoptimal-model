@@ -407,7 +407,9 @@ plots.mh.history.cost.draw <- function() {
                     stat.price.change = stat.price.sum / .first$stat.price.sum
                     )
     })
+  palette <- shades::saturation(style.instance.colors, delta(0.22))
   ggplot(.df, aes(x = meta.join.time, y = stat.price.change, label = label, color = workload.id)) +
+    scale_color_manual(values = palette) +
     geom_line(aes(group = workload.id), linetype = "dashed") +
     ## geom_text(data = dplyr::filter(.df, workload.id == "A"), nudge_y = 0.01, nudge_x = 0.2) +
     geom_line(aes(group = paste(workload.id, id)), size = 1.5) +
@@ -417,13 +419,14 @@ plots.mh.history.cost.draw <- function() {
                        breaks = seq(0, 1, 0.2),
                        labels = c("0", ".2", ".4", ".6", ".8", "1")) +
     theme(legend.position = "none",
+          axis.title.x = element_blank(),
           plot.margin=grid::unit(c(1,1,1,1), "mm"))
 }
 
-## plots.mh.history.cost.draw()
-## ggsave(plots.mkpath("mh-date-cost.pdf"), plots.mh.history.cost.draw(),
-##        width = 3.6, height = 2.3, units = "in",
-##        device = cairo_pdf)
+plots.mh.history.cost.draw()
+ggsave(plots.mkpath("mh-date-cost-3.pdf"), plots.mh.history.cost.draw(),
+       width = 180, height = 65, units = "mm",
+       device = cairo_pdf)
 
 ## ---------------------------------------------------------------------------------------------- ##
 
@@ -538,3 +541,73 @@ plots.mh.spot.cost.draw <- function() {
 ##        width = 3.6, height = 1.6, units = "in",
 ##        device = cairo_pdf)
 ## util.notify()
+
+plots.eval.slicing.network.data.load <- memoize(function(file) {
+  dir <- "./data/iperf-test"
+  path <- paste(dir, paste(file, 'csv', sep='.'), sep="/")
+  read_csv(path)
+})
+
+plots.eval.slicing.network.draw <- function(filenames, N = 500, .to.pdf = FALSE) {
+  .df <- purrr::map_dfr(filenames, function(filename) {
+    raw <- plots.eval.slicing.network.data.load(filename)
+    raw$file <- filename
+    raw
+  }) %>%
+    mutate(
+      file = factor(file, levels = filenames),
+      x.raw = .[["UNIX Secs"]],
+      y.raw = .[["Throughput bps"]]
+    ) %>%
+    group_by(file) %>%
+    top_n(-N, wt = x.raw) %>%
+    transmute(
+      x.min = min(x.raw),
+      x = x.raw - x.min,
+      y = y.raw / 1024^3,
+      inst = file
+    )
+
+  .final <- .df %>%
+    group_by(inst) %>%
+    top_n(N/10, wt = x) %>% # last 10% ~ asymptotic throughput
+    summarize(end.avg = mean(y),
+              end.pos = max(x)) %>%
+    mutate(label = paste(signif(end.avg, 3), "Gbps"))
+
+  .start <- .df %>%
+    group_by(inst) %>%
+    top_n(-N/10, wt = x) %>% # first 10% ~ start value
+    summarize(fst.avg = mean(y),
+              fst.pos = min(x)) %>%
+    mutate(label = paste(signif(fst.avg, 3), "Gbps"))
+
+  .final.nudge <- max(.final$end.avg) * 0.14
+  .text.size <- if_else(.to.pdf, 2.75, 6.5)
+
+  ggplot(.df, aes(x = x, y = y, color = inst)) +
+    scale_color_manual(values=styles.color.palette1) +
+    theme_bw() +
+    geom_text(data = .final, aes(x = end.pos, y = end.avg + .final.nudge, label = label), hjust = 1, size = .text.size, show.legend = FALSE) +
+    geom_text(data = .start, aes(x = fst.pos, y = fst.avg * 1.15,         label = label), hjust = 0, size = .text.size, show.legend = FALSE) +
+    geom_line() +
+    theme(
+      text = element_text(size = if_else(.to.pdf, 8.5, 18)),
+      legend.position = "bottom",
+      legend.title = element_blank(),
+      legend.margin = margin(t = -2.5, unit = 'mm'),
+    ) +
+    labs(
+      y = "Throughput (Gbps)",
+      x = "Request",
+      color = "Instance"
+    )
+}
+
+plots.eval.slicing.network.inst <- c('c5n.xlarge', 'c5n.2xlarge', 'c5n.4xlarge')
+## plots.eval.slicing.network.draw(plots.eval.slicing.network.inst)
+ggsave(plots.mkpath("eval-slicing-network.pdf"),
+       plots.eval.slicing.network.draw(plots.eval.slicing.network.inst, .to.pdf = TRUE),
+       width = 100, height = 75, units = "mm",
+#        width = 3.6, height = 1.6, units = "in",
+       device = cairo_pdf)
