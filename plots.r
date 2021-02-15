@@ -301,27 +301,33 @@ plots.m3.time.cost.draw <- function() {
   .query <- .def$query
   .time.fn <- .def$time.fn
 
-  ## .inst <- rbind(
-  ##   aws.data.current.large.relevant,
-  ##   aws.data.current %>% dplyr::filter(id == "c5d.2xlarge") %>% dplyr::mutate(id = "snowflake")
-  ## )
-  .inst <- aws.data.current.large.relevant.spot.lt5
+  .inst <- rbind(
+    aws.data.current.large.relevant,
+    aws.data.current %>% dplyr::filter(id == "c5d.2xlarge") %>% dplyr::mutate(id = "snowflake"),
+    aws.data.current %>% dplyr::filter(id == "c5d.2xlarge") %>%
+    dplyr::mutate(id = "snowflake (burst)") %>% mutate(network.is.steady = TRUE)
+  )
+  ## .inst <- aws.data.current.large.relevant.spot.lt5
   .palette <- style.instance.colors
+  .inst.id <- c("c5d", "snowflake", "snowflake (burst)")
 
-  .cost.all <- model.calc.costs(.query, .inst, .time.fn) %>%
-    dplyr::inner_join(select(.inst, id, starts_with("meta.")), by = c("id.name" = "id"))
+  .cost.all <- model.calc.costs(.query, .inst, .time.fn) ## %>% dplyr::inner_join(select(.inst, id, starts_with("meta.")), by = c("id.name" = "id"))
   .frontier <- model.calc.frontier(.cost.all,
                                    x = "stat.time.sum", y = "stat.price.sum",
                                    id = "id", quadrant = "bottom.left")
   .df <- .cost.all %>% dplyr::mutate(
                                 id.prefix = sub("^([A-Za-z1-9-]+)\\..*", "\\1", id.name),
-                                group = ifelse(id %in% .frontier$id | id.prefix %in% names(.palette), id.prefix, "other"),
-                                name = paste(group, ifelse(meta.uses.spot.price, "-S", "-D"), sep=""))
+                                group = ifelse((id %in% .frontier$id | id.prefix %in% .inst.id), id.prefix, "other"),
+                                name = group
+                                ## name = paste(group, ifelse(meta.uses.spot.price, "-S", "-D"), sep="")
+                              )
 
   .groups <- unique(.df$group)
 
   .palette["other"] <- "#eeeeee"
   .palette["frontier"] <- "#ff0000"
+  .palette["snowflake"] <- "#29b5e8"
+  .palette["snowflake (burst)"] <- shades::brightness("#29b5e8", delta(-0.4))
 
   .colored <- .df %>% dplyr::filter(group != "other")
   .greys <- .df %>% dplyr::filter(group == "other")
@@ -335,7 +341,7 @@ plots.m3.time.cost.draw <- function() {
     geom_point(data = .greys, size = 1) +
     geom_point(data = .colored, size = 1) +
     geom_text(data = .labels, nudge_x = -0.15, nudge_y = 0.08) +
-    ## geom_text(data = .colored, aes(label = count)) +
+    # geom_text(data = .colored, aes(label = count)) +
     scale_x_log10(limits = c(30, 6e03)) +
     scale_y_log10() +
     labs(y = "Workload Cost ($) [log]",
@@ -347,9 +353,9 @@ plots.m3.time.cost.draw <- function() {
 }
 
 ## plots.m3.time.cost.draw()
-## ggsave(plots.mkpath("m3-time-cost.pdf"), plots.m3.time.cost.draw(),
-##        width = 3.6, height = 2.6, units = "in",
-##        device = cairo_pdf)
+ggsave(plots.mkpath("m3-time-cost-burst.pdf"), plots.m3.time.cost.draw(),
+       width = 3.6, height = 2.6, units = "in",
+       device = cairo_pdf)
 
 ## ---------------------------------------------------------------------------------------------- ##
                                         # MH: History #
@@ -423,10 +429,10 @@ plots.mh.history.cost.draw <- function() {
           plot.margin=grid::unit(c(1,1,1,1), "mm"))
 }
 
-plots.mh.history.cost.draw()
-ggsave(plots.mkpath("mh-date-cost-3.pdf"), plots.mh.history.cost.draw(),
-       width = 180, height = 65, units = "mm",
-       device = cairo_pdf)
+## plots.mh.history.cost.draw()
+## ggsave(plots.mkpath("mh-date-cost-3.pdf"), plots.mh.history.cost.draw(),
+##        width = 180, height = 65, units = "mm",
+##        device = cairo_pdf)
 
 ## ---------------------------------------------------------------------------------------------- ##
 
@@ -604,10 +610,10 @@ plots.eval.slicing.network.draw <- function(filenames, N = 500, .to.pdf = FALSE)
     )
 }
 
-plots.eval.slicing.network.inst <- c('c5n.xlarge', 'c5n.2xlarge', 'c5n.4xlarge')
+## plots.eval.slicing.network.inst <- c('c5n.xlarge', 'c5n.2xlarge', 'c5n.4xlarge')
 ## plots.eval.slicing.network.draw(plots.eval.slicing.network.inst)
-ggsave(plots.mkpath("eval-slicing-network.pdf"),
-       plots.eval.slicing.network.draw(plots.eval.slicing.network.inst, .to.pdf = TRUE),
-       width = 100, height = 75, units = "mm",
-#        width = 3.6, height = 1.6, units = "in",
-       device = cairo_pdf)
+## ggsave(plots.mkpath("eval-slicing-network.pdf"),
+##        plots.eval.slicing.network.draw(plots.eval.slicing.network.inst, .to.pdf = TRUE),
+##        width = 100, height = 75, units = "mm",
+##         width = 3.6, height = 1.6, units = "in",
+##       device = cairo_pdf)
