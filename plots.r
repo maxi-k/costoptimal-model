@@ -303,13 +303,12 @@ plots.m3.time.cost.draw <- function() {
 
   .inst <- rbind(
     aws.data.current.large.relevant,
-    aws.data.current %>% dplyr::filter(id == "c5d.2xlarge") %>% dplyr::mutate(id = "snowflake"),
-    aws.data.current %>% dplyr::filter(id == "c5d.2xlarge") %>%
-    dplyr::mutate(id = "snowflake (burst)") %>% mutate(network.is.steady = TRUE)
+    aws.data.current %>% dplyr::filter(id == "c5d.2xlarge") %>% dplyr::mutate(id = "snowflake (steady)"),
+    aws.data.current %>% dplyr::filter(id == "c5d.2xlarge") %>% dplyr::mutate(id = "snowflake (burst)") %>% mutate(network.is.steady = TRUE)
   )
   ## .inst <- aws.data.current.large.relevant.spot.lt5
   .palette <- style.instance.colors
-  .inst.id <- c("c5d", "snowflake", "snowflake (burst)")
+  .inst.id <- c("c5d", "snowflake (steady)", "snowflake (burst)")
 
   .cost.all <- model.calc.costs(.query, .inst, .time.fn) ## %>% dplyr::inner_join(select(.inst, id, starts_with("meta.")), by = c("id.name" = "id"))
   .frontier <- model.calc.frontier(.cost.all,
@@ -317,6 +316,8 @@ plots.m3.time.cost.draw <- function() {
                                    id = "id", quadrant = "bottom.left")
   .df <- .cost.all %>% dplyr::mutate(
                                 id.prefix = sub("^([A-Za-z1-9-]+)\\..*", "\\1", id.name),
+                                id.short = str_replace(id.name, "xlarge", ""),
+                                id.short = str_replace(id.short, "snowflake", "c5d.2"),
                                 group = ifelse((id %in% .frontier$id | id.prefix %in% .inst.id), id.prefix, "other"),
                                 name = group
                                 ## name = paste(group, ifelse(meta.uses.spot.price, "-S", "-D"), sep="")
@@ -326,7 +327,7 @@ plots.m3.time.cost.draw <- function() {
 
   .palette["other"] <- "#eeeeee"
   .palette["frontier"] <- "#ff0000"
-  .palette["snowflake"] <- "#29b5e8"
+  .palette["snowflake (steady)"] <- "#29b5e8"
   .palette["snowflake (burst)"] <- shades::brightness("#29b5e8", delta(-0.4))
 
   .colored <- .df %>% dplyr::filter(group != "other")
@@ -336,14 +337,14 @@ plots.m3.time.cost.draw <- function() {
     dplyr::group_by(group) %>%
     dplyr::filter(stat.price.sum == max(stat.price.sum))
 
-  ggplot(.df, aes(x = stat.time.sum, y = stat.price.sum, color = group, label = name)) +
+  ggplot(.df, aes(x = stat.time.sum, y = stat.price.sum, color = group, label = id.short)) +
     scale_color_manual(values = .palette) +
     geom_point(data = .greys, size = 1) +
     geom_point(data = .colored, size = 1) +
-    geom_text(data = .labels, nudge_x = -0.15, nudge_y = 0.08) +
-    # geom_text(data = .colored, aes(label = count)) +
+    geom_text(data = .labels, nudge_x = -0.15, nudge_y = 0.08, fontface = "bold") +
+    geom_text(data = .colored, aes(label = count)) +
     scale_x_log10(limits = c(30, 6e03)) +
-    scale_y_log10() +
+    scale_y_log10(limits = c(2.22, 34)) +
     labs(y = "Workload Cost ($) [log]",
          x = "Workload Execution Time (s) [log]",
          color = "Instance") +
@@ -353,9 +354,9 @@ plots.m3.time.cost.draw <- function() {
 }
 
 ## plots.m3.time.cost.draw()
-ggsave(plots.mkpath("m3-time-cost-burst.pdf"), plots.m3.time.cost.draw(),
-       width = 3.6, height = 2.6, units = "in",
-       device = cairo_pdf)
+## ggsave(plots.mkpath("m3-time-cost-burst.pdf"), plots.m3.time.cost.draw(),
+##        width = 3.6, height = 2.0, units = "in",
+##        device = cairo_pdf)
 
 ## ---------------------------------------------------------------------------------------------- ##
                                         # MH: History #
@@ -617,3 +618,91 @@ plots.eval.slicing.network.draw <- function(filenames, N = 500, .to.pdf = FALSE)
 ##        width = 100, height = 75, units = "mm",
 ##         width = 3.6, height = 1.6, units = "in",
 ##       device = cairo_pdf)
+
+## runs.large.insts.measured <- read.csv("data/eval-run-single.csv") %>%
+##   dplyr::mutate(id.name = paste(stringr::str_trim(id.name, side = "both"), "xlarge", sep=""),
+##                 time.measured.cpu = time.cpu / (10^6),
+##                 time.measured.exe = time.exe / (10^6)
+##                 ) %>%
+##   group_by(id.name) %>%
+##   summarize(
+##     time.cpu.sd = sd(time.measured.cpu),
+##     time.exe.sd = sd(time.measured.exe),
+##     time.measured.cpu = mean(time.measured.cpu),
+##     time.measured.exe = mean(time.measured.exe)
+##   )
+
+runs.large.insts.measured <- read.csv("data/eval-run-single.csv") %>%
+  dplyr::mutate(id.name = stringr::str_trim(instance, side = "both"),
+                time.measured.cpu = time.cpu / (10^6),
+                time.measured.exe = time.exe / (10^6)
+                ) %>%
+  group_by(id.name) %>%
+  summarize(
+    time.cpu.sd = sd(time.measured.cpu),
+    time.exe.sd = sd(time.measured.exe),
+    time.measured.cpu = mean(time.measured.cpu),
+    time.measured.exe = mean(time.measured.exe)
+  )
+runs.large.insts.instance <- aws.data.current %>% filter(id %in% runs.large.insts.measured$id.name)
+
+runs.large.insts.workload <- model.gen.workload(
+    list(
+      cpu.hours  = 987 / 3600,
+      data.scan  = 90,
+      max.count  = 1,
+      cache.skew = 0.0000001,
+      spool.skew = 0.0000001,
+      spool.frac = 0.05,
+      scale.fact = 1,
+      load.first = FALSE,
+      max.period = 2^30
+    )
+)
+
+runs.large.insts.costs <- model.calc.costs(
+  runs.large.insts.workload$query,
+  runs.large.insts.instance,
+  runs.large.insts.workload$time.fn
+)
+runs.large.insts.run.df <- dplyr::inner_join(runs.large.insts.costs, runs.large.insts.measured, by = c("id.name")) %>%
+    dplyr::mutate(
+             id.prefix = sub("^([A-Za-z1-9-]+)\\..*", "\\1", id.name),
+             id.short = sub("xlarge", "", id.name),
+             time.predicted = stat.time.sum,
+             time.measured = time.measured.exe,
+             cost.predicted = stat.price.sum * 100,
+             cost.measured = time.measured * (cost.usdph / 3600) * 100,
+             cost.sd = time.exe.sd * (cost.usdph / 3600) * 100,
+             color = ifelse(cost.predicted == min(cost.predicted), "red", if_else(cost.measured == min(cost.measured), "blue", "black")),
+             rank.measured = rank(cost.measured),
+             rank.predicted = rank(cost.predicted)
+             ) %>% filter(id.name != "i3.16xlarge")
+
+runs.large.insts.plot.scatter.draw <- function() {
+  .df <- runs.large.insts.run.df
+  .lim <- c(2.5, 6.9)
+  ggplot(.df, aes(x = cost.predicted, y = cost.measured, label = id.prefix)) +
+    geom_abline(color = "darkgrey") +
+    geom_point() +
+    scale_color_manual(values = style.instance.colors.vibrant) +
+    geom_text(size = 3.3, nudge_y = 0.17, nudge_x = 0.021, hjust = 0) +
+    # geom_text_repel(aes(label = rank.measured), color = "blue", nudge_x = 0.1, size = 2) +
+    # geom_text_repel(aes(label = rank.predicted), color = "red", nudge_y = -0.1, size = 2) +
+    annotate(geom = "text", x = min(.df$cost.predicted), y = max(.df$cost.measured), hjust = 0, size = 4.2, fontface = "bold", color = "darkgrey", label = "More expensive than predicted") +
+    annotate(geom = "text", x = max(.df$cost.predicted), y = min(.df$cost.measured), hjust = 1, size = 4.2, fontface = "bold", color = "darkgrey", label = "Cheaper than predicted") +
+    theme_bw() +
+    expand_limits(x = .lim, y = .lim) +
+    theme(legend.position = "none", plot.margin = margin(1,1,1,1, unit = "mm")) +
+    labs(
+      y = "Measured Cost (cents)",
+      x = "Predicted Cost (cents)",
+      color = "Instance"
+    )
+}
+
+## runs.large.insts.plot.scatter.draw()
+ggsave(plots.mkpath("eval-run-single-large-inst.pdf"),
+       runs.large.insts.plot.scatter.draw(),
+       width = 200, height = 60, unit = "mm",
+       device = cairo_pdf)

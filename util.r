@@ -16,7 +16,7 @@ util.packages.require <- function(pkgs) {
 }
 
 util.packages.basic.setup <- function() {
-  base <- c("readr", "tidyverse", "caret", "shiny", "slider", "sqldf",
+  base <- c("readr", "tidyverse", "caret", "shiny", "slider", "sqldf", "readODS",
             "VGAM", "ggrepel", "plotly", "DT", "Cairo", "RColorBrewer",
             "lubridate", "memoise", "parallel", "furrr", "shades")
   modeling <- c("C50", "pls", "gbm")

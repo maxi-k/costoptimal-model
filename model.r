@@ -32,8 +32,11 @@ model.make.scaling.fn <- function(p) {
 
 model.make.distr.fn <- function(shape) {
   function(size) {
-    if (length(size) == 0) {
+    if (is.na(size) || length(size) == 0) {
       return(c())
+    }
+    if (size <= 1) {
+      return(c(size))
     }
     distr <- dzipf(1:size, size, shape)
     normd <- distr / sum(distr) * size
