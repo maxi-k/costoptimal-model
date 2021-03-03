@@ -414,7 +414,7 @@ plots.mh.history.cost.draw <- function() {
                     stat.price.change = stat.price.sum / .first$stat.price.sum
                     )
     })
-  palette <- shades::saturation(style.instance.colors, delta(0.22))
+  palette <- shades::saturation(style.instance.colors, delta(0.01))
   ggplot(.df, aes(x = meta.join.time, y = stat.price.change, label = label, color = workload.id)) +
     scale_color_manual(values = palette) +
     geom_line(aes(group = workload.id), linetype = "dashed") +
@@ -427,13 +427,16 @@ plots.mh.history.cost.draw <- function() {
                        labels = c("0", ".2", ".4", ".6", ".8", "1")) +
     theme(legend.position = "none",
           axis.title.x = element_blank(),
+          axis.title.y = element_text(size = 8.5),
+          axis.text = element_text(size = 8),
           plot.margin=grid::unit(c(1,1,1,1), "mm"))
 }
 
 ## plots.mh.history.cost.draw()
-## ggsave(plots.mkpath("mh-date-cost-3.pdf"), plots.mh.history.cost.draw(),
-##        width = 180, height = 65, units = "mm",
-##        device = cairo_pdf)
+ggsave(plots.mkpath("mh-date-cost.pdf"),
+       plots.mh.history.cost.draw(),
+       width = 3.6, height = 1.7, units = "in",
+       device = cairo_pdf)
 
 ## ---------------------------------------------------------------------------------------------- ##
 
@@ -531,21 +534,24 @@ plots.mh.spot.cost.draw <- function() {
     geom_line() +
     # geom_text(data = .text, angle = 90, nudge_y = 0.01, hjust = 0) +
     scale_x_datetime(breaks = .xlims, labels = .xlabs) +
-    scale_y_continuous(limits = c(0, 0.685), breaks = seq(0, 1, 0.1)) +
-    annotate(geom = "text", x = .vcenter, y = 0.65, label = "On Demand: i3 is best", color = style.instance.colors.vibrant["i3"]) +
-    annotate(geom = "text", x = .vcenter, y = 0.34, label = "spot price, < 5% interruptions: m5n is best", color = style.instance.colors.vibrant["m5n"]) +
-    annotate(geom = "text", x = .vcenter, y = 0.13, label = "spot price, > 20% interruptions: i3 is best", color = style.instance.colors.vibrant["i3"]) +
+    scale_y_continuous(limits = c(0, 0.62), breaks = seq(0, 1, 0.15)) +
+    annotate(geom = "text", x = .vcenter, y = 0.52, size = 3.5, label = "On Demand: i3 is best", color = style.instance.colors.vibrant["i3"]) +
+    annotate(geom = "text", x = .vcenter, y = 0.36, size = 3.5, label = "spot price, < 5% interruptions: m5n is best", color = style.instance.colors.vibrant["m5n"]) +
+    annotate(geom = "text", x = .vcenter, y = 0.1,  size = 3.5, label = "spot price, > 20% interruptions: i3 is best", color = style.instance.colors.vibrant["i3"]) +
     labs(y = "Workload Cost ($)", x = "Date") +
     theme_bw() +
     theme(legend.position = "none",
           axis.title.x = element_blank(),
-          plot.margin=grid::unit(c(1,1,1,1), "mm"))
+          axis.title.y = element_text(size = 8.4),
+          axis.text = element_text(size = 8),
+          plot.margin=grid::unit(c(1,1,1,1), "mm"),
+          )
   plot
 }
 
 ## plots.mh.spot.cost.draw()
 ## ggsave(plots.mkpath("mh-spot-prices.pdf"), plots.mh.spot.cost.draw(),
-##        width = 3.6, height = 1.6, units = "in",
+##        width = 3.6, height = 1.1, units = "in",
 ##        device = cairo_pdf)
 ## util.notify()
 
@@ -681,28 +687,36 @@ runs.large.insts.run.df <- dplyr::inner_join(runs.large.insts.costs, runs.large.
 
 runs.large.insts.plot.scatter.draw <- function() {
   .df <- runs.large.insts.run.df
-  .lim <- c(2.5, 6.9)
+  .lim.y <- c(2.5, 6.9)
+  .lim.x <- c(2.5, 5)
+  color.annotate <- shades::saturation(styles.color.palette.light[c(4, 1, 2)], delta(0.1))
   ggplot(.df, aes(x = cost.predicted, y = cost.measured, label = id.prefix)) +
-    geom_abline(color = "darkgrey") +
-    geom_point() +
+    geom_abline(color = color.annotate[3]) +
+    geom_point(size = 2.7) +
     scale_color_manual(values = style.instance.colors.vibrant) +
-    geom_text(size = 3.3, nudge_y = 0.17, nudge_x = 0.021, hjust = 0) +
+    geom_text_repel(size = 6.2, nudge_x = 0.02, nudge_y = 0.02, hjust = 0, angle = 45) +
+    # geom_text(size = 3.3, nudge_y = 0.17, nudge_x = 0.021, hjust = 0) +
     # geom_text_repel(aes(label = rank.measured), color = "blue", nudge_x = 0.1, size = 2) +
     # geom_text_repel(aes(label = rank.predicted), color = "red", nudge_y = -0.1, size = 2) +
-    annotate(geom = "text", x = min(.df$cost.predicted), y = max(.df$cost.measured), hjust = 0, size = 4.2, fontface = "bold", color = "darkgrey", label = "More expensive than predicted") +
-    annotate(geom = "text", x = max(.df$cost.predicted), y = min(.df$cost.measured), hjust = 1, size = 4.2, fontface = "bold", color = "darkgrey", label = "Cheaper than predicted") +
+    annotate(geom = "text", x = min(.df$cost.predicted), y = max(.df$cost.measured),           hjust = 0, size = 6.5, fontface = "bold", color = color.annotate[1], label = "More expensive than predicted") +
+    annotate(geom = "text", x = max(.df$cost.predicted), y = min(.df$cost.measured),           hjust = 1, size = 6.5, fontface = "bold", color = color.annotate[2], label = "Cheaper than predicted") +
+    annotate(geom = "text", x = mean(.df$cost.predicted), y = mean(.df$cost.predicted) + 0.35, hjust = 0, size = 6.5, fontface = "bold", color = color.annotate[3], label = "Prediction = Measurement", angle = 7.8) +
     theme_bw() +
-    expand_limits(x = .lim, y = .lim) +
-    theme(legend.position = "none", plot.margin = margin(1,1,1,1, unit = "mm")) +
+    expand_limits(x = .lim.x, y = .lim.y) +
+    theme(legend.position = "none",
+          plot.margin = margin(1,1,1,1, unit = "mm"),
+          axis.text = element_text(size = 13),
+          axis.title = element_text(size = 19)
+          ) +
     labs(
-      y = "Measured Cost (cents)",
+      y = "Measured Cost",
       x = "Predicted Cost (cents)",
       color = "Instance"
     )
 }
 
 ## runs.large.insts.plot.scatter.draw()
-ggsave(plots.mkpath("eval-run-single-large-inst.pdf"),
-       runs.large.insts.plot.scatter.draw(),
-       width = 200, height = 60, unit = "mm",
-       device = cairo_pdf)
+## ggsave(plots.mkpath("eval-run-single-large-inst.pdf"),
+##        runs.large.insts.plot.scatter.draw(),
+##        width = 200, height = 60, unit = "mm",
+##        device = cairo_pdf)
