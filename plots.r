@@ -433,10 +433,10 @@ plots.mh.history.cost.draw <- function() {
 }
 
 ## plots.mh.history.cost.draw()
-ggsave(plots.mkpath("mh-date-cost.pdf"),
-       plots.mh.history.cost.draw(),
-       width = 3.6, height = 1.7, units = "in",
-       device = cairo_pdf)
+## ggsave(plots.mkpath("mh-date-cost.pdf"),
+##        plots.mh.history.cost.draw(),
+##        width = 3.6, height = 1.7, units = "in",
+##        device = cairo_pdf)
 
 ## ---------------------------------------------------------------------------------------------- ##
 
@@ -526,7 +526,7 @@ plots.mh.spot.cost.draw <- function() {
 
   .xlims <- c(min(.df$parsed.date), median(.df$parsed.date), max(.df$parsed.date))
   .xlabs <- lubridate::stamp("Aug 2")(.xlims)
-
+  .breaks <- seq(0, 1, 0.2)
   plot <- ggplot(.df, aes(x = parsed.date,
                           y = stat.price.sum,
                           label = group, group = group, color = id.prefix)) +
@@ -534,7 +534,7 @@ plots.mh.spot.cost.draw <- function() {
     geom_line() +
     # geom_text(data = .text, angle = 90, nudge_y = 0.01, hjust = 0) +
     scale_x_datetime(breaks = .xlims, labels = .xlabs) +
-    scale_y_continuous(limits = c(0, 0.62), breaks = seq(0, 1, 0.15)) +
+    scale_y_continuous(limits = c(0, 0.62), breaks = .breaks, labels = str_replace(signif(.breaks, 3), "^0\\.", ".")) +
     annotate(geom = "text", x = .vcenter, y = 0.52, size = 3.5, label = "On Demand: i3 is best", color = style.instance.colors.vibrant["i3"]) +
     annotate(geom = "text", x = .vcenter, y = 0.36, size = 3.5, label = "spot price, < 5% interruptions: m5n is best", color = style.instance.colors.vibrant["m5n"]) +
     annotate(geom = "text", x = .vcenter, y = 0.1,  size = 3.5, label = "spot price, > 20% interruptions: i3 is best", color = style.instance.colors.vibrant["i3"]) +
@@ -638,7 +638,7 @@ plots.eval.slicing.network.draw <- function(filenames, N = 500, .to.pdf = FALSE)
 ##     time.measured.exe = mean(time.measured.exe)
 ##   )
 
-runs.large.insts.measured <- read.csv("data/eval-run-single.csv") %>%
+runs.large.insts.measured <- read.csv("data/eval-run-single-2.csv") %>%
   dplyr::mutate(id.name = stringr::str_trim(instance, side = "both"),
                 time.measured.cpu = time.cpu / (10^6),
                 time.measured.exe = time.exe / (10^6)
@@ -654,8 +654,8 @@ runs.large.insts.instance <- aws.data.current %>% filter(id %in% runs.large.inst
 
 runs.large.insts.workload <- model.gen.workload(
     list(
-      cpu.hours  = 987 / 3600,
-      data.scan  = 90,
+      cpu.hours  = 1050 / 3600,
+      data.scan  = 100,
       max.count  = 1,
       cache.skew = 0.0000001,
       spool.skew = 0.0000001,
@@ -689,24 +689,24 @@ runs.large.insts.plot.scatter.draw <- function() {
   .df <- runs.large.insts.run.df
   .lim.y <- c(2.5, 6.9)
   .lim.x <- c(2.5, 5)
+  .antxt <- 3.5
   color.annotate <- shades::saturation(styles.color.palette.light[c(4, 1, 2)], delta(0.1))
   ggplot(.df, aes(x = cost.predicted, y = cost.measured, label = id.prefix)) +
     geom_abline(color = color.annotate[3]) +
-    geom_point(size = 2.7) +
+    geom_point(size = 1) +
     scale_color_manual(values = style.instance.colors.vibrant) +
-    geom_text_repel(size = 6.2, nudge_x = 0.02, nudge_y = 0.02, hjust = 0, angle = 45) +
+    geom_text_repel(size = 3.2, nudge_x = 0.02, nudge_y = 0.015, hjust = 0, angle = 15.8) +
     # geom_text(size = 3.3, nudge_y = 0.17, nudge_x = 0.021, hjust = 0) +
     # geom_text_repel(aes(label = rank.measured), color = "blue", nudge_x = 0.1, size = 2) +
     # geom_text_repel(aes(label = rank.predicted), color = "red", nudge_y = -0.1, size = 2) +
-    annotate(geom = "text", x = min(.df$cost.predicted), y = max(.df$cost.measured),           hjust = 0, size = 6.5, fontface = "bold", color = color.annotate[1], label = "More expensive than predicted") +
-    annotate(geom = "text", x = max(.df$cost.predicted), y = min(.df$cost.measured),           hjust = 1, size = 6.5, fontface = "bold", color = color.annotate[2], label = "Cheaper than predicted") +
-    annotate(geom = "text", x = mean(.df$cost.predicted), y = mean(.df$cost.predicted) + 0.35, hjust = 0, size = 6.5, fontface = "bold", color = color.annotate[3], label = "Prediction = Measurement", angle = 7.8) +
+    annotate(geom = "text", x = min(.df$cost.predicted), y = max(.df$cost.measured) - 0.1,     hjust = 0, size = .antxt, fontface = "bold", color = color.annotate[1], label = "More expensive than predicted") +
+    annotate(geom = "text", x = max(.df$cost.predicted), y = min(.df$cost.measured),           hjust = 1, size = .antxt, fontface = "bold", color = color.annotate[2], label = "Cheaper than predicted") +
+    annotate(geom = "text", x = mean(.df$cost.predicted) - 0.22, y = mean(.df$cost.predicted), hjust = 0, size = .antxt, fontface = "bold", color = color.annotate[3], label = "Prediction = Measurement", angle = 15.8) +
     theme_bw() +
     expand_limits(x = .lim.x, y = .lim.y) +
     theme(legend.position = "none",
-          plot.margin = margin(1,1,1,1, unit = "mm"),
-          axis.text = element_text(size = 13),
-          axis.title = element_text(size = 19)
+          axis.title = element_text(size = 9.5),
+          plot.margin = margin(1,1,1,1, unit = "mm")
           ) +
     labs(
       y = "Measured Cost",
@@ -716,7 +716,7 @@ runs.large.insts.plot.scatter.draw <- function() {
 }
 
 ## runs.large.insts.plot.scatter.draw()
-## ggsave(plots.mkpath("eval-run-single-large-inst.pdf"),
-##        runs.large.insts.plot.scatter.draw(),
-##        width = 200, height = 60, unit = "mm",
-##        device = cairo_pdf)
+ggsave(plots.mkpath("eval-run-single-large-inst.pdf"),
+       runs.large.insts.plot.scatter.draw(),
+       width = 3.6125, height = 2.0, units = "in",
+       device = cairo_pdf)
