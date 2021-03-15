@@ -535,7 +535,7 @@ plots.mh.spot.cost.draw <- function() {
     # geom_text(data = .text, angle = 90, nudge_y = 0.01, hjust = 0) +
     scale_x_datetime(breaks = .xlims, labels = .xlabs) +
     scale_y_continuous(limits = c(0, 0.62), breaks = .breaks, labels = str_replace(signif(.breaks, 3), "^0\\.", ".")) +
-    annotate(geom = "text", x = .vcenter, y = 0.52, size = 3.5, label = "On Demand: i3 is best", color = style.instance.colors.vibrant["i3"]) +
+    annotate(geom = "text", x = .vcenter, y = 0.52, size = 3.5, label = "on demand: i3 is best", color = style.instance.colors.vibrant["i3"]) +
     annotate(geom = "text", x = .vcenter, y = 0.36, size = 3.5, label = "spot price, < 5% interruptions: m5n is best", color = style.instance.colors.vibrant["m5n"]) +
     annotate(geom = "text", x = .vcenter, y = 0.1,  size = 3.5, label = "spot price, > 20% interruptions: i3 is best", color = style.instance.colors.vibrant["i3"]) +
     labs(y = "Workload Cost ($)", x = "Date") +
