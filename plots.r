@@ -687,36 +687,38 @@ runs.large.insts.run.df <- dplyr::inner_join(runs.large.insts.costs, runs.large.
 
 runs.large.insts.plot.scatter.draw <- function() {
   .df <- runs.large.insts.run.df
-  .lim.y <- c(2.5, 6.9)
-  .lim.x <- c(2.5, 5)
+  .breaks.y <- seq(3, 7, 1)
+  .breaks.x <- seq(3, 5, 0.5)
   .antxt <- 3.5
   color.annotate <- shades::saturation(styles.color.palette.light[c(4, 1, 2)], delta(0.1))
   ggplot(.df, aes(x = cost.predicted, y = cost.measured, label = id.prefix)) +
     geom_abline(color = color.annotate[3]) +
     geom_point(size = 1) +
     scale_color_manual(values = style.instance.colors.vibrant) +
-    geom_text_repel(size = 3.2, nudge_x = 0.02, nudge_y = 0.015, hjust = 0, angle = 15.8) +
+    geom_text_repel(size = 3.2, nudge_x = 0.015, nudge_y = 0.01, hjust = 0, angle = 14.8) +
     # geom_text(size = 3.3, nudge_y = 0.17, nudge_x = 0.021, hjust = 0) +
     # geom_text_repel(aes(label = rank.measured), color = "blue", nudge_x = 0.1, size = 2) +
     # geom_text_repel(aes(label = rank.predicted), color = "red", nudge_y = -0.1, size = 2) +
-    annotate(geom = "text", x = min(.df$cost.predicted), y = max(.df$cost.measured) - 0.1,     hjust = 0, size = .antxt, fontface = "bold", color = color.annotate[1], label = "More expensive than predicted") +
+    annotate(geom = "text", x = min(.df$cost.predicted), y = max(.df$cost.measured) - 0.15,    hjust = 0, size = .antxt, fontface = "bold", color = color.annotate[1], label = "More expensive than predicted") +
     annotate(geom = "text", x = max(.df$cost.predicted), y = min(.df$cost.measured),           hjust = 1, size = .antxt, fontface = "bold", color = color.annotate[2], label = "Cheaper than predicted") +
-    annotate(geom = "text", x = mean(.df$cost.predicted) - 0.22, y = mean(.df$cost.predicted), hjust = 0, size = .antxt, fontface = "bold", color = color.annotate[3], label = "Prediction = Measurement", angle = 15.8) +
+    annotate(geom = "text", x = mean(.df$cost.predicted) - 0.25, y = mean(.df$cost.predicted), hjust = 0, size = .antxt, fontface = "bold", color = color.annotate[3], label = "Prediction = Measurement", angle = 14.8) +
     theme_bw() +
-    expand_limits(x = .lim.x, y = .lim.y) +
+    scale_x_continuous(breaks = .breaks.x) +
+    scale_y_continuous(breaks = .breaks.y) +
+    expand_limits(x = c(min(.breaks.x), max(.breaks.x)), y = c(min(.breaks.y), max(.breaks.y))) +
     theme(legend.position = "none",
           axis.title = element_text(size = 9.5),
           plot.margin = margin(1,1,1,1, unit = "mm")
           ) +
     labs(
-      y = "Measured Cost",
+      y = "Measured Cost (cents)",
       x = "Predicted Cost (cents)",
       color = "Instance"
     )
 }
 
 ## runs.large.insts.plot.scatter.draw()
-ggsave(plots.mkpath("eval-run-single-large-inst.pdf"),
-       runs.large.insts.plot.scatter.draw(),
-       width = 3.6125, height = 2.0, units = "in",
-       device = cairo_pdf)
+## ggsave(plots.mkpath("eval-run-single-large-inst.pdf"),
+##        runs.large.insts.plot.scatter.draw(),
+##        width = 3.6125, height = 2.0, units = "in",
+##        device = cairo_pdf)
