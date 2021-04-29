@@ -1,6 +1,23 @@
 # Towards Cost-Optimal Query Processing in the Cloud - Model Implementation
 
-The R implementation for the model described in the paper "Towards Cost-Optimal Query Processing in the Cloud".
+The implementation for the cost model introduced in the paper "[Towards Cost-Optimal Query Processing in the Cloud](https://www.cs6.tf.fau.de/files/2021/04/costoptimal.pdf)".
+
+
+## Running
+
+This version of the model is implemented in *R*. 
+As such you need to have R installed on your computer, see [here](https://www.r-project.org/).
+We also depend on various R packages that are not part of the basic installation.
+These should install automatically when running any file. 
+If they don't, please look at the list in `util.r#util.packages.basic.setup` and install them manually.
+
+To start an interactive, browser-based explorer for the model predictions, please execute the file `app.r` by following these steps:
+1. Run `R` in a command line. This should open an `R` [REPL](https://en.wikipedia.org/wiki/REPL).
+2. Type `source("app.r")` in the R REPL. This will load the source file and should open your browser with the URL <http://0.0.0.0:3030>, displaying the model explorer.
+
+To generate the plots used in the paper, please execute the respective code blocks in the `plots.r` file.
+
+## Project Structure
 
 Files of interest:
 | Path | Description 
