@@ -1,6 +1,9 @@
 # common files
 .DS_Store
 *.log
+data/raw
+.envrc
+.direnv
 
 # rsconnect deployments to shinyapps.io: https://github.com/rstudio/rsconnect
 rsconnect
