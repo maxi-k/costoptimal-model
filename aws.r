@@ -39,7 +39,7 @@ aws.data.historical.new.load <- function() {
     select *,
            case when storage_size is null then 'EBS'
                 when storage_size = 0 then 'EBS'
-                when storage_nvme_ssd = 'true' then 'NVMe'
+                when storage_nvme_ssd = 'true' and storage_ssd = 'true' then 'NVMe'
                 when storage_ssd = 'true' then 'SSD'
                 else 'HDD'
            end as storage_type,
@@ -48,6 +48,7 @@ aws.data.historical.new.load <- function() {
            case when instr(physical_processor, 'AMD')!=0 then 'AMD'
                 when instr(physical_processor, 'Intel')!=0 then 'Intel'
                 when instance_type like 'a1%' then 'ARM'
+                when physical_processor like '%Graviton%' then 'ARM'
                 else '?'
            end as CPU_brand
     from data d1 join dates using (entry)
@@ -81,6 +82,7 @@ aws.data.historical.new.load <- function() {
              network_performance.is_guaranteed = !str_detect(network_performance, "Up to"),
              cost.ondemand.value.usdph         = as.numeric(pricing),
              processorName                     = physical_processor,
+             processorBrand                    = CPU_brand,
              clockSpeed.text                   = clock_speed_ghz,
              region.name                       = "us-east-1",
              join.entry                        = entry - 1,
@@ -167,6 +169,7 @@ aws.data.normalize <- function(df, commits = aws.data.commits) {
                    id                = id,
                    memory.GiB        = memory.value.gib,
                    vcpu.count        = vcpu.value.count,
+                   cpu.brand         = processorBrand,
                    clock.ghz         = clockSpeed.value.ghz,
                    storage.GiB       = storage.sum.gib,
                    storage.count     = storage.count,
@@ -227,7 +230,7 @@ aws.data.all.by.date <- aws.data.all %>%
     dplyr::mutate(
                meta.group = paste(commit.date, meta.join.entry, meta.origin, sep = " | ")
            ) %>%
-    dplyr::arrange(desc(meta.join.entry, meta.origin)) %>%
+    dplyr::arrange(desc(meta.join.entry), desc(meta.origin)) %>%
     dplyr::group_by(meta.group)
 
 aws.data.metacols <- c("meta.region.name", "meta.join.entry",
@@ -238,7 +241,8 @@ aws.data.prefixes.irrelevant <- c(
   "a1", "g3", "p3", "g3s", "p2",
   "c1", "c3", "c4", "cr1", "d2",
   "u-9tb1", "u-12tb1", "u-6tb1", "u-24tb1",
-  "r3", "m1", "m2", "m4", "m6g", "t1", "cc2", "m5a", "m5ad", "r5ad", "r5a"
+  "hpc7g",
+  "r3", "m1", "m2", "m4", "t1", "cc2", "m5a", "m5ad", "r5ad", "r5a" # "m6g"
 )
 
 ## Filter functions
@@ -469,7 +473,7 @@ if (!util.is.shiny.deployed) {
                                         # STYLES
 ## ---------------------------------------------------------------------------------------------- ##
 
-style.instance.colors <- c(
+style.intel.colors <- c(
   # + m3 plot
   "c5n"  = "#b48ead",
   "c5d"  = "#a3be8c",
@@ -486,8 +490,22 @@ style.instance.colors <- c(
   # + m1-all plot
   "i3en" = "#d8dee9",
   # + m3 plot
-  "c5d.2" = "#5e81ac"
+  "c5d.2" = "#5e81ac",
+  # new instances
+  "c6in" = "#d08770",
+  "u-18tb1" = "#ebcb8b",
+  "m6a"  = "#ebcb8b"
 )
+arm.color.delta <- 0.1
+style.arm.colors <- c(
+  "c6gn"  = "#b48ead",
+  "c6g"   = "#a3be8c",
+  "c7gn"  = "#81a1c1",
+  "c7g"   = "#8fbcbb",
+  "m6g"   = "#d08770",
+  "r6g"  = "#d8dee9"
+) |> sapply(shades::brightness, delta(arm.color.delta)) |> sapply(shades::saturation, delta(arm.color.delta/2))
+style.instance.colors <- c(style.intel.colors, style.arm.colors)
 style.instance.colored <- names(style.instance.colors)
 style.instance.colors.vibrant <- as.character(shades::saturation(style.instance.colors, delta(0.5)))
 names(style.instance.colors.vibrant) <- style.instance.colored

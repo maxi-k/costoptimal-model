@@ -208,8 +208,13 @@ model.with.speeds <- function(inst) {
              calc.s3.speed     = calc.net.speed * 0.8,
              calc.mem.speed    = model.factors.bandwidth$RAM,
              calc.sto.speed    = model.calc.storage.speed(inst, calc.net.speed),
-             ## no hyperthreads, a ssume 2 threads/core
-             calc.cpu.real     = vcpu.count  / 2,
+             ## no hyperthreads, assume 2 threads/core
+             ## though ARM has a real core per vCPU, benchmarks suggest they are
+             ## comparable to Intel cores (https://www.phoronix.com/review/graviton3-amd-intel/9)
+             ## so we use the same scaling factor;
+             ## should run own benchmarks here to get a better estimate
+             ## calc.cpu.real     = if_else(cpu.brand == 'ARM', vcpu.count, vcpu.count  / 2),
+             calc.cpu.real  = vcpu.count / 2,
              calc.mem.caching  = memory.GiB  / 2,
              calc.sto.caching  = storage.GiB / 2,
              calc.mem.spooling = memory.GiB - calc.mem.caching,

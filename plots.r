@@ -3,7 +3,7 @@ source("./aws.r")
 source("./param.finder.r")
 
 plots.inst <- aws.data.paper
-plots.path <- "../figures"
+plots.path <- "../figures-2023-11"
 
 plots.mkpath <- function(filename) {
   paste(plots.path, filename, sep="/")
@@ -75,10 +75,10 @@ plots.m1.all.draw <- function() {
     labs(x = "CPU Hours", y = "Workload Cost ($)")
 }
 
-## plots.m1.all.draw()
-## ggsave(plots.mkpath("m1-cost-cpu-all.pdf"), plots.m1.all.draw(),
-##        width = 3.6, height = 1.9, units = "in",
-##        device = cairo_pdf)
+# plots.m1.all.draw()
+# ggsave(plots.mkpath("m1-cost-cpu-all.pdf"), plots.m1.all.draw(),
+#        width = 3.6, height = 1.9, units = "in",
+#        device = cairo_pdf)
 
 
 ## ---------------------------------------------------------------------------------------------- ##
@@ -92,6 +92,7 @@ plots.m1.all.draw <- function() {
 ## http://127.0.0.1:3030/?_inputs_&instance.count.max=32&locality=0.8&timings.plot.budget.ticks.at.limits=true&instSet.details.show=0&instanceFilter=%22Paper%20Table%201%22&timings.plot.budget.step.digits=3&instance=%22%22&spooling.fraction=0.4&tables.frontier.show=false&plotly_relayout-A=%22%7B%5C%22width%5C%22%3A1242%2C%5C%22height%5C%22%3A9220%7D%22&instances.plot.display.frontier=true&time.cpu=20&instances.plot.frontier.quadrant=%22top.left%22&data.read=1998&instance.type.opt.include=%22frontier%22&instFilter.details.show=0&config.options.show=0&instances.plot.display.frontier.only=false&spooling.shape=0.1&instances.plot.x=%22stat.time.sum%22&time.period.num=1&plotly_hover-A=%22%5B%7B%5C%22curveNumber%5C%22%3A0%2C%5C%22pointNumber%5C%22%3A86%2C%5C%22x%5C%22%3A285.5405361662%2C%5C%22y%5C%22%3A0.28472599407325%7D%5D%22&timings.plot.budget.step=100&timings.plot.budget.duplicates.filter=true&timings.plot.budget.limits.logarithmic=true&recommendationColumn=%22stat.price.sum%22&instances.plot.scale.y=%22Linear%22&scaling.efficiency.param.%20p=0.98&.clientValue-default-plotlyCrosstalkOpts=%7B%22on%22%3A%22plotly_click%22%2C%22persistent%22%3Afalse%2C%22dynamic%22%3Afalse%2C%22selectize%22%3Afalse%2C%22opacityDim%22%3A0.2%2C%22selected%22%3A%7B%22opacity%22%3A1%7D%2C%22debounce%22%3A0%2C%22color%22%3A%5B%5D%7D&plotly_afterplot-A=%22%5C%22instances.plot.queriesPerDollar%5C%22%22&timings.plot.budget.col.cost=%22stat.price.sum%22&instances.plot.y=%22col.recom.inv%22&instances.plot.scale.x=%22Linear%22&user.notes=%22%22&time.period.unit=%22Weeks%22&timings.plot.budget.col.optim=%22stat.time.sum%22&instanceSet=%222019-11-30%20%7C%20101%20%7C%20website%22&timings.plot.budget.limits.display=true&comparison.count=1&distr.caching.load.first=false
 
 all.params <- try.params(aws.data.current.large.relevant)
+# all.params.intel <- try.params(aws.data.current.large.relevant |> filter(cpu.brand == 'Intel'))
 
 plots.m2.spool.draw <- function() {
   res <- all.params
@@ -101,7 +102,11 @@ plots.m2.spool.draw <- function() {
   palette <- style.instance.colors
   ggplot(plotdata, aes(x = param.scanned, y = param.spool.frac,
                        label = paste(str_replace(id.name, "xlarge", ""),
-                                     ifelse(meta.uses.spot.price, "-S", "-D"), sep=""))) +
+                                        '\n',
+                                     signif(stat.price.sum, 3),
+                                        # ifelse(meta.uses.spot.price, "-S", "-D"),
+                                    sep="")
+                       )) +
     scale_fill_manual(values = palette) +
     geom_tile(aes(fill = id.prefix)) +
     geom_text() +
@@ -211,18 +216,20 @@ plots.m2.draw.diff.for <- function(.id) {
     theme_bw() +
     theme(legend.position = "none",
           axis.title.y = element_blank(),
-          axis.text.y  = element_blank(),
-          axis.ticks.y = element_blank(),
+          # axis.text.y  = element_blank(),
+          # axis.ticks.y = element_blank(),
           axis.title.x = element_text(hjust = 0.3475),
-          plot.margin=grid::unit(c(1,1,1,0), "mm")) +
+          plot.margin=grid::unit(c(1,1,1,1), "mm")) +
     labs(x = "Scanned Data [log]", y = "Materialization Fraction") +
-    facet_grid(cols = vars(id.factor))
+    facet_wrap(vars(id.factor), ncol = 3)
 }
 
 ## plots.m2.diff.inst <- c("c5.24xlarge", "c5d.24xlarge", "i3.16xlarge","c5n.18xlarge")
+## plots.m2.diff.inst <- c("c6i.32xlarge", "c6g.16xlarge", "c7g.16xlarge",
+##                         "c6in.32xlarge", "c6gn.16xlarge","c7gn.16xlarge")
 ## plots.m2.draw.diff.for(plots.m2.diff.inst)
 ## ggsave(plots.mkpath("m2-spool-diff.pdf"), plots.m2.draw.diff.for(plots.m2.diff.inst),
-##        width = 3 * 2.5, height = 2.5, units = "in",
+##        width = 3 * 2.5, height = 2 * 2.5, units = "in",
 ##        device = cairo_pdf)
 
 
@@ -307,8 +314,8 @@ plots.m3.time.cost.draw <- function() {
     aws.data.current %>% dplyr::filter(id == "c5d.2xlarge") %>% dplyr::mutate(id = "snowflake (burst)") %>% mutate(network.is.steady = TRUE)
   )
   ## .inst <- aws.data.current.large.relevant.spot.lt5
-  .palette <- style.instance.colors
   .inst.id <- c("c5d", "snowflake (steady)", "snowflake (burst)")
+  .best.intel <- c("c5n", "r5n", "m5n")
 
   .cost.all <- model.calc.costs(.query, .inst, .time.fn) ## %>% dplyr::inner_join(select(.inst, id, starts_with("meta.")), by = c("id.name" = "id"))
   .frontier <- model.calc.frontier(.cost.all,
@@ -318,32 +325,40 @@ plots.m3.time.cost.draw <- function() {
                                 id.prefix = sub("^([A-Za-z1-9-]+)\\..*", "\\1", id.name),
                                 id.short = str_replace(id.name, "xlarge", ""),
                                 id.short = str_replace(id.short, "snowflake", "c5d.2"),
-                                group = ifelse((id %in% .frontier$id | id.prefix %in% .inst.id), id.prefix, "other"),
+                                group = ifelse((id %in% .frontier$id | id.prefix %in% .inst.id | id.prefix %in% .best.intel), id.prefix, "other"),
                                 name = group
                                 ## name = paste(group, ifelse(meta.uses.spot.price, "-S", "-D"), sep="")
                               )
 
+  print("frontier: ")
+  print(unique(.frontier$id))
+
   .groups <- unique(.df$group)
 
+  .palette <- style.instance.colors
   .palette["other"] <- "#eeeeee"
   .palette["frontier"] <- "#ff0000"
+  .palette["c7gn.16"] <- "#ff0000"
   .palette["snowflake (steady)"] <- "#29b5e8"
   .palette["snowflake (burst)"] <- shades::brightness("#29b5e8", delta(-0.4))
+  .palette[names(.palette) %in% .best.intel] <- sapply(.palette[names(.palette) %in% .best.intel], shades::saturation, delta(-0.15))
 
   .colored <- .df %>% dplyr::filter(group != "other")
   .greys <- .df %>% dplyr::filter(group == "other")
 
   .labels <- .colored %>%
-    dplyr::group_by(group) %>%
-    dplyr::filter(stat.price.sum == max(stat.price.sum))
+    dplyr::group_by(id.prefix) %>%
+    dplyr::filter(stat.price.sum == max(stat.price.sum)) %>% ungroup()
+
+  print(.labels)
 
   ggplot(.df, aes(x = stat.time.sum, y = stat.price.sum, color = group, label = id.short)) +
     scale_color_manual(values = .palette) +
     geom_point(data = .greys, size = 1) +
     geom_point(data = .colored, size = 1) +
-    geom_text(data = .labels, nudge_x = -0.15, nudge_y = 0.08, fontface = "bold") +
-    geom_text(data = .colored, aes(label = count)) +
-    scale_x_log10(limits = c(30, 6e03)) +
+    geom_text(data = .labels, nudge_x = -0.15, nudge_y = 0.06, fontface = "bold") +
+    # geom_text(data = .colored, aes(label = count)) +
+    scale_x_log10(limits = c(20, 6e03)) +
     scale_y_log10(limits = c(2.22, 34)) +
     labs(y = "Workload Cost ($) [log]",
          x = "Workload Execution Time (s) [log]",
@@ -353,9 +368,11 @@ plots.m3.time.cost.draw <- function() {
           legend.position = "none")
 }
 
+
 ## plots.m3.time.cost.draw()
+## scale <- 1.8
 ## ggsave(plots.mkpath("m3-time-cost-burst.pdf"), plots.m3.time.cost.draw(),
-##        width = 3.6, height = 2.0, units = "in",
+##        width = scale * 3.6, height = scale * 2.0, units = "in",
 ##        device = cairo_pdf)
 
 ## ---------------------------------------------------------------------------------------------- ##
@@ -380,7 +397,7 @@ history.mkdata <- memoize(function() {
   .def2 <- model.gen.workload(.wl2)
   .def3 <- model.gen.workload(.wl3)
   #
-  .filtered <- c("m6g")
+  .filtered <- c("m6g", "hpc7g", "t4g")
   .inst <- aws.data.all.by.date %>% dplyr::filter(!(id.prefix %in% .filtered))
   .cost <- dplyr::group_modify(.inst, function(.slice, date) {
     .large <- aws.data.filter.large(.slice)
@@ -418,7 +435,7 @@ plots.mh.history.cost.draw <- function() {
   ggplot(.df, aes(x = meta.join.time, y = stat.price.change, label = label, color = workload.id)) +
     scale_color_manual(values = palette) +
     geom_line(aes(group = workload.id), linetype = "dashed") +
-    ## geom_text(data = dplyr::filter(.df, workload.id == "A"), nudge_y = 0.01, nudge_x = 0.2) +
+    geom_text(data = .df, nudge_y = 0.05, nudge_x = 0.2, size = 3, angle = 30) + # dplyr::filter(.df, workload.id == "A")
     geom_line(aes(group = paste(workload.id, id)), size = 1.5) +
     labs(x = "Date", y = "Normalized Workload Cost", color = "Workload") +
     theme_bw() +
@@ -433,9 +450,10 @@ plots.mh.history.cost.draw <- function() {
 }
 
 ## plots.mh.history.cost.draw()
+## scale <- 2
 ## ggsave(plots.mkpath("mh-date-cost.pdf"),
 ##        plots.mh.history.cost.draw(),
-##        width = 3.6, height = 1.7, units = "in",
+##        width = scale * 3.6, height = scale * 1.7, units = "in",
 ##        device = cairo_pdf)
 
 ## ---------------------------------------------------------------------------------------------- ##

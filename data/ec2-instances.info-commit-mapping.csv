@@ -1,4 +1,7 @@
 join.entry,commit.hash,commit.date,commit.msg
+200,f98fe21,2023-11-22,(maxi-k)manual scrape
+104,4c10336,2022-01-18,latest build
+103,14ede5a,2021-08-03,latest
 102,70b380e,2020-06-02,Rebuild
 101,0057391,2019-11-30,Rebuild
 100,a3506b3,2019-11-22,Rebuild
