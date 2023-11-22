@@ -287,26 +287,32 @@ model.calc.frontier <- function(data, x = "x", y = "y", id = "id",
     stop("both x and y must be numeric variables")
   }
 
+  ord <- function(c1, c2, decreasing) {
+    l1 <- if (is.data.frame(c1)) c1[[1L]] else c1
+    l2 <- if (is.data.frame(c2)) c2[[1L]] else c2
+    wrapr::orderv(list(l1, l2), decreasing = decreasing)
+  }
+
   quadrant <- match.arg(quadrant)
   if (quadrant == "top.right") {
-    zz <- z[order(z[, 1L], z[, 2L], decreasing = TRUE), ]
+    zz <- z[ord(z[, 1L], z[, 2L], decreasing = TRUE), ]
     zz <- zz[which(!duplicated(cummax(zz[, 2L]))), ]
-    zz[order(zz[, 1L], zz[, 2L], decreasing = decreasing), ]
+    zz[ord(zz[, 1L], zz[, 2L], decreasing = decreasing), ]
   } else if (quadrant == "bottom.right") {
-    zz <- z[order(z[, 1L], z[, 2L], decreasing = TRUE), ]
+    zz <- z[ord(z[, 1L], z[, 2L], decreasing = TRUE), ]
     zz <- zz[which(!duplicated(cummin(zz[, 2L]))), ]
     zz <- zz[which(!duplicated(zz[, 1L])), ]
-    zz[order(zz[, 1L], zz[, 2L], decreasing = decreasing), ]
+    zz[ord(zz[, 1L], zz[, 2L], decreasing = decreasing), ]
   } else if (quadrant == "bottom.left") {
-    zz <- z[order(z[, 1L], z[, 2L], decreasing = FALSE), ]
+    zz <- z[ord(z[, 1L], z[, 2L], decreasing = FALSE), ]
     zz <- zz[which(!duplicated(cummin(zz[, 2L]))), ]
-    zz[order(zz[, 1L], zz[, 2L], decreasing = decreasing), ]
+    zz[ord(zz[, 1L], zz[, 2L], decreasing = decreasing), ]
   } else {
-    zz <- z[order(z[, 1L], z[, 2L], decreasing = FALSE), ]
+    zz <- z[ord(z[, 1L], z[, 2L], decreasing = FALSE), ]
     zz <- zz[which(!duplicated(cummax(zz[, 2L]))), ]
-    zz <- zz[order(zz[, 1L], zz[, 2L], decreasing = TRUE), ]
+    zz <- zz[ord(zz[, 1L], zz[, 2L], decreasing = TRUE), ]
     zz <- zz[which(!duplicated(zz[, 1L])), ]
-    zz[order(zz[, 1L], zz[, 2L], decreasing = decreasing), ]
+    zz[ord(zz[, 1L], zz[, 2L], decreasing = decreasing), ]
   }
 }
 
