@@ -10528,3 +10528,765 @@ Memory optimized,current,r6gd.large,0,2,AWS Graviton2 Processor,2.5 GHz,R6GD Lar
 General purpose,current,t4g.xlarge,0,4,AWS Graviton2 Processor,2.5 GHz,T4G Extra Large,16,Up to 5 Gigabit,0,0,,,,,0.1344,201
 Storage optimized,current,is4gen.xlarge,0,4,AWS Graviton2 Processor,2.5 GHz,IS4GEN Extra Large,24,Up to 25 Gigabit,0,0,1,true,true,3750,0.5763,201
 General purpose,current,t2.nano,variable,1,Intel Xeon Family,Up to 3.3 GHz,T2 Nano,0.5,Low to Moderate,0,0,,,,,0.0058,201
+Compute optimized,current,c5d.2xlarge,39,8,Intel Xeon Platinum 8124M,3 GHz,C5 High-CPU Double Extra Large,16,Up to 10 Gigabit,0,0,1,true,true,200,0.384,202
+Compute optimized,current,c5d.xlarge,20,4,Intel Xeon Platinum 8124M,3 GHz,C5 High-CPU Extra Large,8,Up to 10 Gigabit,0,0,1,true,true,100,0.192,202
+General purpose,current,m6a.24xlarge,0,96,AMD EPYC 7R13 Processor,3.6 GHz,M6A 24xlarge,384,37.5 Gigabit,0,0,,,,,4.1472,202
+Compute optimized,current,c7a.large,0,2,AMD EPYC 9R14 Processor,3.7 GHz,C7A Large,4,Up to 12.5 Gigabit,0,0,,,,,0.10264,202
+General purpose,current,m5dn.xlarge,0,4,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,M5DN Extra Large,16,Up to 25 Gigabit,0,0,1,true,true,150,0.272,202
+Compute optimized,current,c7a.xlarge,0,4,AMD EPYC 9R14 Processor,3.7 GHz,C7A Extra Large,8,Up to 12.5 Gigabit,0,0,,,,,0.20528,202
+Compute optimized,current,c5.metal,375,96,Intel Xeon Platinum 8275L,3 GHz,C5 High-CPU Metal,192,25 Gigabit,0,0,,,,,4.08,202
+Compute optimized,current,c6a.8xlarge,0,32,AMD EPYC 7R13 Processor,3.6 GHz,C6A Eight Extra Large,64,12.5 Gigabit,0,0,,,,,1.224,202
+GPU instance,current,g5.16xlarge,0,64,AMD EPYC 7R32,2.8 GHz,G5 Graphics and Machine Learning GPU 16xlarge,256,25 Gigabit,0,1,1,true,true,1900,4.096,202
+Storage optimized,current,d3en.12xlarge,0,48,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,D3EN 12xlarge,192,75 Gigabit,0,0,24,false,true,13980,6.30864,202
+Storage optimized,current,d3en.8xlarge,0,32,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,D3EN Eight Extra Large,128,50 Gigabit,0,0,16,false,true,13980,4.20576,202
+Memory optimized,current,r5ad.16xlarge,0,64,AMD EPYC 7571,2.5 GHz,R5AD 16xlarge,512,12 Gigabit,0,0,4,true,true,600,4.192,202
+General purpose,current,m5a.2xlarge,0,8,AMD EPYC 7571,2.5 GHz,M5A Double Extra Large,32,Up to 10 Gigabit,0,0,,,,,0.344,202
+General purpose,current,m5n.metal,0,96,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,M5N Metal,384,100 Gigabit,0,0,,,,,5.712,202
+General purpose,current,m6id.2xlarge,0,8,Intel Xeon 8375C (Ice Lake),3.5 GHz,M6ID Double Extra Large,32,Up to 12.5 Gigabit,0,0,1,true,true,474,0.4746,202
+Compute optimized,current,c6id.8xlarge,0,32,Intel Xeon 8375C (Ice Lake),3.5 GHz,C6ID Eight Extra Large,64,12.5 Gigabit,0,0,1,true,true,1900,1.6128,202
+General purpose,current,m5ad.2xlarge,0,8,AMD EPYC 7571,2.5 GHz,M5AD Double Extra Large,32,Up to 10 Gigabit,0,0,1,true,true,300,0.412,202
+General purpose,current,m6id.xlarge,0,4,Intel Xeon 8375C (Ice Lake),3.5 GHz,M6ID Extra Large,16,Up to 12.5 Gigabit,0,0,1,true,true,237,0.2373,202
+Compute optimized,current,c6i.32xlarge,0,128,Intel Xeon 8375C (Ice Lake),3.5 GHz,C6I 32xlarge,256,50 Gigabit,0,0,,,,,5.44,202
+Memory optimized,current,r5b.xlarge,0,4,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,R5B Extra Large,32,Up to 10 Gigabit,0,0,,,,,0.298,202
+General purpose,current,m5d.large,10,2,Intel Xeon Platinum 8175,3.1 GHz,M5 General Purpose Large,8,Up to 10 Gigabit,0,0,1,true,true,75,0.113,202
+Memory optimized,current,r5n.12xlarge,0,48,Intel Xeon Platinum 8259 (Cascade Lake),2.5 GHz,R5N 12xlarge,384,50 Gigabit,0,0,,,,,3.576,202
+Storage optimized,previous,i2.2xlarge,27,8,Intel Xeon E5-2670 v2 (Ivy Bridge),2.5 GHz,I2 Double Extra Large,61,High,0,0,2,true,false,800,1.705,202
+Compute optimized,current,c7i.16xlarge,0,64,Intel Xeon Scalable (Sapphire Rapids),3.2 GHz,C7I 16xlarge,128,25 Gigabit,0,0,,,,,2.856,202
+General purpose,current,m7a.2xlarge,0,8,AMD EPYC 9R14 Processor,3.7 GHz,M7A Double Extra Large,32,Up to 12.5 Gigabit,0,0,,,,,0.46368,202
+Compute optimized,current,c5.9xlarge,139,36,Intel Xeon Platinum 8124M,3 GHz,C5 High-CPU 9xlarge,72,12 Gigabit,0,0,,,,,1.53,202
+Memory optimized,current,r5ad.xlarge,0,4,AMD EPYC 7571,2.5 GHz,R5AD Extra Large,32,Up to 10 Gigabit,0,0,1,true,true,150,0.262,202
+Memory optimized,current,r5.metal,347,96,Intel Xeon Platinum 8175,3.1 GHz,R5 Metal,768,25 Gigabit,0,0,,,,,6.048,202
+GPU instance,current,g3s.xlarge,13,4,Intel Xeon E5-2686 v4 (Broadwell),2.3 GHz,G3S Extra Large,30.5,Up to 10 Gigabit,0,1,,,,,0.75,202
+General purpose,current,m5.24xlarge,337,96,Intel Xeon Platinum 8175,3.1 GHz,M5 General Purpose 24xlarge,384,25 Gigabit,0,0,,,,,4.608,202
+Memory optimized,current,r7i.2xlarge,0,8,Intel Xeon Scalable (Sapphire Rapids),3.2 GHz,R7I Double Extra Large,64,Up to 12.5 Gigabit,0,0,,,,,0.5292,202
+General purpose,current,m5d.24xlarge,337,96,Intel Xeon Platinum 8175,3.1 GHz,M5 General Purpose 24xlarge,384,25 Gigabit,0,0,4,true,true,900,5.424,202
+Memory optimized,current,r5n.xlarge,0,4,Intel Xeon Platinum 8259 (Cascade Lake),2.5 GHz,R5N Extra Large,32,Up to 25 Gigabit,0,0,,,,,0.298,202
+Memory optimized,current,x2idn.32xlarge,0,128,Intel Xeon Scalable (Icelake),3.5 GHz,X2IDN 32xlarge,2048,100 Gigabit,0,0,2,true,true,1900,13.338,202
+Memory optimized,current,r6a.12xlarge,0,48,AMD EPYC 7R13 Processor,3.6 GHz,R6A 12xlarge,384,18.75 Gigabit,0,0,,,,,2.7216,202
+General purpose,current,m6i.32xlarge,0,128,Intel Xeon 8375C (Ice Lake),3.5 GHz,M6I 32xlarge,512,50 Gigabit,0,0,,,,,6.144,202
+Storage optimized,current,i3en.12xlarge,168,48,Intel Xeon Platinum 8175,3.1 GHz,I3EN 12xlarge,384,50 Gigabit,0,0,4,true,true,7500,5.424,202
+Storage optimized,current,i4i.large,0,2,Intel Xeon 8375C (Ice Lake),3.5 GHz,I4I Large,16,Up to 10 Gigabit,0,0,1,true,true,468,0.172,202
+Storage optimized,current,i3en.metal,0,96,Intel Xeon Platinum 8175,3.1 GHz,I3EN Metal,768,100 Gigabit,0,0,8,true,true,7500,10.848,202
+Memory optimized,current,r7a.2xlarge,0,8,AMD EPYC 9R14 Processor,3.7 GHz,R7A Double Extra Large,64,Up to 12.5 Gigabit,0,0,,,,,0.6086,202
+General purpose,current,m5zn.3xlarge,0,12,Intel Xeon Platinum 8252,4.5 GHz,M5ZN 3xlarge,48,Up to 25 Gigabit,0,0,,,,,0.991,202
+General purpose,current,m5d.12xlarge,168,48,Intel Xeon Platinum 8175,3.1 GHz,M5 General Purpose 12xlarge,192,12 Gigabit,0,0,2,true,true,900,2.712,202
+General purpose,current,m5.4xlarge,70,16,Intel Xeon Platinum 8175,3.1 GHz,M5 General Purpose Quadruple Extra Large,64,Up to 10 Gigabit,0,0,,,,,0.768,202
+General purpose,current,m7i.metal-24xl,0,96,Intel Xeon Scalable (Sapphire Rapids),3.2 GHz,M7I Metal-24xl,384,37.5 Gigabit,0,0,,,,,4.8384,202
+Compute optimized,current,c5ad.xlarge,0,4,AMD EPYC 7R32,3.3 GHz,C5AD Extra Large,8,Up to 10 Gigabit,0,0,1,true,true,150,0.172,202
+Memory optimized,current,u-9tb1.112xlarge,0,448,Intel Xeon Scalable (Skylake),,U-9TB1 112xlarge,9216,100 Gigabit,0,0,,,,,81.9,202
+Memory optimized,current,x2iezn.12xlarge,0,48,Intel Xeon Platinum 8252,4.5 GHz,X2IEZN 12xlarge,1536,100 Gigabit,0,0,,,,,10.008,202
+General purpose,current,m6id.32xlarge,0,128,Intel Xeon 8375C (Ice Lake),3.5 GHz,M6ID 32xlarge,512,50 Gigabit,0,0,4,true,true,1900,7.5936,202
+Compute optimized,current,c5.large,10,2,Intel Xeon Platinum 8124M,3 GHz,C5 High-CPU Large,4,Up to 10 Gigabit,0,0,,,,,0.085,202
+Memory optimized,current,r5dn.xlarge,0,4,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,R5DN Extra Large,32,Up to 25 Gigabit,0,0,1,true,true,150,0.334,202
+Compute optimized,current,c6a.4xlarge,0,16,AMD EPYC 7R13 Processor,3.6 GHz,C6A Quadruple Extra Large,32,Up to 12.5 Gigabit,0,0,,,,,0.612,202
+Memory optimized,current,r7iz.xlarge,0,4,Intel Xeon Scalable (Sapphire Rapids),3.9 GHz,R7IZ Extra Large,32,Up to 12.5 Gigabit,0,0,,,,,0.372,202
+Compute optimized,current,c5n.large,10,2,Intel Xeon Platinum 8124M,3 GHz,C5N Large,5.25,Up to 25 Gigabit,0,0,,,,,0.108,202
+Storage optimized,current,is4gen.8xlarge,0,32,AWS Graviton2 Processor,2.5 GHz,IS4GEN Eight Extra Large,192,50 Gigabit,0,0,4,true,true,7500,4.6104,202
+Compute optimized,current,c7i.48xlarge,0,192,Intel Xeon Scalable (Sapphire Rapids),3.2 GHz,C7I 48xlarge,384,50 Gigabit,0,0,,,,,8.568,202
+General purpose,current,m6id.4xlarge,0,16,Intel Xeon 8375C (Ice Lake),3.5 GHz,M6ID Quadruple Extra Large,64,Up to 12.5 Gigabit,0,0,1,true,true,950,0.9492,202
+General purpose,current,t3a.nano,variable,2,AMD EPYC 7571,2.5 GHz,T3A Nano,0.5,Up to 5 Gigabit,0,0,,,,,0.0047,202
+Memory optimized,current,x2iedn.2xlarge,0,8,Intel Xeon Scalable (Icelake),3.5 GHz,X2IEDN Double Extra Large,256,Up to 25 Gigabit,0,0,1,true,true,237,1.66725,202
+Compute optimized,current,c5.24xlarge,375,96,Intel Xeon Platinum 8275L,3 GHz,C5 High-CPU 24xlarge,192,25 Gigabit,0,0,,,,,4.08,202
+Storage optimized,previous,i2.xlarge,14,4,Intel Xeon E5-2670 v2 (Ivy Bridge),2.5 GHz,I2 Extra Large,30.5,Moderate,0,0,1,true,false,800,0.853,202
+General purpose,current,m6in.12xlarge,0,48,Intel Xeon 8375C (Ice Lake),3.5 GHz,M6IN 12xlarge,192,75 Gigabit,0,0,,,,,3.34152,202
+Compute optimized,current,c5.12xlarge,188,48,Intel Xeon Platinum 8275L,3 GHz,C5 High-CPU 12xlarge,96,12 Gigabit,0,0,,,,,2.04,202
+Memory optimized,current,r7a.32xlarge,0,128,AMD EPYC 9R14 Processor,3.7 GHz,R7A 32xlarge,1024,50 Gigabit,0,0,,,,,9.7376,202
+Storage optimized,current,i4i.32xlarge,0,128,Intel Xeon 8375C (Ice Lake),3.5 GHz,I4I 32xlarge,1024,75 Gigabit,0,0,8,true,true,3750,10.9824,202
+General purpose,current,m5n.16xlarge,0,64,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,M5N 16xlarge,256,75 Gigabit,0,0,,,,,3.808,202
+General purpose,current,m6in.8xlarge,0,32,Intel Xeon 8375C (Ice Lake),3.5 GHz,M6IN Eight Extra Large,128,50 Gigabit,0,0,,,,,2.22768,202
+General purpose,current,t2.micro,variable,1,Intel Xeon Family,Up to 3.3 GHz,T2 Micro,1,Low to Moderate,0,0,,,,,0.0116,202
+Storage optimized,previous,d2.8xlarge,116,36,Intel Xeon E5-2676 v3 (Haswell),2.4 GHz,D2 Eight Extra Large,244,10 Gigabit,0,0,24,false,false,2048,5.52,202
+General purpose,current,m6i.24xlarge,0,96,Intel Xeon 8375C (Ice Lake),3.5 GHz,M6I 24xlarge,384,37.5 Gigabit,0,0,,,,,4.608,202
+GPU instance,current,g5.24xlarge,0,96,AMD EPYC 7R32,2.8 GHz,G5 Graphics and Machine Learning GPU 24xlarge,384,50 Gigabit,0,4,1,true,true,3800,8.144,202
+Storage optimized,current,i3en.3xlarge,0,12,Intel Xeon Platinum 8175,3.1 GHz,I3EN 3xlarge,96,Up to 25 Gigabit,0,0,1,true,true,7500,1.356,202
+Memory optimized,current,z1d.3xlarge,64,12,Intel Xeon Platinum 8151,4 GHz,Z1D 3xlarge,96,Up to 10 Gigabit,0,0,1,true,true,450,1.116,202
+Compute optimized,current,c7gn.8xlarge,0,32,AWS Graviton3 Processor,2.6 GHz,C7GN Eight Extra Large,64,100 Gigabit,0,0,,,,,1.9968,202
+Memory optimized,current,r7gd.8xlarge,0,32,AWS Graviton3 Processor,2.5 GHz,R7GD Eight Extra Large,256,15 Gigabit,0,0,1,true,true,1900,2.1773,202
+General purpose,current,m5.2xlarge,37,8,Intel Xeon Platinum 8175,3.1 GHz,M5 General Purpose Double Extra Large,32,Up to 10 Gigabit,0,0,,,,,0.384,202
+General purpose,current,m6idn.4xlarge,0,16,Intel Xeon 8375C (Ice Lake),3.5 GHz,M6IDN Quadruple Extra Large,64,Up to 50 Gigabit,0,0,1,true,true,950,1.27296,202
+General purpose,current,m7a.8xlarge,0,32,AMD EPYC 9R14 Processor,3.7 GHz,M7A Eight Extra Large,128,12.5 Gigabit,0,0,,,,,1.85472,202
+Machine Learning ASIC Instances,current,inf1.xlarge,0,4,Intel Xeon Platinum 8275CL (Cascade Lake),,INF1 Extra Large,8,Up to 25 Gigabit,0,1,,,,,0.228,202
+General purpose,current,m6idn.large,0,2,Intel Xeon 8375C (Ice Lake),3.5 GHz,M6IDN Large,8,Up to 25 Gigabit,0,0,1,true,true,118,0.15912,202
+General purpose,current,m7i.metal-48xl,0,192,Intel Xeon Scalable (Sapphire Rapids),3.2 GHz,M7I Metal-48xl,768,50 Gigabit,0,0,,,,,9.6768,202
+Memory optimized,current,r7iz.12xlarge,0,48,Intel Xeon Scalable (Sapphire Rapids),3.9 GHz,R7IZ 12xlarge,384,25 Gigabit,0,0,,,,,4.464,202
+Memory optimized,current,r6in.24xlarge,0,96,Intel Xeon 8375C (Ice Lake),3.5 GHz,R6IN 24xlarge,768,150 Gigabit,0,0,,,,,8.36784,202
+Compute optimized,current,c5.18xlarge,281,72,Intel Xeon Platinum 8124M,3 GHz,C5 High-CPU 18xlarge,144,25 Gigabit,0,0,,,,,3.06,202
+Compute optimized,current,c6id.2xlarge,0,8,Intel Xeon 8375C (Ice Lake),3.5 GHz,C6ID Double Extra Large,16,Up to 12.5 Gigabit,0,0,1,true,true,474,0.4032,202
+Memory optimized,current,x2iedn.32xlarge,0,128,Intel Xeon Scalable (Icelake),3.5 GHz,X2IEDN 32xlarge,4096,100 Gigabit,0,0,2,true,true,1900,26.676,202
+Machine Learning ASIC Instances,current,trn1.32xlarge,0,128,Intel Xeon Scalable (Icelake),Up to 3.5 GHz,TRN1 32xlarge,512,8x 100 Gigabit,0,16,4,true,true,1900,21.5,202
+Memory optimized,current,r6gd.16xlarge,0,64,AWS Graviton2 Processor,2.5 GHz,R6GD 16xlarge,512,25 Gigabit,0,0,2,true,true,1900,3.6864,202
+Compute optimized,current,c7i.xlarge,0,4,Intel Xeon Scalable (Sapphire Rapids),3.2 GHz,C7I Extra Large,8,Up to 12.5 Gigabit,0,0,,,,,0.1785,202
+General purpose,current,m5.12xlarge,168,48,Intel Xeon Platinum 8175,3.1 GHz,M5 General Purpose 12xlarge,192,12 Gigabit,0,0,,,,,2.304,202
+Machine Learning ASIC Instances,current,dl1.24xlarge,0,96,Intel Xeon Platinum 8275L,3 GHz,DL1 24xlarge,768,4x 100 Gigabit,0,0,4,true,true,1000,13.10904,202
+Memory optimized,current,x1e.16xlarge,179,64,High Frequency Intel Xeon E7-8880 v3 (Haswell),2.3 GHz,X1E 16xlarge,1952,10 Gigabit,0,0,1,true,false,1920,13.344,202
+Memory optimized,current,r5n.24xlarge,0,96,Intel Xeon Platinum 8259 (Cascade Lake),2.5 GHz,R5N 24xlarge,768,100 Gigabit,0,0,,,,,7.152,202
+Memory optimized,current,r5dn.metal,0,96,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,R5DN Metal,768,100 Gigabit,0,0,4,true,true,900,8.016,202
+Storage optimized,current,i4g.8xlarge,0,32,AWS Graviton2 Processor,2.5 GHz,I4G Eight Extra Large,256,18.75 Gigabit,0,0,2,true,true,3750,2.47104,202
+Storage optimized,previous,i2.8xlarge,104,32,Intel Xeon E5-2670 v2 (Ivy Bridge),2.5 GHz,I2 Eight Extra Large,244,10 Gigabit,0,0,8,true,false,800,6.82,202
+Memory optimized,current,r7i.48xlarge,0,192,Intel Xeon Scalable (Sapphire Rapids),3.2 GHz,R7I 48xlarge,1536,50 Gigabit,0,0,,,,,12.7008,202
+Memory optimized,current,r5dn.8xlarge,0,32,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,R5DN Eight Extra Large,256,25 Gigabit,0,0,2,true,true,600,2.672,202
+General purpose,current,m7i.large,0,2,Intel Xeon Scalable (Sapphire Rapids),3.2 GHz,M7I Large,8,Up to 12.5 Gigabit,0,0,,,,,0.1008,202
+General purpose,current,m7i.xlarge,0,4,Intel Xeon Scalable (Sapphire Rapids),3.2 GHz,M7I Extra Large,16,Up to 12.5 Gigabit,0,0,,,,,0.2016,202
+Memory optimized,current,r5a.8xlarge,0,32,AMD EPYC 7571,2.5 GHz,R5A Eight Extra Large,256,Up to 10 Gigabit,0,0,,,,,1.808,202
+Storage optimized,current,i4i.16xlarge,0,64,Intel Xeon 8375C (Ice Lake),3.5 GHz,I4I 16xlarge,512,37.5 Gigabit,0,0,4,true,true,3750,5.491,202
+Memory optimized,current,r7a.4xlarge,0,16,AMD EPYC 9R14 Processor,3.7 GHz,R7A Quadruple Extra Large,128,Up to 12.5 Gigabit,0,0,,,,,1.2172,202
+Memory optimized,current,r7iz.4xlarge,0,16,Intel Xeon Scalable (Sapphire Rapids),3.9 GHz,R7IZ Quadruple Extra Large,128,Up to 12.5 Gigabit,0,0,,,,,1.488,202
+Compute optimized,current,c7a.metal-48xl,0,192,AMD EPYC 9R14 Processor,3.7 GHz,C7A Metal-48xl,384,50 Gigabit,0,0,,,,,9.85344,202
+Memory optimized,current,r6i.large,0,2,Intel Xeon 8375C (Ice Lake),3.5 GHz,R6I Large,16,Up to 12.5 Gigabit,0,0,,,,,0.126,202
+Memory optimized,current,r5dn.4xlarge,0,16,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,R5DN Quadruple Extra Large,128,Up to 25 Gigabit,0,0,2,true,true,300,1.336,202
+Memory optimized,current,r7a.12xlarge,0,48,AMD EPYC 9R14 Processor,3.7 GHz,R7A 12xlarge,384,18.75 Gigabit,0,0,,,,,3.6516,202
+Memory optimized,current,r6a.16xlarge,0,64,AMD EPYC 7R13 Processor,3.6 GHz,R6A 16xlarge,512,25 Gigabit,0,0,,,,,3.6288,202
+General purpose,current,m6a.4xlarge,0,16,AMD EPYC 7R13 Processor,3.6 GHz,M6A Quadruple Extra Large,64,Up to 12.5 Gigabit,0,0,,,,,0.6912,202
+Memory optimized,current,r6g.medium,0,1,AWS Graviton2 Processor,2.5 GHz,R6G Medium,8,Up to 10 Gigabit,0,0,,,,,0.0504,202
+Compute optimized,current,c6i.24xlarge,0,96,Intel Xeon 8375C (Ice Lake),3.5 GHz,C6I 24xlarge,192,37.5 Gigabit,0,0,,,,,4.08,202
+Compute optimized,current,c6id.32xlarge,0,128,Intel Xeon 8375C (Ice Lake),3.5 GHz,C6ID 32xlarge,256,50 Gigabit,0,0,4,true,true,1900,6.4512,202
+Memory optimized,current,r6id.12xlarge,0,48,Intel Xeon 8375C (Ice Lake),3.5 GHz,R6ID 12xlarge,384,18.75 Gigabit,0,0,2,true,true,1425,3.6288,202
+Memory optimized,current,r7i.12xlarge,0,48,Intel Xeon Scalable (Sapphire Rapids),3.2 GHz,R7I 12xlarge,384,18.75 Gigabit,0,0,,,,,3.1752,202
+General purpose,current,m6i.large,0,2,Intel Xeon 8375C (Ice Lake),3.5 GHz,M6I Large,8,Up to 12.5 Gigabit,0,0,,,,,0.096,202
+Memory optimized,current,r6a.4xlarge,0,16,AMD EPYC 7R13 Processor,3.6 GHz,R6A Quadruple Extra Large,128,Up to 12.5 Gigabit,0,0,,,,,0.9072,202
+Memory optimized,current,r6g.12xlarge,0,48,AWS Graviton2 Processor,2.5 GHz,R6G 12xlarge,384,20 Gigabit,0,0,,,,,2.4192,202
+Compute optimized,current,c4.4xlarge,62,16,Intel Xeon E5-2666 v3 (Haswell),2.9 GHz,C4 High-CPU Quadruple Extra Large,30,High,0,0,,,,,0.796,202
+General purpose,previous,a1.metal,0,16,AWS Graviton Processor,2.3 GHz,A1 Metal,32,Up to 10 Gigabit,0,0,,,,,0.408,202
+Storage optimized,current,i4i.metal,0,128,Intel Xeon 8375C (Ice Lake),3.5 GHz,I4I Metal,1024,75 Gigabit,0,0,8,true,true,3750,10.982,202
+Storage optimized,current,i3en.xlarge,0,4,Intel Xeon Platinum 8175,3.1 GHz,I3EN Extra Large,32,Up to 25 Gigabit,0,0,1,true,true,2500,0.452,202
+Storage optimized,current,i3.xlarge,16,4,Intel Xeon E5-2686 v4 (Broadwell),2.3 GHz,I3 High I/O Extra Large,30.5,Up to 10 Gigabit,0,0,1,true,true,950,0.312,202
+Storage optimized,current,d3.2xlarge,0,8,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,D3 Double Extra Large,64,Up to 15 Gigabit,0,0,6,false,true,1980,0.999,202
+Storage optimized,current,im4gn.16xlarge,0,64,AWS Graviton2 Processor,2.5 GHz,IM4GN 16xlarge,256,100 Gigabit,0,0,4,true,true,7500,5.82067,202
+General purpose,current,t4g.micro,0,2,AWS Graviton2 Processor,2.5 GHz,T4G Micro,1,Up to 5 Gigabit,0,0,,,,,0.0084,202
+General purpose,current,m5zn.metal,0,48,Intel Xeon Platinum 8252,4.5 GHz,M5ZN Metal,192,100 Gigabit,0,0,,,,,3.9641,202
+Memory optimized,current,r7i.4xlarge,0,16,Intel Xeon Scalable (Sapphire Rapids),3.2 GHz,R7I Quadruple Extra Large,128,Up to 12.5 Gigabit,0,0,,,,,1.0584,202
+General purpose,current,m6idn.24xlarge,0,96,Intel Xeon 8375C (Ice Lake),3.5 GHz,M6IDN 24xlarge,384,150 Gigabit,0,0,4,true,true,1425,7.63776,202
+Memory optimized,current,r5b.large,0,2,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,R5B Large,16,Up to 10 Gigabit,0,0,,,,,0.149,202
+Storage optimized,current,i3.4xlarge,58,16,Intel Xeon E5-2686 v4 (Broadwell),2.3 GHz,I3 High I/O Quadruple Extra Large,122,Up to 10 Gigabit,0,0,2,true,true,1900,1.248,202
+Storage optimized,current,i3en.2xlarge,37,8,Intel Xeon Platinum 8175,3.1 GHz,I3EN Double Extra Large,64,Up to 25 Gigabit,0,0,2,true,true,2500,0.904,202
+General purpose,current,m5a.xlarge,0,4,AMD EPYC 7571,2.5 GHz,M5A Extra Large,16,Up to 10 Gigabit,0,0,,,,,0.172,202
+Memory optimized,current,r6idn.xlarge,0,4,Intel Xeon 8375C (Ice Lake),3.5 GHz,R6IDN Extra Large,32,Up to 30 Gigabit,0,0,1,true,true,237,0.39078,202
+Compute optimized,current,c6i.8xlarge,0,32,Intel Xeon 8375C (Ice Lake),3.5 GHz,C6I Eight Extra Large,64,12.5 Gigabit,0,0,,,,,1.36,202
+GPU instance,current,p3.2xlarge,31,8,Intel Xeon E5-2686 v4 (Broadwell),2.3 GHz,P3 High Performance GPU Double Extra Large,61,Up to 10 Gigabit,0,1,,,,,3.06,202
+Compute optimized,current,c5.xlarge,20,4,Intel Xeon Platinum 8124M,3 GHz,C5 High-CPU Extra Large,8,Up to 10 Gigabit,0,0,,,,,0.17,202
+Compute optimized,current,c6gn.8xlarge,0,32,AWS Graviton2 Processor,2.5 GHz,C6GN Eight Extra Large,64,50 Gigabit,0,0,,,,,1.3824,202
+General purpose,current,m6idn.32xlarge,0,128,Intel Xeon 8375C (Ice Lake),3.5 GHz,M6IDN 32xlarge,512,200 Gigabit,0,0,4,true,true,1900,10.18368,202
+General purpose,current,m5n.24xlarge,0,96,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,M5N 24xlarge,384,100 Gigabit,0,0,,,,,5.712,202
+Compute optimized,current,c6id.4xlarge,0,16,Intel Xeon 8375C (Ice Lake),3.5 GHz,C6ID Quadruple Extra Large,32,Up to 12.5 Gigabit,0,0,1,true,true,950,0.8064,202
+Compute optimized,current,c6id.24xlarge,0,96,Intel Xeon 8375C (Ice Lake),3.5 GHz,C6ID 24xlarge,192,37.5 Gigabit,0,0,4,true,true,1425,4.8384,202
+Memory optimized,current,r5d.8xlarge,128,32,Intel Xeon Platinum 8175,3.1 GHz,R5D Eight Extra Large,256,10 Gigabit,0,0,2,true,true,600,2.304,202
+Compute optimized,current,c6g.2xlarge,0,8,AWS Graviton2 Processor,2.5 GHz,C6G Double Extra Large,16,Up to 10 Gigabit,0,0,,,,,0.272,202
+General purpose,current,m5zn.2xlarge,0,8,Intel Xeon Platinum 8252,4.5 GHz,M5ZN Double Extra Large,32,Up to 25 Gigabit,0,0,,,,,0.6607,202
+Storage optimized,current,i4g.16xlarge,0,64,AWS Graviton2 Processor,2.5 GHz,I4G 16xlarge,512,37.5 Gigabit,0,0,4,true,true,3750,4.94208,202
+Compute optimized,current,c6in.xlarge,0,4,Intel Xeon 8375C (Ice Lake),3.5 GHz,C6IN Extra Large,8,Up to 30 Gigabit,0,0,,,,,0.2268,202
+General purpose,current,t2.2xlarge,variable,8,Intel Xeon Family,Up to 3.3 GHz,T2 Double Extra Large,32,Moderate,0,0,,,,,0.3712,202
+Memory optimized,current,r5.12xlarge,168,48,Intel Xeon Platinum 8175,3.1 GHz,R5 12xlarge,384,12 Gigabit,0,0,,,,,3.024,202
+Memory optimized,current,r6in.32xlarge,0,128,Intel Xeon 8375C (Ice Lake),3.5 GHz,R6IN 32xlarge,1024,200 Gigabit,0,0,,,,,11.15712,202
+General purpose,current,m7g.large,0,2,AWS Graviton3 Processor,2.5 GHz,M7G Large,8,Up to 12.5 Gigabit,0,0,,,,,0.0816,202
+Memory optimized,current,u-12tb1.112xlarge,0,448,Intel Xeon Scalable (Skylake),,U-12TB1 112xlarge,12288,100 Gigabit,0,0,,,,,109.2,202
+Storage optimized,current,h1.8xlarge,97,32,Intel Xeon E5-2686 v4 (Broadwell),2.3 GHz,H1 Eight Extra Large,128,10 Gigabit,0,0,4,false,false,2000,1.872,202
+Memory optimized,current,r5b.16xlarge,0,64,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,R5B 16xlarge,512,20 Gigabit,0,0,,,,,4.768,202
+Memory optimized,current,r5d.24xlarge,337,96,Intel Xeon Platinum 8175,3.1 GHz,R5D 24xlarge,768,25 Gigabit,0,0,4,true,true,900,6.912,202
+Storage optimized,current,i3en.6xlarge,0,24,Intel Xeon Platinum 8175,3.1 GHz,I3EN 6xlarge,192,25 Gigabit,0,0,2,true,true,7500,2.712,202
+Memory optimized,current,r4.8xlarge,97,32,Intel Xeon E5-2686 v4 (Broadwell),2.3 GHz,R4 High-Memory Eight Extra Large,244,10 Gigabit,0,0,,,,,2.128,202
+General purpose,current,t2.large,variable,2,Intel Xeon Family,Up to 3.3 GHz,T2 Large,8,Low to Moderate,0,0,,,,,0.0928,202
+Compute optimized,previous,c3.4xlarge,55,16,Intel Xeon E5-2680 v2 (Ivy Bridge),2.8 GHz,C3 High-CPU Quadruple Extra Large,30,High,0,0,2,true,false,160,0.84,202
+General purpose,current,m6idn.xlarge,0,4,Intel Xeon 8375C (Ice Lake),3.5 GHz,M6IDN Extra Large,16,Up to 30 Gigabit,0,0,1,true,true,237,0.31824,202
+Memory optimized,current,x1.16xlarge,174.5,64,High Frequency Intel Xeon E7-8880 v3 (Haswell),2.3 GHz,X1 Extra High-Memory 16xlarge,976,10 Gigabit,0,0,1,true,false,1920,6.669,202
+Compute optimized,current,c6in.24xlarge,0,96,Intel Xeon 8375C (Ice Lake),3.5 GHz,C6IN 24xlarge,192,150 Gigabit,0,0,,,,,5.4432,202
+Compute optimized,current,c5d.18xlarge,281,72,Intel Xeon Platinum 8124M,3 GHz,C5 High-CPU 18xlarge,144,25 Gigabit,0,0,2,true,true,900,3.456,202
+General purpose,current,m5a.16xlarge,0,64,AMD EPYC 7571,2.5 GHz,M5A 16xlarge,256,12 Gigabit,0,0,,,,,2.752,202
+Compute optimized,current,c6i.12xlarge,0,48,Intel Xeon 8375C (Ice Lake),3.5 GHz,C6I 12xlarge,96,18.75 Gigabit,0,0,,,,,2.04,202
+Memory optimized,current,r5a.large,0,2,AMD EPYC 7571,2.5 GHz,R5A Large,16,Up to 10 Gigabit,0,0,,,,,0.113,202
+Memory optimized,current,r6a.8xlarge,0,32,AMD EPYC 7R13 Processor,3.6 GHz,R6A Eight Extra Large,256,12.5 Gigabit,0,0,,,,,1.8144,202
+Compute optimized,current,c7gn.4xlarge,0,16,AWS Graviton3 Processor,2.6 GHz,C7GN Quadruple Extra Large,32,50 Gigabit,0,0,,,,,0.9984,202
+Compute optimized,previous,c3.large,7,2,Intel Xeon E5-2680 v2 (Ivy Bridge),2.8 GHz,C3 High-CPU Large,3.75,Moderate,0,0,2,true,false,16,0.105,202
+Compute optimized,current,c6a.48xlarge,0,192,AMD EPYC 7R13 Processor,3.6 GHz,C6A 48xlarge,384,50 Gigabit,0,0,,,,,7.344,202
+General purpose,current,m6i.16xlarge,0,64,Intel Xeon 8375C (Ice Lake),3.5 GHz,M6I 16xlarge,256,25 Gigabit,0,0,,,,,3.072,202
+General purpose,current,m7a.medium,0,1,AMD EPYC 9R14 Processor,3.7 GHz,M7A Medium,4,Up to 12.5 Gigabit,0,0,,,,,0.05796,202
+Compute optimized,current,c6gd.medium,0,1,AWS Graviton2 Processor,2.5 GHz,C6GD Medium,2,Up to 10 Gigabit,0,0,1,true,true,59,0.0384,202
+Machine Learning ASIC Instances,current,inf1.24xlarge,0,96,Intel Xeon Platinum 8275CL (Cascade Lake),,INF1 24xlarge,192,100 Gigabit,0,16,,,,,4.721,202
+Memory optimized,current,r5a.24xlarge,0,96,AMD EPYC 7571,2.5 GHz,R5A 24xlarge,768,20 Gigabit,0,0,,,,,5.424,202
+General purpose,current,m7i-flex.xlarge,0,4,Intel Xeon Scalable (Sapphire Rapids),3.5 GHz,M7I-FLEX Extra Large,16,Up to 12.5 Gigabit,0,0,,,,,0.19152,202
+GPU instance,current,g3.16xlarge,201,64,Intel Xeon E5-2686 v4 (Broadwell),2.3 GHz,G3 Graphics GPU 16xlarge,488,25 Gigabit,0,4,,,,,4.56,202
+General purpose,previous,a1.2xlarge,0,8,AWS Graviton Processor,2.3 GHz,A1 Double Extra Large,16,Up to 10 Gigabit,0,0,,,,,0.204,202
+Storage optimized,current,i3en.large,10,2,Intel Xeon Platinum 8175,3.1 GHz,I3EN Large,16,Up to 25 Gigabit,0,0,1,true,true,1250,0.226,202
+General purpose,current,m7a.12xlarge,0,48,AMD EPYC 9R14 Processor,3.7 GHz,M7A 12xlarge,192,18.75 Gigabit,0,0,,,,,2.78208,202
+Memory optimized,current,r7a.24xlarge,0,96,AMD EPYC 9R14 Processor,3.7 GHz,R7A 24xlarge,768,37.5 Gigabit,0,0,,,,,7.3032,202
+Memory optimized,current,r6in.12xlarge,0,48,Intel Xeon 8375C (Ice Lake),3.5 GHz,R6IN 12xlarge,384,75 Gigabit,0,0,,,,,4.18392,202
+General purpose,current,m6in.xlarge,0,4,Intel Xeon 8375C (Ice Lake),3.5 GHz,M6IN Extra Large,16,Up to 30 Gigabit,0,0,,,,,0.27846,202
+Memory optimized,current,u-6tb1.56xlarge,0,224,Intel Xeon Scalable (Skylake),,U-6TB1 56xlarge,6144,100 Gigabit,0,0,,,,,46.40391,202
+Compute optimized,current,c5n.4xlarge,73,16,Intel Xeon Platinum 8124M,3 GHz,C5N Quadruple Extra Large,42,Up to 25 Gigabit,0,0,,,,,0.864,202
+General purpose,current,m7gd.16xlarge,0,64,AWS Graviton3 Processor,2.5 GHz,M7GD 16xlarge,256,30 Gigabit,0,0,2,true,true,1900,3.4171,202
+Compute optimized,current,c7a.4xlarge,0,16,AMD EPYC 9R14 Processor,3.7 GHz,C7A Quadruple Extra Large,32,Up to 12.5 Gigabit,0,0,,,,,0.82112,202
+Compute optimized,current,c4.xlarge,16,4,Intel Xeon E5-2666 v3 (Haswell),2.9 GHz,C4 High-CPU Extra Large,7.5,High,0,0,,,,,0.199,202
+Memory optimized,current,x1e.4xlarge,47,16,High Frequency Intel Xeon E7-8880 v3 (Haswell),2.3 GHz,X1E Quadruple Extra Large,488,Up to 10 Gigabit,0,0,1,true,false,480,3.336,202
+Memory optimized,current,x1e.32xlarge,340,128,High Frequency Intel Xeon E7-8880 v3 (Haswell),2.3 GHz,X1E 32xlarge,3904,25 Gigabit,0,0,2,true,false,1920,26.688,202
+General purpose,current,m5d.xlarge,16,4,Intel Xeon Platinum 8175,3.1 GHz,M5 General Purpose Extra Large,16,Up to 10 Gigabit,0,0,1,true,true,150,0.226,202
+General purpose,current,m5ad.xlarge,0,4,AMD EPYC 7571,2.5 GHz,M5AD Extra Large,16,Up to 10 Gigabit,0,0,1,true,true,150,0.206,202
+Compute optimized,current,c6id.metal,0,128,Intel Xeon 8375C (Ice Lake),3.5 GHz,C6ID Metal,256,50 Gigabit,0,0,4,true,true,1900,6.4512,202
+Storage optimized,current,i3en.24xlarge,337,96,Intel Xeon Platinum 8175,3.1 GHz,I3EN 24xlarge,768,100 Gigabit,0,0,8,true,true,7500,10.848,202
+Compute optimized,current,c5n.18xlarge,281,72,Intel Xeon Platinum 8124M,3 GHz,C5N 18xlarge,192,100 Gigabit,0,0,,,,,3.888,202
+General purpose,current,m5d.16xlarge,256,64,Intel Xeon Platinum 8175,3.1 GHz,M5 General Purpose 16xlarge,256,20 Gigabit,0,0,4,true,true,600,3.616,202
+Memory optimized,current,r6a.large,0,2,AMD EPYC 7R13 Processor,3.6 GHz,R6A Large,16,Up to 12.5 Gigabit,0,0,,,,,0.1134,202
+Compute optimized,current,c7gd.2xlarge,0,8,AWS Graviton3 Processor,2.5 GHz,C7GD Double Extra Large,16,Up to 15 Gigabit,0,0,1,true,true,474,0.3629,202
+Compute optimized,current,c6gd.metal,0,64,AWS Graviton2 Processor,2.5 GHz,C6GD Metal,128,25 Gigabit,0,0,2,true,true,1900,2.4576,202
+General purpose,current,m6a.xlarge,0,4,AMD EPYC 7R13 Processor,3.6 GHz,M6A Extra Large,16,Up to 12.5 Gigabit,0,0,,,,,0.1728,202
+General purpose,current,m4.large,6.5,2,Intel Xeon E5-2676 v3 (Haswell),2.4 GHz,M4 General Purpose Large,8,Moderate,0,0,,,,,0.1,202
+General purpose,current,t3.medium,variable,2,Intel Skylake E5 2686 v5,3.1 GHz,T3 Medium,4,Up to 5 Gigabit,0,0,,,,,0.0416,202
+Memory optimized,current,r7i.metal-24xl,0,96,Intel Xeon Scalable (Sapphire Rapids),3.2 GHz,R7I Metal-24xl,768,37.5 Gigabit,0,0,,,,,6.3504,202
+Storage optimized,current,h1.4xlarge,58,16,Intel Xeon E5-2686 v4 (Broadwell),2.3 GHz,H1 Quadruple Extra Large,64,Up to 10 Gigabit,0,0,2,false,false,2000,0.936,202
+Memory optimized,current,x1e.xlarge,12,4,High Frequency Intel Xeon E7-8880 v3 (Haswell),2.3 GHz,X1E Extra Large,122,Up to 10 Gigabit,0,0,1,true,false,120,0.834,202
+Memory optimized,current,x2iezn.6xlarge,0,24,Intel Xeon Platinum 8252,4.5 GHz,X2IEZN 6xlarge,768,50 Gigabit,0,0,,,,,5.004,202
+General purpose,current,m7i.24xlarge,0,96,Intel Xeon Scalable (Sapphire Rapids),3.2 GHz,M7I 24xlarge,384,37.5 Gigabit,0,0,,,,,4.8384,202
+General purpose,current,m5dn.24xlarge,0,96,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,M5DN 24xlarge,384,100 Gigabit,0,0,4,true,true,900,6.528,202
+Compute optimized,current,c6i.2xlarge,0,8,Intel Xeon 8375C (Ice Lake),3.5 GHz,C6I Double Extra Large,16,Up to 12.5 Gigabit,0,0,,,,,0.34,202
+GPU instance,current,g5.4xlarge,0,16,AMD EPYC 7R32,2.8 GHz,G5 Graphics and Machine Learning GPU Quadruple Extra Large,64,Up to 25 Gigabit,0,1,1,true,true,600,1.624,202
+Memory optimized,current,r7a.8xlarge,0,32,AMD EPYC 9R14 Processor,3.7 GHz,R7A Eight Extra Large,256,12.5 Gigabit,0,0,,,,,2.4344,202
+Memory optimized,current,r7iz.16xlarge,0,64,Intel Xeon Scalable (Sapphire Rapids),3.9 GHz,R7IZ 16xlarge,512,25 Gigabit,0,0,,,,,5.952,202
+General purpose,current,m5dn.metal,0,96,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,M5DN Metal,384,100 Gigabit,0,0,4,true,true,900,6.528,202
+General purpose,current,m6idn.12xlarge,0,48,Intel Xeon 8375C (Ice Lake),3.5 GHz,M6IDN 12xlarge,192,75 Gigabit,0,0,2,true,true,1425,3.81888,202
+GPU instance,current,g4dn.8xlarge,0,32,Intel Xeon Family,2.5 GHz,G4DN Eight Extra Large,128,50 Gigabit,0,1,1,true,true,900,2.176,202
+General purpose,current,m5a.large,0,2,AMD EPYC 7571,2.5 GHz,M5A Large,8,Up to 10 Gigabit,0,0,,,,,0.086,202
+Memory optimized,current,r7i.8xlarge,0,32,Intel Xeon Scalable (Sapphire Rapids),3.2 GHz,R7I Eight Extra Large,256,12.5 Gigabit,0,0,,,,,2.1168,202
+Memory optimized,current,r5n.large,0,2,Intel Xeon Platinum 8259 (Cascade Lake),2.5 GHz,R5N Large,16,Up to 25 Gigabit,0,0,,,,,0.149,202
+Memory optimized,current,r6id.8xlarge,0,32,Intel Xeon 8375C (Ice Lake),3.5 GHz,R6ID Eight Extra Large,256,12.5 Gigabit,0,0,1,true,true,1900,2.4192,202
+General purpose,current,m5.large,10,2,Intel Xeon Platinum 8175,3.1 GHz,M5 General Purpose Large,8,Up to 10 Gigabit,0,0,,,,,0.096,202
+Compute optimized,current,c5.4xlarge,73,16,Intel Xeon Platinum 8124M,3 GHz,C5 High-CPU Quadruple Extra Large,32,Up to 10 Gigabit,0,0,,,,,0.68,202
+Memory optimized,current,r7g.large,0,2,AWS Graviton3 Processor,2.5 GHz,R7G Large,16,Up to 12.5 Gigabit,0,0,,,,,0.1071,202
+General purpose,current,m5.16xlarge,256,64,Intel Xeon Platinum 8175,3.1 GHz,M5 General Purpose 16xlarge,256,20 Gigabit,0,0,,,,,3.072,202
+General purpose,current,m7a.32xlarge,0,128,AMD EPYC 9R14 Processor,3.7 GHz,M7A 32xlarge,512,50 Gigabit,0,0,,,,,7.41888,202
+Memory optimized,previous,r3.large,6.5,2,Intel Xeon E5-2670 v2 (Ivy Bridge),2.5 GHz,R3 High-Memory Large,15.25,Moderate,0,0,1,true,false,32,0.166,202
+General purpose,current,m7g.2xlarge,0,8,AWS Graviton3 Processor,2.5 GHz,M7G Double Extra Large,32,Up to 15 Gigabit,0,0,,,,,0.3264,202
+General purpose,current,m5dn.16xlarge,0,64,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,M5DN 16xlarge,256,75 Gigabit,0,0,4,true,true,600,4.352,202
+General purpose,current,m6id.large,0,2,Intel Xeon 8375C (Ice Lake),3.5 GHz,M6ID Large,8,Up to 12.5 Gigabit,0,0,1,true,true,118,0.11865,202
+General purpose,current,m6a.8xlarge,0,32,AMD EPYC 7R13 Processor,3.6 GHz,M6A Eight Extra Large,128,12.5 Gigabit,0,0,,,,,1.3824,202
+Compute optimized,current,c6a.32xlarge,0,128,AMD EPYC 7R13 Processor,3.6 GHz,C6A 32xlarge,256,50 Gigabit,0,0,,,,,4.896,202
+Storage optimized,current,i4i.24xlarge,0,96,Intel Xeon 8375C (Ice Lake),3.5 GHz,I4I 24xlarge,768,56.25 Gigabit,0,0,6,true,true,3750,8.2368,202
+Memory optimized,current,r7iz.metal-32xl,0,128,Intel Xeon Scalable (Sapphire Rapids),3.9 GHz,R7IZ Metal-32xl,1024,50 Gigabit,0,0,,,,,11.904,202
+Compute optimized,current,c7a.32xlarge,0,128,AMD EPYC 9R14 Processor,3.7 GHz,C7A 32xlarge,256,50 Gigabit,0,0,,,,,6.56896,202
+Memory optimized,current,r5n.2xlarge,0,8,Intel Xeon Platinum 8259 (Cascade Lake),2.5 GHz,R5N Double Extra Large,64,Up to 25 Gigabit,0,0,,,,,0.596,202
+Compute optimized,current,c7i.metal-48xl,0,192,Intel Xeon Scalable (Sapphire Rapids),3.2 GHz,C7I Metal-48xl,384,50 Gigabit,0,0,,,,,8.568,202
+Compute optimized,current,c4.large,8,2,Intel Xeon E5-2666 v3 (Haswell),2.9 GHz,C4 High-CPU Large,3.75,Moderate,0,0,,,,,0.1,202
+Compute optimized,current,c7a.12xlarge,0,48,AMD EPYC 9R14 Processor,3.7 GHz,C7A 12xlarge,96,18.75 Gigabit,0,0,,,,,2.46336,202
+Memory optimized,current,r5dn.16xlarge,0,64,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,R5DN 16xlarge,512,75 Gigabit,0,0,4,true,true,600,5.344,202
+Memory optimized,current,r5d.xlarge,19,4,Intel Xeon Platinum 8175,3.1 GHz,R5D Extra Large,32,Up to 10 Gigabit,0,0,1,true,true,150,0.288,202
+General purpose,current,m4.4xlarge,53.5,16,Intel Xeon E5-2676 v3 (Haswell),2.4 GHz,M4 General Purpose Quadruple Extra Large,64,High,0,0,,,,,0.8,202
+Compute optimized,current,c7a.48xlarge,0,192,AMD EPYC 9R14 Processor,3.7 GHz,C7A 48xlarge,384,50 Gigabit,0,0,,,,,9.85344,202
+Memory optimized,current,u-24tb1.112xlarge,0,448,Intel Xeon Platinum 8280L (Cascade Lake),,U-24TB1 112xlarge,24576,100 Gigabit,0,0,,,,,218.4,202
+General purpose,current,m6i.8xlarge,0,32,Intel Xeon 8375C (Ice Lake),3.5 GHz,M6I Eight Extra Large,128,12.5 Gigabit,0,0,,,,,1.536,202
+Memory optimized,current,x2iezn.2xlarge,0,8,Intel Xeon Platinum 8252,4.5 GHz,X2IEZN Double Extra Large,256,Up to 25 Gigabit,0,0,,,,,1.668,202
+Compute optimized,current,c7gd.xlarge,0,4,AWS Graviton3 Processor,2.5 GHz,C7GD Extra Large,8,Up to 12.5 Gigabit,0,0,1,true,true,237,0.1814,202
+Memory optimized,current,r5.2xlarge,37,8,Intel Xeon Platinum 8175,3.1 GHz,R5 Double Extra Large,64,Up to 10 Gigabit,0,0,,,,,0.504,202
+General purpose,previous,m3.2xlarge,26,8,Intel Xeon E5-2670 v2 (Ivy Bridge/Sandy Bridge),2.5 GHz,M3 General Purpose Double Extra Large,30,High,0,0,2,true,false,80,0.532,202
+General purpose,current,m6g.metal,0,64,AWS Graviton2 Processor,,M6G Metal,256,25 Gigabit,0,0,,,,,2.464,202
+Compute optimized,previous,c3.2xlarge,28,8,Intel Xeon E5-2680 v2 (Ivy Bridge),2.8 GHz,C3 High-CPU Double Extra Large,15,High,0,0,2,true,false,80,0.42,202
+Memory optimized,current,r7iz.metal-16xl,0,64,Intel Xeon Scalable (Sapphire Rapids),3.9 GHz,R7IZ Metal-16xl,512,25 Gigabit,0,0,,,,,5.952,202
+Memory optimized,current,r7i.16xlarge,0,64,Intel Xeon Scalable (Sapphire Rapids),3.2 GHz,R7I 16xlarge,512,25 Gigabit,0,0,,,,,4.2336,202
+General purpose,current,m6in.32xlarge,0,128,Intel Xeon 8375C (Ice Lake),3.5 GHz,M6IN 32xlarge,512,200 Gigabit,0,0,,,,,8.91072,202
+Compute optimized,current,c5n.9xlarge,139,36,Intel Xeon Platinum 8124M,3 GHz,C5N 9xlarge,96,50 Gigabit,0,0,,,,,1.944,202
+Compute optimized,current,c5d.24xlarge,375,96,Intel Xeon Platinum 8275L,3 GHz,C5 High-CPU 24xlarge,192,25 Gigabit,0,0,4,true,true,900,4.608,202
+General purpose,current,m5a.12xlarge,0,48,AMD EPYC 7571,2.5 GHz,M5A 12xlarge,192,10 Gigabit,0,0,,,,,2.064,202
+Compute optimized,current,c6in.2xlarge,0,8,Intel Xeon 8375C (Ice Lake),3.5 GHz,C6IN Double Extra Large,16,Up to 40 Gigabit,0,0,,,,,0.4536,202
+General purpose,current,m6i.metal,0,128,Intel Xeon 8375C (Ice Lake),3.5 GHz,M6I Metal,512,50 Gigabit,0,0,,,,,6.144,202
+Memory optimized,current,x2gd.4xlarge,0,16,AWS Graviton2 Processor,2.5 GHz,X2GD Quadruple Extra Large,256,Up to 10 Gigabit,0,0,1,true,true,950,1.336,202
+Memory optimized,previous,r3.xlarge,13,4,Intel Xeon E5-2670 v2 (Ivy Bridge),2.5 GHz,R3 High-Memory Extra Large,30.5,Moderate,0,0,1,true,false,80,0.333,202
+Memory optimized,current,r7i.24xlarge,0,96,Intel Xeon Scalable (Sapphire Rapids),3.2 GHz,R7I 24xlarge,768,37.5 Gigabit,0,0,,,,,6.3504,202
+General purpose,current,m5ad.16xlarge,0,64,AMD EPYC 7571,2.5 GHz,M5AD 16xlarge,256,12 Gigabit,0,0,4,true,true,600,3.296,202
+Memory optimized,current,r7a.medium,0,1,AMD EPYC 9R14 Processor,3.7 GHz,R7A Medium,8,Up to 12.5 Gigabit,0,0,,,,,0.07608,202
+Compute optimized,current,c6id.16xlarge,0,64,Intel Xeon 8375C (Ice Lake),3.5 GHz,C6ID 16xlarge,128,25 Gigabit,0,0,2,true,true,1900,3.2256,202
+General purpose,current,m5n.12xlarge,0,48,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,M5N 12xlarge,192,50 Gigabit,0,0,,,,,2.856,202
+General purpose,current,m5d.2xlarge,37,8,Intel Xeon Platinum 8175,3.1 GHz,M5 General Purpose Double Extra Large,32,Up to 10 Gigabit,0,0,1,true,true,300,0.452,202
+General purpose,current,m6a.48xlarge,0,192,AMD EPYC 7R13 Processor,3.6 GHz,M6A 48xlarge,768,50 Gigabit,0,0,,,,,8.2944,202
+Memory optimized,current,r6idn.4xlarge,0,16,Intel Xeon 8375C (Ice Lake),3.5 GHz,R6IDN Quadruple Extra Large,128,Up to 50 Gigabit,0,0,1,true,true,950,1.56312,202
+Memory optimized,current,r6id.32xlarge,0,128,Intel Xeon 8375C (Ice Lake),3.5 GHz,R6ID 32xlarge,1024,50 Gigabit,0,0,4,true,true,1900,9.6768,202
+General purpose,current,m4.10xlarge,124.5,40,Intel Xeon E5-2676 v3 (Haswell),2.4 GHz,M4 General Purpose Deca Extra Large,160,10 Gigabit,0,0,,,,,2,202
+General purpose,current,m5ad.large,0,2,AMD EPYC 7571,2.5 GHz,M5AD Large,8,Up to 10 Gigabit,0,0,1,true,true,75,0.103,202
+Memory optimized,current,r6a.xlarge,0,4,AMD EPYC 7R13 Processor,3.6 GHz,R6A Extra Large,32,Up to 12.5 Gigabit,0,0,,,,,0.2268,202
+Memory optimized,current,x2iezn.4xlarge,0,16,Intel Xeon Platinum 8252,4.5 GHz,X2IEZN Quadruple Extra Large,512,Up to 25 Gigabit,0,0,,,,,3.336,202
+Compute optimized,current,c5d.large,10,2,Intel Xeon Platinum 8124M,3 GHz,C5 High-CPU Large,4,Up to 10 Gigabit,0,0,1,true,true,50,0.096,202
+Compute optimized,current,c6i.4xlarge,0,16,Intel Xeon 8375C (Ice Lake),3.5 GHz,C6I Quadruple Extra Large,32,Up to 12.5 Gigabit,0,0,,,,,0.68,202
+Memory optimized,current,r5d.2xlarge,37,8,Intel Xeon Platinum 8175,3.1 GHz,R5D Double Extra Large,64,Up to 10 Gigabit,0,0,1,true,true,300,0.576,202
+Compute optimized,current,c7a.medium,0,1,AMD EPYC 9R14 Processor,3.7 GHz,C7A Medium,2,Up to 12.5 Gigabit,0,0,,,,,0.05132,202
+Compute optimized,current,c7a.16xlarge,0,64,AMD EPYC 9R14 Processor,3.7 GHz,C7A 16xlarge,128,25 Gigabit,0,0,,,,,3.28448,202
+Memory optimized,current,r7g.4xlarge,0,16,AWS Graviton3 Processor,2.5 GHz,R7G Quadruple Extra Large,128,Up to 15 Gigabit,0,0,,,,,0.8568,202
+General purpose,current,m6g.2xlarge,0,8,AWS Graviton2 Processor,,M6G Double Extra Large,32,Up to 10 Gigabit,0,0,,,,,0.308,202
+Memory optimized,current,r7i.metal-48xl,0,192,Intel Xeon Scalable (Sapphire Rapids),3.2 GHz,R7I Metal-48xl,1536,50 Gigabit,0,0,,,,,12.7008,202
+Memory optimized,current,r5b.24xlarge,0,96,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,R5B 24xlarge,768,25 Gigabit,0,0,,,,,7.152,202
+Memory optimized,current,x2gd.2xlarge,0,8,AWS Graviton2 Processor,2.5 GHz,X2GD Double Extra Large,128,Up to 10 Gigabit,0,0,1,true,true,475,0.668,202
+General purpose,current,m4.16xlarge,188,64,Intel Xeon E5-2686 v4 (Broadwell),2.4 GHz,M4 General Purpose 16xlarge,256,25 Gigabit,0,0,,,,,3.2,202
+Memory optimized,current,r5d.metal,347,96,Intel Xeon Platinum 8175,3.1 GHz,R5D Metal,768,25 Gigabit,0,0,4,true,true,900,6.912,202
+Storage optimized,previous,i2.4xlarge,53,16,Intel Xeon E5-2670 v2 (Ivy Bridge),2.5 GHz,I2 Quadruple Extra Large,122,High,0,0,4,true,false,800,3.41,202
+General purpose,current,m7a.xlarge,0,4,AMD EPYC 9R14 Processor,3.7 GHz,M7A Extra Large,16,Up to 12.5 Gigabit,0,0,,,,,0.23184,202
+Compute optimized,current,c6a.2xlarge,0,8,AMD EPYC 7R13 Processor,3.6 GHz,C6A Double Extra Large,16,Up to 12.5 Gigabit,0,0,,,,,0.306,202
+Memory optimized,current,r5n.16xlarge,0,64,Intel Xeon Platinum 8259 (Cascade Lake),2.5 GHz,R5N 16xlarge,512,75 Gigabit,0,0,,,,,4.768,202
+Compute optimized,current,c7i.8xlarge,0,32,Intel Xeon Scalable (Sapphire Rapids),3.2 GHz,C7I Eight Extra Large,64,12.5 Gigabit,0,0,,,,,1.428,202
+Compute optimized,current,c6in.8xlarge,0,32,Intel Xeon 8375C (Ice Lake),3.5 GHz,C6IN Eight Extra Large,64,50 Gigabit,0,0,,,,,1.8144,202
+Compute optimized,current,c6i.16xlarge,0,64,Intel Xeon 8375C (Ice Lake),3.5 GHz,C6I 16xlarge,128,25 Gigabit,0,0,,,,,2.72,202
+Memory optimized,current,r5a.16xlarge,0,64,AMD EPYC 7571,2.5 GHz,R5A 16xlarge,512,12 Gigabit,0,0,,,,,3.616,202
+Compute optimized,current,c7i.2xlarge,0,8,Intel Xeon Scalable (Sapphire Rapids),3.2 GHz,C7I Double Extra Large,16,Up to 12.5 Gigabit,0,0,,,,,0.357,202
+Memory optimized,current,x1.32xlarge,349,128,High Frequency Intel Xeon E7-8880 v3 (Haswell),2.3 GHz,X1 Extra High-Memory 32xlarge,1952,25 Gigabit,0,0,2,true,false,1920,13.338,202
+General purpose,current,m7gd.8xlarge,0,32,AWS Graviton3 Processor,2.5 GHz,M7GD Eight Extra Large,128,15 Gigabit,0,0,1,true,true,1900,1.7086,202
+GPU instance,current,g4dn.metal,0,96,Intel Xeon Family,2.5 GHz,G4DN Metal,384,100 Gigabit,0,8,2,true,true,900,7.824,202
+Storage optimized,current,i4i.2xlarge,0,8,Intel Xeon 8375C (Ice Lake),3.5 GHz,I4I Double Extra Large,64,Up to 12 Gigabit,0,0,1,true,true,1875,0.686,202
+Compute optimized,current,c7gn.16xlarge,0,64,AWS Graviton3 Processor,2.6 GHz,C7GN 16xlarge,128,200 Gigabit,0,0,,,,,3.9936,202
+Compute optimized,current,c7i.metal-24xl,0,96,Intel Xeon Scalable (Sapphire Rapids),3.2 GHz,C7I Metal-24xl,192,37.5 Gigabit,0,0,,,,,4.284,202
+General purpose,current,m6in.4xlarge,0,16,Intel Xeon 8375C (Ice Lake),3.5 GHz,M6IN Quadruple Extra Large,64,Up to 50 Gigabit,0,0,,,,,1.11384,202
+Memory optimized,current,r6idn.12xlarge,0,48,Intel Xeon 8375C (Ice Lake),3.5 GHz,R6IDN 12xlarge,384,75 Gigabit,0,0,2,true,true,1425,4.68936,202
+Compute optimized,current,c5n.2xlarge,39,8,Intel Xeon Platinum 8124M,3 GHz,C5N Double Extra Large,21,Up to 25 Gigabit,0,0,,,,,0.432,202
+Compute optimized,current,c6gn.12xlarge,0,48,AWS Graviton2 Processor,2.5 GHz,C6GN 12xlarge,96,75 Gigabit,0,0,,,,,2.0736,202
+Memory optimized,current,r5n.8xlarge,0,32,Intel Xeon Platinum 8259 (Cascade Lake),2.5 GHz,R5N Eight Extra Large,256,25 Gigabit,0,0,,,,,2.384,202
+Storage optimized,current,d3en.xlarge,0,4,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,D3EN Extra Large,16,Up to 25 Gigabit,0,0,2,false,true,13980,0.526,202
+General purpose,current,m6idn.8xlarge,0,32,Intel Xeon 8375C (Ice Lake),3.5 GHz,M6IDN Eight Extra Large,128,50 Gigabit,0,0,1,true,true,1900,2.54592,202
+Compute optimized,current,c7i.24xlarge,0,96,Intel Xeon Scalable (Sapphire Rapids),3.2 GHz,C7I 24xlarge,192,37.5 Gigabit,0,0,,,,,4.284,202
+Compute optimized,current,c6i.large,0,2,Intel Xeon 8375C (Ice Lake),3.5 GHz,C6I Large,4,Up to 12.5 Gigabit,0,0,,,,,0.085,202
+GPU instance,current,g4ad.8xlarge,0,32,AMD EPYC 7R32,2.8 GHz,G4AD Eight Extra Large,128,15 Gigabit,0,2,1,true,true,1200,1.734,202
+General purpose,current,m5.metal,345,96,Intel Xeon Platinum 8175,3.1 GHz,M5 General Purpose Metal,384,25 Gigabit,0,0,,,,,4.608,202
+General purpose,current,m6in.large,0,2,Intel Xeon 8375C (Ice Lake),3.5 GHz,M6IN Large,8,Up to 25 Gigabit,0,0,,,,,0.13923,202
+General purpose,current,m5dn.large,0,2,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,M5DN Large,8,Up to 25 Gigabit,0,0,1,true,true,75,0.136,202
+General purpose,current,m7i.12xlarge,0,48,Intel Xeon Scalable (Sapphire Rapids),3.2 GHz,M7I 12xlarge,192,18.75 Gigabit,0,0,,,,,2.4192,202
+GPU instance,current,p3.16xlarge,201,64,Intel Xeon E5-2686 v4 (Broadwell),2.3 GHz,P3 High Performance GPU 16xlarge,488,25 Gigabit,0,8,,,,,24.48,202
+Memory optimized,current,r6id.4xlarge,0,16,Intel Xeon 8375C (Ice Lake),3.5 GHz,R6ID Quadruple Extra Large,128,Up to 12.5 Gigabit,0,0,1,true,true,950,1.2096,202
+General purpose,current,m6a.large,0,2,AMD EPYC 7R13 Processor,3.6 GHz,M6A Large,8,Up to 12.5 Gigabit,0,0,,,,,0.0864,202
+Memory optimized,current,r6id.24xlarge,0,96,Intel Xeon 8375C (Ice Lake),3.5 GHz,R6ID 24xlarge,768,37.5 Gigabit,0,0,4,true,true,1425,7.2576,202
+General purpose,current,m7i-flex.2xlarge,0,8,Intel Xeon Scalable (Sapphire Rapids),3.5 GHz,M7I-FLEX Double Extra Large,32,Up to 12.5 Gigabit,0,0,,,,,0.38304,202
+Memory optimized,current,r5d.4xlarge,70,16,Intel Xeon Platinum 8175,3.1 GHz,R5D Quadruple Extra Large,128,Up to 10 Gigabit,0,0,2,true,true,300,1.152,202
+Memory optimized,current,r7a.48xlarge,0,192,AMD EPYC 9R14 Processor,3.7 GHz,R7A 48xlarge,1536,50 Gigabit,0,0,,,,,14.6064,202
+General purpose,current,m7a.16xlarge,0,64,AMD EPYC 9R14 Processor,3.7 GHz,M7A 16xlarge,256,25 Gigabit,0,0,,,,,3.70944,202
+Memory optimized,current,r6id.16xlarge,0,64,Intel Xeon 8375C (Ice Lake),3.5 GHz,R6ID 16xlarge,512,25 Gigabit,0,0,2,true,true,1900,4.8384,202
+Compute optimized,current,c7g.xlarge,0,4,AWS Graviton3 Processor,2.5 GHz,C7G Extra Large,8,Up to 12.5 Gigabit,0,0,,,,,0.145,202
+Memory optimized,current,r6gd.12xlarge,0,48,AWS Graviton2 Processor,2.5 GHz,R6GD 12xlarge,384,20 Gigabit,0,0,2,true,true,1425,2.7648,202
+Storage optimized,current,i4i.4xlarge,0,16,Intel Xeon 8375C (Ice Lake),3.5 GHz,I4I Quadruple Extra Large,128,Up to 25 Gigabit,0,0,1,true,true,3750,1.373,202
+Memory optimized,current,r6g.2xlarge,0,8,AWS Graviton2 Processor,2.5 GHz,R6G Double Extra Large,64,Up to 10 Gigabit,0,0,,,,,0.4032,202
+General purpose,previous,m3.large,6.5,2,Intel Xeon E5-2670 v2 (Ivy Bridge/Sandy Bridge),2.5 GHz,M3 General Purpose Large,7.5,Moderate,0,0,1,true,false,32,0.133,202
+General purpose,current,m7i.2xlarge,0,8,Intel Xeon Scalable (Sapphire Rapids),3.2 GHz,M7I Double Extra Large,32,Up to 12.5 Gigabit,0,0,,,,,0.4032,202
+General purpose,current,m6i.4xlarge,0,16,Intel Xeon 8375C (Ice Lake),3.5 GHz,M6I Quadruple Extra Large,64,Up to 12.5 Gigabit,0,0,,,,,0.768,202
+Compute optimized,current,c5d.4xlarge,73,16,Intel Xeon Platinum 8124M,3 GHz,C5 High-CPU Quadruple Extra Large,32,Up to 10 Gigabit,0,0,1,true,true,400,0.768,202
+Compute optimized,current,c6gd.12xlarge,0,48,AWS Graviton2 Processor,2.5 GHz,C6GD 12xlarge,96,20 Gigabit,0,0,2,true,true,1425,1.8432,202
+Compute optimized,current,c7i.4xlarge,0,16,Intel Xeon Scalable (Sapphire Rapids),3.2 GHz,C7I Quadruple Extra Large,32,Up to 12.5 Gigabit,0,0,,,,,0.714,202
+Memory optimized,current,r5n.4xlarge,0,16,Intel Xeon Platinum 8259 (Cascade Lake),2.5 GHz,R5N Quadruple Extra Large,128,Up to 25 Gigabit,0,0,,,,,1.192,202
+General purpose,current,m5n.2xlarge,0,8,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,M5N Double Extra Large,32,Up to 25 Gigabit,0,0,,,,,0.476,202
+Memory optimized,current,r5.24xlarge,337,96,Intel Xeon Platinum 8175,3.1 GHz,R5 24xlarge,768,25 Gigabit,0,0,,,,,6.048,202
+Memory optimized,current,r5ad.12xlarge,0,48,AMD EPYC 7571,2.5 GHz,R5AD 12xlarge,384,10 Gigabit,0,0,2,true,true,900,3.144,202
+Memory optimized,current,x2iedn.8xlarge,0,32,Intel Xeon Scalable (Icelake),3.5 GHz,X2IEDN Eight Extra Large,1024,25 Gigabit,0,0,1,true,true,950,6.669,202
+General purpose,current,m5dn.12xlarge,0,48,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,M5DN 12xlarge,192,50 Gigabit,0,0,2,true,true,900,3.264,202
+Compute optimized,current,c6gd.2xlarge,0,8,AWS Graviton2 Processor,2.5 GHz,C6GD Double Extra Large,16,Up to 10 Gigabit,0,0,1,true,true,474,0.3072,202
+Memory optimized,current,r5.xlarge,19,4,Intel Xeon Platinum 8175,3.1 GHz,R5 Extra Large,32,Up to 10 Gigabit,0,0,,,,,0.252,202
+Memory optimized,current,r4.large,8,2,Intel Xeon E5-2686 v4 (Broadwell),2.3 GHz,R4 High-Memory Large,15.25,Up to 10 Gigabit,0,0,,,,,0.133,202
+Storage optimized,current,d3en.2xlarge,0,8,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,D3EN Double Extra Large,32,Up to 25 Gigabit,0,0,4,false,true,13980,1.051,202
+Media Accelerator Instances,current,vt1.24xlarge,0,96,Intel Xeon Platinum 8259CL,2.5 GHz,VT1 24xlarge,192,25 Gigabit,0,0,,,,,5.2,202
+Memory optimized,current,x2iedn.xlarge,0,4,Intel Xeon Scalable (Icelake),3.5 GHz,X2IEDN Extra Large,128,Up to 25 Gigabit,0,0,1,true,true,118,0.83363,202
+Memory optimized,current,r7iz.32xlarge,0,128,Intel Xeon Scalable (Sapphire Rapids),3.9 GHz,R7IZ 32xlarge,1024,50 Gigabit,0,0,,,,,11.904,202
+General purpose,current,m6gd.4xlarge,0,16,AWS Graviton2 Processor,2.5 GHz,M6GD Quadruple Extra Large,64,Up to 10 Gigabit,0,0,1,true,true,950,0.7232,202
+Memory optimized,current,x2iedn.metal,0,128,Intel Xeon Scalable (Icelake),3.5 GHz,X2IEDN Metal,4096,100 Gigabit,0,0,2,true,true,1900,26.676,202
+Compute optimized,current,c5n.xlarge,20,4,Intel Xeon Platinum 8124M,3 GHz,C5N Extra Large,10.5,Up to 25 Gigabit,0,0,,,,,0.216,202
+Machine Learning ASIC Instances,current,inf2.8xlarge,0,32,AMD EPYC 7R13 Processor,2.95 GHz,INF2 Eight Extra Large,128,Up to 25 Gigabit,0,1,,,,,1.96786,202
+General purpose,current,m5a.4xlarge,0,16,AMD EPYC 7571,2.5 GHz,M5A Quadruple Extra Large,64,Up to 10 Gigabit,0,0,,,,,0.688,202
+Memory optimized,current,r5ad.2xlarge,0,8,AMD EPYC 7571,2.5 GHz,R5AD Double Extra Large,64,Up to 10 Gigabit,0,0,1,true,true,300,0.524,202
+Compute optimized,current,c7gn.medium,0,1,AWS Graviton3 Processor,2.6 GHz,C7GN Medium,2,Up to 25 Gigabit,0,0,,,,,0.0624,202
+Memory optimized,current,x2iezn.metal,0,48,Intel Xeon Platinum 8252,4.5 GHz,X2IEZN Metal,1536,100 Gigabit,0,0,,,,,10.008,202
+Compute optimized,current,c5a.2xlarge,0,8,AMD EPYC 7R32,3.3 GHz,C5A Double Extra Large,16,Up to 10 Gigabit,0,0,,,,,0.308,202
+General purpose,current,t2.xlarge,variable,4,Intel Xeon Family,Up to 3.3 GHz,T2 Extra Large,16,Moderate,0,0,,,,,0.1856,202
+Memory optimized,current,z1d.metal,271,48,Intel Xeon Platinum 8151,4 GHz,Z1D Metal,384,25 Gigabit,0,0,2,true,true,900,4.464,202
+Compute optimized,current,c6in.32xlarge,0,128,Intel Xeon 8375C (Ice Lake),3.5 GHz,C6IN 32xlarge,256,200 Gigabit,0,0,,,,,7.2576,202
+GPU instance,current,p3dn.24xlarge,337,96,Intel Xeon Platinum 8175 (Skylake),2.5 GHz,P3DN 24xlarge,768,100 Gigabit,0,8,2,true,true,900,31.212,202
+Memory optimized,current,x2gd.metal,0,64,AWS Graviton2 Processor,2.5 GHz,X2GD Metal,1024,25 Gigabit,0,0,2,true,true,1900,5.344,202
+GPU instance,current,g4dn.xlarge,0,4,Intel Xeon Family,2.5 GHz,G4DN Extra Large,16,Up to 25 Gigabit,0,1,1,true,true,125,0.526,202
+GPU instance,current,p2.16xlarge,201,64,Intel Xeon E5-2686 v4 (Broadwell),2.3 GHz,P2 General Purpose GPU 16xlarge,732,25 Gigabit,0,8,,,,,14.4,202
+Memory optimized,current,r6a.48xlarge,0,192,AMD EPYC 7R13 Processor,3.6 GHz,R6A 48xlarge,1536,50 Gigabit,0,0,,,,,10.8864,202
+Compute optimized,previous,c3.8xlarge,108,32,Intel Xeon E5-2680 v2 (Ivy Bridge),2.8 GHz,C3 High-CPU Eight Extra Large,60,10 Gigabit,0,0,2,true,false,320,1.68,202
+Memory optimized,current,r6in.16xlarge,0,64,Intel Xeon 8375C (Ice Lake),3.5 GHz,R6IN 16xlarge,512,100 Gigabit,0,0,,,,,5.57856,202
+General purpose,current,m6id.16xlarge,0,64,Intel Xeon 8375C (Ice Lake),3.5 GHz,M6ID 16xlarge,256,25 Gigabit,0,0,2,true,true,1900,3.7968,202
+Memory optimized,current,r6in.large,0,2,Intel Xeon 8375C (Ice Lake),3.5 GHz,R6IN Large,16,Up to 25 Gigabit,0,0,,,,,0.17433,202
+Compute optimized,current,c7i.12xlarge,0,48,Intel Xeon Scalable (Sapphire Rapids),3.2 GHz,C7I 12xlarge,96,18.75 Gigabit,0,0,,,,,2.142,202
+General purpose,previous,m3.medium,3,1,Intel Xeon E5-2670 v2 (Ivy Bridge/Sandy Bridge),2.5 GHz,M3 General Purpose Medium,3.75,Moderate,0,0,1,true,false,4,0.067,202
+GPU instance,current,g4ad.xlarge,0,4,AMD EPYC 7R32,2.8 GHz,G4AD Extra Large,16,Up to 10 Gigabit,0,1,1,true,true,150,0.37853,202
+General purpose,current,m6i.xlarge,0,4,Intel Xeon 8375C (Ice Lake),3.5 GHz,M6I Extra Large,16,Up to 12.5 Gigabit,0,0,,,,,0.192,202
+Memory optimized,current,r6i.2xlarge,0,8,Intel Xeon 8375C (Ice Lake),3.5 GHz,R6I Double Extra Large,64,Up to 12.5 Gigabit,0,0,,,,,0.504,202
+General purpose,current,m6idn.2xlarge,0,8,Intel Xeon 8375C (Ice Lake),3.5 GHz,M6IDN Double Extra Large,32,Up to 40 Gigabit,0,0,1,true,true,474,0.63648,202
+Memory optimized,current,r5dn.2xlarge,0,8,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,R5DN Double Extra Large,64,Up to 25 Gigabit,0,0,1,true,true,300,0.668,202
+Memory optimized,current,x1e.2xlarge,23,8,High Frequency Intel Xeon E7-8880 v3 (Haswell),2.3 GHz,X1E Double Extra Large,244,Up to 10 Gigabit,0,0,1,true,false,240,1.668,202
+Machine Learning ASIC Instances,current,inf1.2xlarge,0,8,Intel Xeon Platinum 8275CL (Cascade Lake),,INF1 Double Extra Large,16,Up to 25 Gigabit,0,1,,,,,0.362,202
+Memory optimized,current,r6id.xlarge,0,4,Intel Xeon 8375C (Ice Lake),3.5 GHz,R6ID Extra Large,32,Up to 12.5 Gigabit,0,0,1,true,true,237,0.3024,202
+General purpose,current,m6a.32xlarge,0,128,AMD EPYC 7R13 Processor,3.6 GHz,M6A 32xlarge,512,50 Gigabit,0,0,,,,,5.5296,202
+General purpose,current,m6in.24xlarge,0,96,Intel Xeon 8375C (Ice Lake),3.5 GHz,M6IN 24xlarge,384,150 Gigabit,0,0,,,,,6.68304,202
+General purpose,current,m6i.2xlarge,0,8,Intel Xeon 8375C (Ice Lake),3.5 GHz,M6I Double Extra Large,32,Up to 12.5 Gigabit,0,0,,,,,0.384,202
+General purpose,current,m6id.24xlarge,0,96,Intel Xeon 8375C (Ice Lake),3.5 GHz,M6ID 24xlarge,384,37.5 Gigabit,0,0,4,true,true,1425,5.6952,202
+Memory optimized,current,r5.8xlarge,128,32,Intel Xeon Platinum 8175,3.1 GHz,R5 Eight Extra Large,256,10 Gigabit,0,0,,,,,2.016,202
+Memory optimized,current,r6in.metal,0,128,Intel Xeon 8375C (Ice Lake),3.5 GHz,R6IN Metal,1024,200 Gigabit,0,0,,,,,11.15712,202
+Compute optimized,current,c5d.9xlarge,139,36,Intel Xeon Platinum 8124M,3 GHz,C5 High-CPU 9xlarge,72,12 Gigabit,0,0,1,true,true,900,1.728,202
+Storage optimized,current,i3.16xlarge,201,64,Intel Xeon E5-2686 v4 (Broadwell),2.3 GHz,I3 High I/O 16xlarge,488,25 Gigabit,0,0,8,true,true,1900,4.992,202
+GPU instance,current,g3.4xlarge,58,16,Intel Xeon E5-2686 v4 (Broadwell),2.3 GHz,G3 Graphics GPU Quadruple Extra Large,122,Up to 10 Gigabit,0,1,,,,,1.14,202
+Memory optimized,current,r6i.12xlarge,0,48,Intel Xeon 8375C (Ice Lake),3.5 GHz,R6I 12xlarge,384,18.75 Gigabit,0,0,,,,,3.024,202
+GPU instance,current,g5.xlarge,0,4,AMD EPYC 7R32,2.8 GHz,G5 Graphics and Machine Learning GPU Extra Large,16,Up to 10 Gigabit,0,1,1,true,true,250,1.006,202
+Memory optimized,current,x2iedn.16xlarge,0,64,Intel Xeon Scalable (Icelake),3.5 GHz,X2IEDN 16xlarge,2048,50 Gigabit,0,0,1,true,true,1900,13.338,202
+Memory optimized,current,r7a.16xlarge,0,64,AMD EPYC 9R14 Processor,3.7 GHz,R7A 16xlarge,512,25 Gigabit,0,0,,,,,4.8688,202
+General purpose,current,m7gd.4xlarge,0,16,AWS Graviton3 Processor,2.5 GHz,M7GD Quadruple Extra Large,64,Up to 15 Gigabit,0,0,1,true,true,950,0.8543,202
+Storage optimized,current,h1.2xlarge,31,8,Intel Xeon E5-2686 v4 (Broadwell),2.3 GHz,H1 Double Extra Large,32,Up to 10 Gigabit,0,0,1,false,false,2000,0.468,202
+General purpose,current,m5a.8xlarge,0,32,AMD EPYC 7571,2.5 GHz,M5A Eight Extra Large,128,Up to 10 Gigabit,0,0,,,,,1.376,202
+General purpose,current,m6in.metal,0,128,Intel Xeon 8375C (Ice Lake),3.5 GHz,M6IN Metal,512,200 Gigabit,0,0,,,,,8.91072,202
+Memory optimized,current,r6id.2xlarge,0,8,Intel Xeon 8375C (Ice Lake),3.5 GHz,R6ID Double Extra Large,64,Up to 12.5 Gigabit,0,0,1,true,true,474,0.6048,202
+Compute optimized,previous,c3.xlarge,14,4,Intel Xeon E5-2680 v2 (Ivy Bridge),2.8 GHz,C3 High-CPU Extra Large,7.5,Moderate,0,0,2,true,false,40,0.21,202
+General purpose,current,m5zn.6xlarge,0,24,Intel Xeon Platinum 8252,4.5 GHz,M5ZN 6xlarge,96,50 Gigabit,0,0,,,,,1.982,202
+Memory optimized,current,x1e.8xlarge,91,32,High Frequency Intel Xeon E7-8880 v3 (Haswell),2.3 GHz,X1E Eight Extra Large,976,Up to 10 Gigabit,0,0,1,true,false,960,6.672,202
+Storage optimized,current,d3en.6xlarge,0,24,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,D3EN 6xlarge,96,40 Gigabit,0,0,12,false,true,13980,3.154,202
+Memory optimized,current,r5a.2xlarge,0,8,AMD EPYC 7571,2.5 GHz,R5A Double Extra Large,64,Up to 10 Gigabit,0,0,,,,,0.452,202
+Compute optimized,current,c5d.metal,375,96,Intel Xeon Platinum 8275L,3 GHz,C5 High-CPU Metal,192,25 Gigabit,0,0,4,true,true,900,4.608,202
+General purpose,current,m5d.8xlarge,128,32,Intel Xeon Platinum 8175,3.1 GHz,M5 General Purpose Eight Extra Large,128,10 Gigabit,0,0,2,true,true,600,1.808,202
+General purpose,current,t2.small,variable,1,Intel Xeon Family,Up to 3.3 GHz,T2 Small,2,Low to Moderate,0,0,,,,,0.023,202
+Machine Learning ASIC Instances,current,trn1.2xlarge,0,8,Intel Xeon Scalable (Icelake),Up to 3.5 GHz,TRN1 Double Extra Large,32,Up to 12.5 Gigabit,0,1,1,true,true,474,1.34375,202
+GPU instance,current,p5.48xlarge,0,192,AMD EPYC 7R13 Processor,2.95 GHz,P5 48xlarge,2048,3200 Gigabit,0,8,8,true,true,3800,98.32,202
+Compute optimized,current,c7gn.12xlarge,0,48,AWS Graviton3 Processor,2.6 GHz,C7GN 12xlarge,96,150 Gigabit,0,0,,,,,2.9952,202
+Compute optimized,current,c6gn.xlarge,0,4,AWS Graviton2 Processor,2.5 GHz,C6GN Extra Large,8,Up to 25 Gigabit,0,0,,,,,0.1728,202
+Memory optimized,current,r6i.metal,0,128,Intel Xeon 8375C (Ice Lake),3.5 GHz,R6I Metal,1024,50 Gigabit,0,0,,,,,8.064,202
+General purpose,current,m4.xlarge,13,4,Intel Xeon E5-2676 v3 (Haswell),2.4 GHz,M4 General Purpose Extra Large,16,High,0,0,,,,,0.2,202
+General purpose,current,m7a.metal-48xl,0,192,AMD EPYC 9R14 Processor,3.7 GHz,M7A Metal-48xl,768,50 Gigabit,0,0,,,,,11.12832,202
+Memory optimized,current,x2idn.metal,0,128,Intel Xeon Scalable (Icelake),3.5 GHz,X2IDN Metal,2048,100 Gigabit,0,0,2,true,true,1900,13.338,202
+Storage optimized,previous,d2.xlarge,14,4,Intel Xeon E5-2676 v3 (Haswell),2.4 GHz,D2 Extra Large,30.5,Moderate,0,0,3,false,false,2048,0.69,202
+Memory optimized,current,r6a.32xlarge,0,128,AMD EPYC 7R13 Processor,3.6 GHz,R6A 32xlarge,1024,50 Gigabit,0,0,,,,,7.2576,202
+Compute optimized,current,c6in.12xlarge,0,48,Intel Xeon 8375C (Ice Lake),3.5 GHz,C6IN 12xlarge,96,75 Gigabit,0,0,,,,,2.7216,202
+Compute optimized,current,c6i.xlarge,0,4,Intel Xeon 8375C (Ice Lake),3.5 GHz,C6I Extra Large,8,Up to 12.5 Gigabit,0,0,,,,,0.17,202
+Compute optimized,current,c6a.12xlarge,0,48,AMD EPYC 7R13 Processor,3.6 GHz,C6A 12xlarge,96,18.75 Gigabit,0,0,,,,,1.836,202
+Compute optimized,current,c5.2xlarge,39,8,Intel Xeon Platinum 8124M,3 GHz,C5 High-CPU Double Extra Large,16,Up to 10 Gigabit,0,0,,,,,0.34,202
+Memory optimized,current,r6gd.xlarge,0,4,AWS Graviton2 Processor,2.5 GHz,R6GD Extra Large,32,Up to 10 Gigabit,0,0,1,true,true,237,0.2304,202
+Compute optimized,current,c7a.2xlarge,0,8,AMD EPYC 9R14 Processor,3.7 GHz,C7A Double Extra Large,16,Up to 12.5 Gigabit,0,0,,,,,0.41056,202
+GPU instance,current,g4dn.16xlarge,0,64,Intel Xeon Family,2.5 GHz,G4DN 16xlarge,256,50 Gigabit,0,1,1,true,true,900,4.352,202
+Memory optimized,current,x2gd.xlarge,0,4,AWS Graviton2 Processor,2.5 GHz,X2GD Extra Large,64,Up to 10 Gigabit,0,0,1,true,true,237,0.334,202
+General purpose,current,m7g.16xlarge,0,64,AWS Graviton3 Processor,2.5 GHz,M7G 16xlarge,256,30 Gigabit,0,0,,,,,2.6112,202
+General purpose,current,m6g.medium,0,1,AWS Graviton2 Processor,,M6G Medium,4,Up to 10 Gigabit,0,0,,,,,0.0385,202
+General purpose,previous,m1.xlarge,8,4,Intel Xeon Family,,M1 General Purpose Extra Large,15,High,0,0,4,false,false,420,0.35,202
+Compute optimized,current,c7i.large,0,2,Intel Xeon Scalable (Sapphire Rapids),3.2 GHz,C7I Large,4,Up to 12.5 Gigabit,0,0,,,,,0.08925,202
+Storage optimized,current,i4i.12xlarge,0,48,Intel Xeon 8375C (Ice Lake),3.5 GHz,I4I 12xlarge,384,28.12 Gigabit,0,0,3,true,true,3750,4.118,202
+Memory optimized,current,r5b.12xlarge,0,48,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,R5B 12xlarge,384,12 Gigabit,0,0,,,,,3.576,202
+General purpose,current,m5n.xlarge,0,4,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,M5N Extra Large,16,Up to 25 Gigabit,0,0,,,,,0.238,202
+Memory optimized,current,r7i.large,0,2,Intel Xeon Scalable (Sapphire Rapids),3.2 GHz,R7I Large,16,Up to 12.5 Gigabit,0,0,,,,,0.1323,202
+Compute optimized,current,c5a.12xlarge,0,48,AMD EPYC 7R32,3.3 GHz,C5A 12xlarge,96,12 Gigabit,0,0,,,,,1.848,202
+General purpose,current,m6g.16xlarge,0,64,AWS Graviton2 Processor,,M6G 16xlarge,256,25 Gigabit,0,0,,,,,2.464,202
+Compute optimized,current,c7a.8xlarge,0,32,AMD EPYC 9R14 Processor,3.7 GHz,C7A Eight Extra Large,64,12.5 Gigabit,0,0,,,,,1.64224,202
+General purpose,current,m7a.4xlarge,0,16,AMD EPYC 9R14 Processor,3.7 GHz,M7A Quadruple Extra Large,64,Up to 12.5 Gigabit,0,0,,,,,0.92736,202
+Memory optimized,current,x2iedn.4xlarge,0,16,Intel Xeon Scalable (Icelake),3.5 GHz,X2IEDN Quadruple Extra Large,512,Up to 25 Gigabit,0,0,1,true,true,475,3.3345,202
+Compute optimized,current,hpc7g.8xlarge,0,32,AWS Graviton3 Processor,2.6 GHz,HPC7G Eight Extra Large,128,200 Gigabit,0,0,,,,,1.6832,202
+General purpose,current,m7i.16xlarge,0,64,Intel Xeon Scalable (Sapphire Rapids),3.2 GHz,M7I 16xlarge,256,25 Gigabit,0,0,,,,,3.2256,202
+Memory optimized,current,r6gd.2xlarge,0,8,AWS Graviton2 Processor,2.5 GHz,R6GD Double Extra Large,64,Up to 10 Gigabit,0,0,1,true,true,474,0.4608,202
+Memory optimized,current,r7iz.8xlarge,0,32,Intel Xeon Scalable (Sapphire Rapids),3.9 GHz,R7IZ Eight Extra Large,256,12.5 Gigabit,0,0,,,,,2.976,202
+General purpose,previous,m3.xlarge,13,4,Intel Xeon E5-2670 v2 (Ivy Bridge/Sandy Bridge),2.5 GHz,M3 General Purpose Extra Large,15,High,0,0,2,true,false,40,0.266,202
+General purpose,current,m6id.metal,0,128,Intel Xeon 8375C (Ice Lake),3.5 GHz,M6ID Metal,512,50 Gigabit,0,0,4,true,true,1900,7.5936,202
+General purpose,previous,m1.medium,2,1,Intel Xeon Family,,M1 General Purpose Medium,3.75,Moderate,0,0,1,false,false,410,0.087,202
+General purpose,current,t3a.medium,variable,2,AMD EPYC 7571,2.5 GHz,T3A Medium,4,Up to 5 Gigabit,0,0,,,,,0.0376,202
+Memory optimized,current,r5n.metal,0,96,Intel Xeon Platinum 8259 (Cascade Lake),2.5 GHz,R5N Metal,768,100 Gigabit,0,0,,,,,7.152,202
+Memory optimized,current,r6a.metal,0,192,AMD EPYC 7R13 Processor,3.6 GHz,R6A Metal,1536,50 Gigabit,0,0,,,,,10.8864,202
+General purpose,current,m5.8xlarge,128,32,Intel Xeon Platinum 8175,3.1 GHz,M5 General Purpose Eight Extra Large,128,10 Gigabit,0,0,,,,,1.536,202
+Memory optimized,current,r4.16xlarge,201,64,Intel Xeon E5-2686 v4 (Broadwell),2.3 GHz,R4 High-Memory 16xlarge,488,25 Gigabit,0,0,,,,,4.256,202
+Memory optimized,current,r6i.16xlarge,0,64,Intel Xeon 8375C (Ice Lake),3.5 GHz,R6I 16xlarge,512,25 Gigabit,0,0,,,,,4.032,202
+Compute optimized,current,c6in.4xlarge,0,16,Intel Xeon 8375C (Ice Lake),3.5 GHz,C6IN Quadruple Extra Large,32,Up to 50 Gigabit,0,0,,,,,0.9072,202
+Memory optimized,current,z1d.6xlarge,116,24,Intel Xeon Platinum 8151,4 GHz,Z1D 6xlarge,192,12 Gigabit,0,0,1,true,true,900,2.232,202
+General purpose,current,m7i.8xlarge,0,32,Intel Xeon Scalable (Sapphire Rapids),3.2 GHz,M7I Eight Extra Large,128,12.5 Gigabit,0,0,,,,,1.6128,202
+General purpose,current,m5.xlarge,16,4,Intel Xeon Platinum 8175,3.1 GHz,M5 General Purpose Extra Large,16,Up to 10 Gigabit,0,0,,,,,0.192,202
+Memory optimized,current,r4.xlarge,16,4,Intel Xeon E5-2686 v4 (Broadwell),2.3 GHz,R4 High-Memory Extra Large,30.5,Up to 10 Gigabit,0,0,,,,,0.266,202
+General purpose,current,m6g.8xlarge,0,32,AWS Graviton2 Processor,,M6G Eight Extra Large,128,12 Gigabit,0,0,,,,,1.232,202
+Storage optimized,current,is4gen.2xlarge,0,8,AWS Graviton2 Processor,2.5 GHz,IS4GEN Double Extra Large,48,Up to 25 Gigabit,0,0,1,true,true,7500,1.1526,202
+Memory optimized,current,z1d.2xlarge,45,8,Intel Xeon Platinum 8151,4 GHz,Z1D Double Extra Large,64,Up to 10 Gigabit,0,0,1,true,true,300,0.744,202
+Memory optimized,current,r6idn.2xlarge,0,8,Intel Xeon 8375C (Ice Lake),3.5 GHz,R6IDN Double Extra Large,64,Up to 40 Gigabit,0,0,1,true,true,474,0.78156,202
+General purpose,current,m5dn.4xlarge,0,16,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,M5DN Quadruple Extra Large,64,Up to 25 Gigabit,0,0,2,true,true,300,1.088,202
+Memory optimized,current,r7g.2xlarge,0,8,AWS Graviton3 Processor,2.5 GHz,R7G Double Extra Large,64,Up to 15 Gigabit,0,0,,,,,0.4284,202
+Compute optimized,current,c6in.metal,0,128,Intel Xeon 8375C (Ice Lake),3.5 GHz,C6IN Metal,256,200 Gigabit,0,0,,,,,7.2576,202
+Storage optimized,current,im4gn.2xlarge,0,8,AWS Graviton2 Processor,2.5 GHz,IM4GN Double Extra Large,32,Up to 25 Gigabit,0,0,1,true,true,3750,0.72758,202
+Memory optimized,current,r7a.metal-48xl,0,192,AMD EPYC 9R14 Processor,3.7 GHz,R7A Metal-48xl,1536,50 Gigabit,0,0,,,,,14.6064,202
+Memory optimized,current,r5ad.24xlarge,0,96,AMD EPYC 7571,2.5 GHz,R5AD 24xlarge,768,20 Gigabit,0,0,4,true,true,900,6.288,202
+Compute optimized,current,c6a.metal,0,192,AMD EPYC 7R13 Processor,3.6 GHz,C6A Metal,384,50 Gigabit,0,0,,,,,7.344,202
+Memory optimized,previous,r3.2xlarge,26,8,Intel Xeon E5-2670 v2 (Ivy Bridge),2.5 GHz,R3 High-Memory Double Extra Large,61,High,0,0,1,true,false,160,0.665,202
+Memory optimized,current,r4.2xlarge,31,8,Intel Xeon E5-2686 v4 (Broadwell),2.3 GHz,R4 High-Memory Double Extra Large,61,Up to 10 Gigabit,0,0,,,,,0.532,202
+General purpose,current,m6a.16xlarge,0,64,AMD EPYC 7R13 Processor,3.6 GHz,M6A 16xlarge,256,25 Gigabit,0,0,,,,,2.7648,202
+Memory optimized,current,z1d.xlarge,23,4,Intel Xeon Platinum 8151,4 GHz,Z1D Extra Large,32,Up to 10 Gigabit,0,0,1,true,true,150,0.372,202
+General purpose,current,m6gd.12xlarge,0,48,AWS Graviton2 Processor,2.5 GHz,M6GD 12xlarge,192,20 Gigabit,0,0,2,true,true,1425,2.1696,202
+Memory optimized,current,r6g.8xlarge,0,32,AWS Graviton2 Processor,2.5 GHz,R6G Eight Extra Large,256,12 Gigabit,0,0,,,,,1.6128,202
+GPU instance,current,g5.8xlarge,0,32,AMD EPYC 7R32,2.8 GHz,G5 Graphics and Machine Learning GPU Eight Extra Large,128,25 Gigabit,0,1,1,true,true,900,2.448,202
+Storage optimized,current,d3.8xlarge,0,32,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,D3 Eight Extra Large,256,25 Gigabit,0,0,24,false,true,1980,3.99552,202
+GPU instance,current,p2.8xlarge,97,32,Intel Xeon E5-2686 v4 (Broadwell),2.3 GHz,P2 General Purpose GPU Eight Extra Large,488,10 Gigabit,0,4,,,,,7.2,202
+Compute optimized,current,c7gn.2xlarge,0,8,AWS Graviton3 Processor,2.6 GHz,C7GN Double Extra Large,16,Up to 50 Gigabit,0,0,,,,,0.4992,202
+Storage optimized,current,is4gen.4xlarge,0,16,AWS Graviton2 Processor,2.5 GHz,IS4GEN Quadruple Extra Large,96,25 Gigabit,0,0,2,true,true,7500,2.3052,202
+Memory optimized,current,r6i.4xlarge,0,16,Intel Xeon 8375C (Ice Lake),3.5 GHz,R6I Quadruple Extra Large,128,Up to 12.5 Gigabit,0,0,,,,,1.008,202
+General purpose,current,m6idn.16xlarge,0,64,Intel Xeon 8375C (Ice Lake),3.5 GHz,M6IDN 16xlarge,256,100 Gigabit,0,0,2,true,true,1900,5.09184,202
+Memory optimized,current,r6i.xlarge,0,4,Intel Xeon 8375C (Ice Lake),3.5 GHz,R6I Extra Large,32,Up to 12.5 Gigabit,0,0,,,,,0.252,202
+Compute optimized,current,c4.8xlarge,132,36,Intel Xeon E5-2666 v3 (Haswell),2.9 GHz,C4 High-CPU Eight Extra Large,60,10 Gigabit,0,0,,,,,1.591,202
+Compute optimized,current,c7g.large,0,2,AWS Graviton3 Processor,2.5 GHz,C7G Large,4,Up to 12.5 Gigabit,0,0,,,,,0.0725,202
+Memory optimized,current,r6idn.24xlarge,0,96,Intel Xeon 8375C (Ice Lake),3.5 GHz,R6IDN 24xlarge,768,150 Gigabit,0,0,4,true,true,1425,9.37872,202
+Compute optimized,current,c6a.16xlarge,0,64,AMD EPYC 7R13 Processor,3.6 GHz,C6A 16xlarge,128,25 Gigabit,0,0,,,,,2.448,202
+Compute optimized,current,c5a.8xlarge,0,32,AMD EPYC 7R32,3.3 GHz,C5A Eight Extra Large,64,10 Gigabit,0,0,,,,,1.232,202
+Compute optimized,current,c6a.xlarge,0,4,AMD EPYC 7R13 Processor,3.6 GHz,C6A Extra Large,8,Up to 12.5 Gigabit,0,0,,,,,0.153,202
+Memory optimized,current,r6a.2xlarge,0,8,AMD EPYC 7R13 Processor,3.6 GHz,R6A Double Extra Large,64,Up to 12.5 Gigabit,0,0,,,,,0.4536,202
+Memory optimized,current,u-3tb1.56xlarge,0,224,Intel Xeon Scalable (Skylake),2.1 GHz,U-3TB1 56xlarge,3072,50 Gigabit,0,0,,,,,27.3,202
+General purpose,current,t3.2xlarge,variable,8,Intel Skylake E5 2686 v5,3.1 GHz,T3 Double Extra Large,32,Up to 5 Gigabit,0,0,,,,,0.3328,202
+Storage optimized,previous,d2.2xlarge,28,8,Intel Xeon E5-2676 v3 (Haswell),2.4 GHz,D2 Double Extra Large,61,High,0,0,6,false,false,2048,1.38,202
+Memory optimized,current,r6g.metal,0,64,AWS Graviton2 Processor,2.5 GHz,R6G Metal,512,25 Gigabit,0,0,,,,,3.2256,202
+Storage optimized,previous,d2.4xlarge,56,16,Intel Xeon E5-2676 v3 (Haswell),2.4 GHz,D2 Quadruple Extra Large,122,High,0,0,12,false,false,2048,2.76,202
+General purpose,current,m5ad.4xlarge,0,16,AMD EPYC 7571,2.5 GHz,M5AD Quadruple Extra Large,64,Up to 10 Gigabit,0,0,2,true,true,300,0.824,202
+Memory optimized,current,r6id.metal,0,128,Intel Xeon 8375C (Ice Lake),3.5 GHz,R6ID Metal,1024,50 Gigabit,0,0,4,true,true,1900,9.6768,202
+Memory optimized,current,r7g.metal,0,64,AWS Graviton3 Processor,2.5 GHz,R7G Metal,512,30 Gigabit,0,0,,,,,3.4272,202
+Compute optimized,current,c6g.4xlarge,0,16,AWS Graviton2 Processor,2.5 GHz,C6G Quadruple Extra Large,32,Up to 10 Gigabit,0,0,,,,,0.544,202
+Memory optimized,current,r6in.xlarge,0,4,Intel Xeon 8375C (Ice Lake),3.5 GHz,R6IN Extra Large,32,Up to 30 Gigabit,0,0,,,,,0.34866,202
+Memory optimized,current,r6i.32xlarge,0,128,Intel Xeon 8375C (Ice Lake),3.5 GHz,R6I 32xlarge,1024,50 Gigabit,0,0,,,,,8.064,202
+Memory optimized,current,x2idn.16xlarge,0,64,Intel Xeon Scalable (Icelake),3.5 GHz,X2IDN 16xlarge,1024,50 Gigabit,0,0,1,true,true,1900,6.669,202
+Memory optimized,current,u-6tb1.112xlarge,0,448,Intel Xeon Scalable (Skylake),,U-6TB1 112xlarge,6144,100 Gigabit,0,0,,,,,54.6,202
+Machine Learning ASIC Instances,current,inf1.6xlarge,0,24,Intel Xeon Platinum 8275CL (Cascade Lake),,INF1 6xlarge,48,25 Gigabit,0,4,,,,,1.18,202
+Memory optimized,current,r6idn.large,0,2,Intel Xeon 8375C (Ice Lake),3.5 GHz,R6IDN Large,16,Up to 25 Gigabit,0,0,1,true,true,118,0.19539,202
+GPU instance,current,g4ad.4xlarge,0,16,AMD EPYC 7R32,2.8 GHz,G4AD Quadruple Extra Large,64,Up to 10 Gigabit,0,1,1,true,true,600,0.867,202
+Storage optimized,current,d3.4xlarge,0,16,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,D3 Quadruple Extra Large,128,Up to 15 Gigabit,0,0,12,false,true,1980,1.998,202
+GPU instance,current,g4ad.2xlarge,0,8,AMD EPYC 7R32,2.8 GHz,G4AD Double Extra Large,32,Up to 10 Gigabit,0,1,1,true,true,300,0.54117,202
+Compute optimized,current,c6in.16xlarge,0,64,Intel Xeon 8375C (Ice Lake),3.5 GHz,C6IN 16xlarge,128,100 Gigabit,0,0,,,,,3.6288,202
+General purpose,current,m5zn.12xlarge,0,48,Intel Xeon Platinum 8252,4.5 GHz,M5ZN 12xlarge,192,100 Gigabit,0,0,,,,,3.9641,202
+Compute optimized,current,c6gd.16xlarge,0,64,AWS Graviton2 Processor,2.5 GHz,C6GD 16xlarge,128,25 Gigabit,0,0,2,true,true,1900,2.4576,202
+General purpose,current,m6gd.2xlarge,0,8,AWS Graviton2 Processor,2.5 GHz,M6GD Double Extra Large,32,Up to 10 Gigabit,0,0,1,true,true,474,0.3616,202
+Compute optimized,current,c5a.xlarge,0,4,AMD EPYC 7R32,3.3 GHz,C5A Extra Large,8,Up to 10 Gigabit,0,0,,,,,0.154,202
+Compute optimized,current,c6id.12xlarge,0,48,Intel Xeon 8375C (Ice Lake),3.5 GHz,C6ID 12xlarge,96,18.75 Gigabit,0,0,2,true,true,1425,2.4192,202
+General purpose,current,m5d.4xlarge,70,16,Intel Xeon Platinum 8175,3.1 GHz,M5 General Purpose Quadruple Extra Large,64,Up to 10 Gigabit,0,0,2,true,true,300,0.904,202
+Memory optimized,current,r7g.xlarge,0,4,AWS Graviton3 Processor,2.5 GHz,R7G Extra Large,32,Up to 12.5 Gigabit,0,0,,,,,0.2142,202
+Memory optimized,current,r6id.large,0,2,Intel Xeon 8375C (Ice Lake),3.5 GHz,R6ID Large,16,Up to 12.5 Gigabit,0,0,1,true,true,118,0.1512,202
+Memory optimized,current,r5.16xlarge,256,64,Intel Xeon Platinum 8175,3.1 GHz,R5 16xlarge,512,20 Gigabit,0,0,,,,,4.032,202
+Memory optimized,current,r7iz.large,0,2,Intel Xeon Scalable (Sapphire Rapids),3.9 GHz,R7IZ Large,16,Up to 12.5 Gigabit,0,0,,,,,0.186,202
+Memory optimized,current,x2iezn.8xlarge,0,32,Intel Xeon Platinum 8252,4.5 GHz,X2IEZN Eight Extra Large,1024,75 Gigabit,0,0,,,,,6.672,202
+Memory optimized,current,r5a.4xlarge,0,16,AMD EPYC 7571,2.5 GHz,R5A Quadruple Extra Large,128,Up to 10 Gigabit,0,0,,,,,0.904,202
+General purpose,current,m6in.16xlarge,0,64,Intel Xeon 8375C (Ice Lake),3.5 GHz,M6IN 16xlarge,256,100 Gigabit,0,0,,,,,4.45536,202
+General purpose,current,m7a.large,0,2,AMD EPYC 9R14 Processor,3.7 GHz,M7A Large,8,Up to 12.5 Gigabit,0,0,,,,,0.11592,202
+General purpose,current,t3.xlarge,variable,4,Intel Skylake E5 2686 v5,3.1 GHz,T3 Extra Large,16,Up to 5 Gigabit,0,0,,,,,0.1664,202
+Compute optimized,current,c6a.large,0,2,AMD EPYC 7R13 Processor,3.6 GHz,C6A Large,4,Up to 12.5 Gigabit,0,0,,,,,0.0765,202
+Memory optimized,current,z1d.12xlarge,235,48,Intel Xeon Platinum 8151,4 GHz,Z1D 12xlarge,384,25 Gigabit,0,0,2,true,true,900,4.464,202
+Memory optimized,current,r5b.metal,0,96,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,R5B Metal,768,25 Gigabit,0,0,,,,,7.152,202
+General purpose,current,m7g.xlarge,0,4,AWS Graviton3 Processor,2.5 GHz,M7G Extra Large,16,Up to 12.5 Gigabit,0,0,,,,,0.1632,202
+General purpose,previous,m1.small,1,1,Intel Xeon Family,,M1 General Purpose Small,1.7,Low,0,0,1,false,false,160,0.044,202
+Compute optimized,current,c5ad.8xlarge,0,32,AMD EPYC 7R32,3.3 GHz,C5AD Eight Extra Large,64,10 Gigabit,0,0,2,true,true,600,1.376,202
+General purpose,current,m7g.8xlarge,0,32,AWS Graviton3 Processor,2.5 GHz,M7G Eight Extra Large,128,15 Gigabit,0,0,,,,,1.3056,202
+General purpose,current,m6in.2xlarge,0,8,Intel Xeon 8375C (Ice Lake),3.5 GHz,M6IN Double Extra Large,32,Up to 40 Gigabit,0,0,,,,,0.55692,202
+Compute optimized,current,c6id.large,0,2,Intel Xeon 8375C (Ice Lake),3.5 GHz,C6ID Large,4,Up to 12.5 Gigabit,0,0,1,true,true,118,0.1008,202
+Memory optimized,current,r6i.8xlarge,0,32,Intel Xeon 8375C (Ice Lake),3.5 GHz,R6I Eight Extra Large,256,12.5 Gigabit,0,0,,,,,2.016,202
+Memory optimized,current,r5d.large,10,2,Intel Xeon Platinum 8175,3.1 GHz,R5D Large,16,Up to 10 Gigabit,0,0,1,true,true,75,0.144,202
+General purpose,previous,a1.xlarge,0,4,AWS Graviton Processor,2.3 GHz,A1 Extra Large,8,Up to 10 Gigabit,0,0,,,,,0.102,202
+Memory optimized,current,x2idn.24xlarge,0,96,Intel Xeon Scalable (Icelake),3.5 GHz,X2IDN 24xlarge,1536,75 Gigabit,0,0,2,true,true,1425,10.0035,202
+Memory optimized,current,r5b.8xlarge,0,32,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,R5B Eight Extra Large,256,10 Gigabit,0,0,,,,,2.384,202
+Memory optimized,current,u-18tb1.112xlarge,0,448,Intel Xeon Platinum 8280L (Cascade Lake),,U-18TB1 112xlarge,18432,100 Gigabit,0,0,,,,,163.8,202
+Memory optimized,current,r6gd.8xlarge,0,32,AWS Graviton2 Processor,2.5 GHz,R6GD Eight Extra Large,256,12 Gigabit,0,0,1,true,true,1900,1.8432,202
+Compute optimized,current,c7g.16xlarge,0,64,AWS Graviton3 Processor,2.5 GHz,C7G 16xlarge,128,30 Gigabit,0,0,,,,,2.32,202
+Compute optimized,current,c7gd.large,0,2,AWS Graviton3 Processor,2.5 GHz,C7GD Large,4,Up to 12.5 Gigabit,0,0,1,true,true,118,0.0907,202
+Memory optimized,current,r6i.24xlarge,0,96,Intel Xeon 8375C (Ice Lake),3.5 GHz,R6I 24xlarge,768,37.5 Gigabit,0,0,,,,,6.048,202
+Storage optimized,current,i3.metal,208,72,Intel Xeon E5-2686 v4 (Broadwell),2.3 GHz,I3 High I/O Metal,512,25 Gigabit,0,0,8,true,true,1900,4.992,202
+Compute optimized,current,c6g.16xlarge,0,64,AWS Graviton2 Processor,2.5 GHz,C6G 16xlarge,128,25 Gigabit,0,0,,,,,2.176,202
+Memory optimized,current,r6g.16xlarge,0,64,AWS Graviton2 Processor,2.5 GHz,R6G 16xlarge,512,25 Gigabit,0,0,,,,,3.2256,202
+General purpose,current,m7gd.medium,0,1,AWS Graviton3 Processor,2.5 GHz,M7GD Medium,4,Up to 12.5 Gigabit,0,0,1,true,true,59,0.0534,202
+Compute optimized,current,c7a.24xlarge,0,96,AMD EPYC 9R14 Processor,3.7 GHz,C7A 24xlarge,192,37.5 Gigabit,0,0,,,,,4.92672,202
+Compute optimized,current,c5ad.24xlarge,0,96,AMD EPYC 7R32,3.3 GHz,C5AD 24xlarge,192,20 Gigabit,0,0,2,true,true,1900,4.128,202
+General purpose,current,m6gd.large,0,2,AWS Graviton2 Processor,2.5 GHz,M6GD Large,8,Up to 10 Gigabit,0,0,1,true,true,118,0.0904,202
+Memory optimized,current,r7gd.12xlarge,0,48,AWS Graviton3 Processor,2.5 GHz,R7GD 12xlarge,384,22.5 Gigabit,0,0,2,true,true,1425,3.2659,202
+Memory optimized,current,r7a.xlarge,0,4,AMD EPYC 9R14 Processor,3.7 GHz,R7A Extra Large,32,Up to 12.5 Gigabit,0,0,,,,,0.3043,202
+Memory optimized,current,r7g.8xlarge,0,32,AWS Graviton3 Processor,2.5 GHz,R7G Eight Extra Large,256,15 Gigabit,0,0,,,,,1.7136,202
+General purpose,current,t4g.large,0,2,AWS Graviton2 Processor,2.5 GHz,T4G Large,8,Up to 5 Gigabit,0,0,,,,,0.0672,202
+General purpose,current,m6id.12xlarge,0,48,Intel Xeon 8375C (Ice Lake),3.5 GHz,M6ID 12xlarge,192,18.75 Gigabit,0,0,2,true,true,1425,2.8476,202
+General purpose,current,m5n.large,0,2,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,M5N Large,8,Up to 25 Gigabit,0,0,,,,,0.119,202
+Memory optimized,current,r6in.8xlarge,0,32,Intel Xeon 8375C (Ice Lake),3.5 GHz,R6IN Eight Extra Large,256,50 Gigabit,0,0,,,,,2.78928,202
+Memory optimized,current,r5b.2xlarge,0,8,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,R5B Double Extra Large,64,Up to 10 Gigabit,0,0,,,,,0.596,202
+Memory optimized,current,x2gd.12xlarge,0,48,AWS Graviton2 Processor,2.5 GHz,X2GD 12xlarge,768,20 Gigabit,0,0,2,true,true,1425,4.008,202
+General purpose,current,m5dn.8xlarge,0,32,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,M5DN Eight Extra Large,128,25 Gigabit,0,0,2,true,true,600,2.176,202
+Compute optimized,current,c5d.12xlarge,188,48,Intel Xeon Platinum 8275L,3 GHz,C5 High-CPU 12xlarge,96,12 Gigabit,0,0,2,true,true,900,2.304,202
+GPU instance,current,p2.xlarge,16,4,Intel Xeon E5-2686 v4 (Broadwell),2.3 GHz,P2 General Purpose GPU Extra Large,61,High,0,1,,,,,0.9,202
+General purpose,current,m7i-flex.large,0,2,Intel Xeon Scalable (Sapphire Rapids),3.5 GHz,M7I-FLEX Large,8,Up to 12.5 Gigabit,0,0,,,,,0.09576,202
+Memory optimized,current,r5dn.large,0,2,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,R5DN Large,16,Up to 25 Gigabit,0,0,1,true,true,75,0.167,202
+Compute optimized,current,c5ad.16xlarge,0,64,AMD EPYC 7R32,3.3 GHz,C5AD 16xlarge,128,20 Gigabit,0,0,2,true,true,1200,2.752,202
+Memory optimized,current,r4.4xlarge,58,16,Intel Xeon E5-2686 v4 (Broadwell),2.3 GHz,R4 High-Memory Quadruple Extra Large,122,Up to 10 Gigabit,0,0,,,,,1.064,202
+Compute optimized,current,c6in.large,0,2,Intel Xeon 8375C (Ice Lake),3.5 GHz,C6IN Large,4,Up to 25 Gigabit,0,0,,,,,0.1134,202
+Memory optimized,current,r5a.xlarge,0,4,AMD EPYC 7571,2.5 GHz,R5A Extra Large,32,Up to 10 Gigabit,0,0,,,,,0.226,202
+General purpose,current,m5n.4xlarge,0,16,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,M5N Quadruple Extra Large,64,Up to 25 Gigabit,0,0,,,,,0.952,202
+Memory optimized,current,r6idn.32xlarge,0,128,Intel Xeon 8375C (Ice Lake),3.5 GHz,R6IDN 32xlarge,1024,200 Gigabit,0,0,4,true,true,1900,12.50496,202
+General purpose,current,m5ad.24xlarge,0,96,AMD EPYC 7571,2.5 GHz,M5AD 24xlarge,384,20 Gigabit,0,0,4,true,true,900,4.944,202
+Memory optimized,current,r7g.16xlarge,0,64,AWS Graviton3 Processor,2.5 GHz,R7G 16xlarge,512,30 Gigabit,0,0,,,,,3.4272,202
+Memory optimized,current,r6in.4xlarge,0,16,Intel Xeon 8375C (Ice Lake),3.5 GHz,R6IN Quadruple Extra Large,128,Up to 50 Gigabit,0,0,,,,,1.39464,202
+Compute optimized,current,c6g.xlarge,0,4,AWS Graviton2 Processor,2.5 GHz,C6G Extra Large,8,Up to 10 Gigabit,0,0,,,,,0.136,202
+Storage optimized,current,d3en.4xlarge,0,16,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,D3EN Quadruple Extra Large,64,25 Gigabit,0,0,8,false,true,13980,2.103,202
+FPGA Instances,current,f1.4xlarge,58,16,Intel Xeon E5-2686 v4 (Broadwell),2.3 GHz,F1 Quadruple Extra Large,244,Up to 10 Gigabit,2,0,1,true,true,940,3.3,202
+General purpose,current,t3a.2xlarge,variable,8,AMD EPYC 7571,2.5 GHz,T3A Double Extra Large,32,Up to 5 Gigabit,0,0,,,,,0.3008,202
+Compute optimized,current,c5a.24xlarge,0,96,AMD EPYC 7R32,3.3 GHz,C5A 24xlarge,192,20 Gigabit,0,0,,,,,3.696,202
+Compute optimized,current,c5a.4xlarge,0,16,AMD EPYC 7R32,3.3 GHz,C5A Quadruple Extra Large,32,Up to 10 Gigabit,0,0,,,,,0.616,202
+General purpose,current,m7gd.2xlarge,0,8,AWS Graviton3 Processor,2.5 GHz,M7GD Double Extra Large,32,Up to 15 Gigabit,0,0,1,true,true,474,0.4271,202
+FPGA Instances,current,f1.2xlarge,31,8,Intel Xeon E5-2686 v4 (Broadwell),2.3 GHz,F1 Double Extra Large,122,Up to 10 Gigabit,1,0,1,true,true,470,1.65,202
+Memory optimized,current,r5a.12xlarge,0,48,AMD EPYC 7571,2.5 GHz,R5A 12xlarge,384,10 Gigabit,0,0,,,,,2.712,202
+General purpose,current,m5zn.large,0,2,Intel Xeon Platinum 8252,4.5 GHz,M5ZN Large,8,Up to 25 Gigabit,0,0,,,,,0.1652,202
+General purpose,current,m7i-flex.4xlarge,0,16,Intel Xeon Scalable (Sapphire Rapids),3.5 GHz,M7I-FLEX Quadruple Extra Large,64,Up to 12.5 Gigabit,0,0,,,,,0.76608,202
+Memory optimized,current,x2gd.medium,0,1,AWS Graviton2 Processor,2.5 GHz,X2GD Medium,16,Up to 10 Gigabit,0,0,1,true,true,59,0.0835,202
+Memory optimized,current,x2iedn.24xlarge,0,96,Intel Xeon Scalable (Icelake),3.5 GHz,X2IEDN 24xlarge,3072,75 Gigabit,0,0,2,true,true,1425,20.007,202
+GPU instance,current,g5.12xlarge,0,48,AMD EPYC 7R32,2.8 GHz,G5 Graphics and Machine Learning GPU 12xlarge,192,40 Gigabit,0,4,1,true,true,3800,5.672,202
+Compute optimized,current,c5ad.4xlarge,0,16,AMD EPYC 7R32,3.3 GHz,C5AD Quadruple Extra Large,32,Up to 10 Gigabit,0,0,2,true,true,300,0.688,202
+General purpose,current,m7i.48xlarge,0,192,Intel Xeon Scalable (Sapphire Rapids),3.2 GHz,M7I 48xlarge,768,50 Gigabit,0,0,,,,,9.6768,202
+General purpose,current,m5d.metal,345,96,Intel Xeon Platinum 8175,3.1 GHz,M5 General Purpose Metal,384,25 Gigabit,0,0,4,true,true,900,5.424,202
+GPU instance,previous,g2.2xlarge,26,8,Intel Xeon E5-2670 (Sandy Bridge),2.6 GHz,G2 Double Extra Large,15,Moderate,0,1,1,true,false,60,0.65,202
+General purpose,current,m7i-flex.8xlarge,0,32,Intel Xeon Scalable (Sapphire Rapids),3.5 GHz,M7I-FLEX Eight Extra Large,128,Up to 12.5 Gigabit,0,0,,,,,1.53216,202
+General purpose,current,m6g.large,0,2,AWS Graviton2 Processor,,M6G Large,8,Up to 10 Gigabit,0,0,,,,,0.077,202
+Machine Learning ASIC Instances,current,inf2.24xlarge,0,96,AMD EPYC 7R13 Processor,2.95 GHz,INF2 24xlarge,384,50 Gigabit,0,6,,,,,6.49063,202
+Compute optimized,current,c4.2xlarge,31,8,Intel Xeon E5-2666 v3 (Haswell),2.9 GHz,C4 High-CPU Double Extra Large,15,High,0,0,,,,,0.398,202
+General purpose,current,m5ad.8xlarge,0,32,AMD EPYC 7571,2.5 GHz,M5AD Eight Extra Large,128,Up to 10 Gigabit,0,0,2,true,true,600,1.648,202
+General purpose,current,m6gd.16xlarge,0,64,AWS Graviton2 Processor,2.5 GHz,M6GD 16xlarge,256,25 Gigabit,0,0,2,true,true,1900,2.8928,202
+GPU instance,current,g4ad.16xlarge,0,64,AMD EPYC 7R32,2.8 GHz,G4AD 16xlarge,256,25 Gigabit,0,4,2,true,true,1200,3.468,202
+Memory optimized,current,r6a.24xlarge,0,96,AMD EPYC 7R13 Processor,3.6 GHz,R6A 24xlarge,768,37.5 Gigabit,0,0,,,,,5.4432,202
+Compute optimized,current,hpc7g.16xlarge,0,64,AWS Graviton3 Processor,2.6 GHz,HPC7G 16xlarge,128,200 Gigabit,0,0,,,,,1.6832,202
+Memory optimized,current,r5dn.12xlarge,0,48,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,R5DN 12xlarge,384,50 Gigabit,0,0,2,true,true,900,4.008,202
+General purpose,current,m6id.8xlarge,0,32,Intel Xeon 8375C (Ice Lake),3.5 GHz,M6ID Eight Extra Large,128,12.5 Gigabit,0,0,1,true,true,1900,1.8984,202
+Compute optimized,current,c6gn.2xlarge,0,8,AWS Graviton2 Processor,2.5 GHz,C6GN Double Extra Large,16,Up to 25 Gigabit,0,0,,,,,0.3456,202
+General purpose,current,m5ad.12xlarge,0,48,AMD EPYC 7571,2.5 GHz,M5AD 12xlarge,192,10 Gigabit,0,0,2,true,true,900,2.472,202
+Storage optimized,current,h1.16xlarge,201,64,Intel Xeon E5-2686 v4 (Broadwell),2.3 GHz,H1 16xlarge,256,25 Gigabit,0,0,8,false,false,2000,3.744,202
+General purpose,current,m6idn.metal,0,128,Intel Xeon 8375C (Ice Lake),3.5 GHz,M6IDN Metal,512,200 Gigabit,0,0,4,true,true,1900,10.18368,202
+General purpose,current,m5a.24xlarge,0,96,AMD EPYC 7571,2.5 GHz,M5A 24xlarge,384,20 Gigabit,0,0,,,,,4.128,202
+General purpose,current,m6g.xlarge,0,4,AWS Graviton2 Processor,,M6G Extra Large,16,Up to 10 Gigabit,0,0,,,,,0.154,202
+Memory optimized,current,r7iz.2xlarge,0,8,Intel Xeon Scalable (Sapphire Rapids),3.9 GHz,R7IZ Double Extra Large,64,Up to 12.5 Gigabit,0,0,,,,,0.744,202
+Memory optimized,current,r6gd.4xlarge,0,16,AWS Graviton2 Processor,2.5 GHz,R6GD Quadruple Extra Large,128,Up to 10 Gigabit,0,0,1,true,true,950,0.9216,202
+General purpose,current,m6a.12xlarge,0,48,AMD EPYC 7R13 Processor,3.6 GHz,M6A 12xlarge,192,18.75 Gigabit,0,0,,,,,2.0736,202
+Compute optimized,current,c7gn.large,0,2,AWS Graviton3 Processor,2.6 GHz,C7GN Large,4,Up to 30 Gigabit,0,0,,,,,0.1248,202
+General purpose,current,m6i.12xlarge,0,48,Intel Xeon 8375C (Ice Lake),3.5 GHz,M6I 12xlarge,192,18.75 Gigabit,0,0,,,,,2.304,202
+General purpose,current,m6a.metal,0,192,AMD EPYC 7R13 Processor,3.6 GHz,M6A Metal,768,50 Gigabit,0,0,,,,,8.2944,202
+Storage optimized,current,i3.large,8,2,Intel Xeon E5-2686 v4 (Broadwell),2.3 GHz,I3 High I/O Large,15.25,Up to 10 Gigabit,0,0,1,true,true,475,0.156,202
+Memory optimized,current,r7i.xlarge,0,4,Intel Xeon Scalable (Sapphire Rapids),3.2 GHz,R7I Extra Large,32,Up to 12.5 Gigabit,0,0,,,,,0.2646,202
+GPU instance,current,g5g.metal,0,64,AWS Graviton2 Processor,2.5 GHz,G5G Metal,128,25 Gigabit,0,2,,,,,2.744,202
+GPU instance,current,g3.8xlarge,97,32,Intel Xeon E5-2686 v4 (Broadwell),2.3 GHz,G3 Graphics GPU Eight Extra Large,244,10 Gigabit,0,2,,,,,2.28,202
+General purpose,current,m6gd.medium,0,1,AWS Graviton2 Processor,2.5 GHz,M6GD Medium,4,Up to 10 Gigabit,0,0,1,true,true,59,0.0452,202
+Compute optimized,current,c6g.12xlarge,0,48,AWS Graviton2 Processor,2.5 GHz,C6G 12xlarge,96,20 Gigabit,0,0,,,,,1.632,202
+Memory optimized,current,r5.4xlarge,70,16,Intel Xeon Platinum 8175,3.1 GHz,R5 Quadruple Extra Large,128,Up to 10 Gigabit,0,0,,,,,1.008,202
+Memory optimized,current,r6idn.8xlarge,0,32,Intel Xeon 8375C (Ice Lake),3.5 GHz,R6IDN Eight Extra Large,256,50 Gigabit,0,0,1,true,true,1900,3.12624,202
+Memory optimized,current,r6idn.metal,0,128,Intel Xeon 8375C (Ice Lake),3.5 GHz,R6IDN Metal,1024,200 Gigabit,0,0,4,true,true,1900,12.50496,202
+Compute optimized,current,c6gd.large,0,2,AWS Graviton2 Processor,2.5 GHz,C6GD Large,4,Up to 10 Gigabit,0,0,1,true,true,118,0.0768,202
+General purpose,current,m5zn.xlarge,0,4,Intel Xeon Platinum 8252,4.5 GHz,M5ZN Extra Large,16,Up to 25 Gigabit,0,0,,,,,0.3303,202
+Compute optimized,current,c5a.16xlarge,0,64,AMD EPYC 7R32,3.3 GHz,C5A 16xlarge,128,20 Gigabit,0,0,,,,,2.464,202
+Memory optimized,current,r7gd.4xlarge,0,16,AWS Graviton3 Processor,2.5 GHz,R7GD Quadruple Extra Large,128,Up to 15 Gigabit,0,0,1,true,true,950,1.0886,202
+Memory optimized,current,r7a.large,0,2,AMD EPYC 9R14 Processor,3.7 GHz,R7A Large,16,Up to 12.5 Gigabit,0,0,,,,,0.15215,202
+Media Accelerator Instances,current,vt1.3xlarge,0,12,Intel Xeon Platinum 8259CL,2.5 GHz,VT1 3xlarge,24,3.12 Gigabit,0,0,,,,,0.65,202
+Memory optimized,current,r5.large,10,2,Intel Xeon Platinum 8175,3.1 GHz,R5 Large,16,Up to 10 Gigabit,0,0,,,,,0.126,202
+Compute optimized,current,c6a.24xlarge,0,96,AMD EPYC 7R13 Processor,3.6 GHz,C6A 24xlarge,192,37.5 Gigabit,0,0,,,,,3.672,202
+General purpose,current,t4g.small,0,2,AWS Graviton2 Processor,2.5 GHz,T4G Small,2,Up to 5 Gigabit,0,0,,,,,0.0168,202
+General purpose,current,m7a.24xlarge,0,96,AMD EPYC 9R14 Processor,3.7 GHz,M7A 24xlarge,384,37.5 Gigabit,0,0,,,,,5.56416,202
+General purpose,current,m4.2xlarge,26,8,Intel Xeon E5-2676 v3 (Haswell),2.4 GHz,M4 General Purpose Double Extra Large,32,High,0,0,,,,,0.4,202
+Storage optimized,current,i4i.8xlarge,0,32,Intel Xeon 8375C (Ice Lake),3.5 GHz,I4I Eight Extra Large,256,18.75 Gigabit,0,0,2,true,true,3750,2.746,202
+General purpose,current,m5dn.2xlarge,0,8,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,M5DN Double Extra Large,32,Up to 25 Gigabit,0,0,1,true,true,300,0.544,202
+Memory optimized,current,r5b.4xlarge,0,16,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,R5B Quadruple Extra Large,128,Up to 10 Gigabit,0,0,,,,,1.192,202
+Memory optimized,current,r5ad.large,0,2,AMD EPYC 7571,2.5 GHz,R5AD Large,16,Up to 10 Gigabit,0,0,1,true,true,75,0.131,202
+Storage optimized,current,im4gn.8xlarge,0,32,AWS Graviton2 Processor,2.5 GHz,IM4GN Eight Extra Large,128,50 Gigabit,0,0,2,true,true,7500,2.91034,202
+Memory optimized,current,r6idn.16xlarge,0,64,Intel Xeon 8375C (Ice Lake),3.5 GHz,R6IDN 16xlarge,512,100 Gigabit,0,0,2,true,true,1900,6.25248,202
+Memory optimized,current,x2gd.8xlarge,0,32,AWS Graviton2 Processor,2.5 GHz,X2GD Eight Extra Large,512,12 Gigabit,0,0,1,true,true,1900,2.672,202
+Compute optimized,current,c5n.metal,0,72,Intel Xeon Platinum 8124M,3 GHz,C5N Metal,192,100 Gigabit,0,0,,,,,3.888,202
+Memory optimized,current,r5ad.8xlarge,0,32,AMD EPYC 7571,2.5 GHz,R5AD Eight Extra Large,256,Up to 10 Gigabit,0,0,2,true,true,600,2.096,202
+Compute optimized,current,c6g.metal,0,64,AWS Graviton2 Processor,2.5 GHz,C6G Metal,128,25 Gigabit,0,0,,,,,2.176,202
+Compute optimized,current,c6gd.8xlarge,0,32,AWS Graviton2 Processor,2.5 GHz,C6GD Eight Extra Large,64,12 Gigabit,0,0,1,true,true,1900,1.2288,202
+General purpose,current,m7gd.large,0,2,AWS Graviton3 Processor,2.5 GHz,M7GD Large,8,Up to 12.5 Gigabit,0,0,1,true,true,118,0.1068,202
+General purpose,current,m6a.2xlarge,0,8,AMD EPYC 7R13 Processor,3.6 GHz,M6A Double Extra Large,32,Up to 12.5 Gigabit,0,0,,,,,0.3456,202
+Compute optimized,current,c7g.2xlarge,0,8,AWS Graviton3 Processor,2.5 GHz,C7G Double Extra Large,16,Up to 15 Gigabit,0,0,,,,,0.29,202
+Memory optimized,current,r7gd.medium,0,1,AWS Graviton3 Processor,2.5 GHz,R7GD Medium,8,Up to 12.5 Gigabit,0,0,1,true,true,59,0.068,202
+Memory optimized,current,z1d.large,12,2,Intel Xeon Platinum 8151,4 GHz,Z1D Large,16,Up to 10 Gigabit,0,0,1,true,true,75,0.186,202
+General purpose,current,m6g.4xlarge,0,16,AWS Graviton2 Processor,,M6G Quadruple Extra Large,64,Up to 10 Gigabit,0,0,,,,,0.616,202
+GPU instance,current,g4dn.4xlarge,0,16,Intel Xeon Family,2.5 GHz,G4DN Quadruple Extra Large,64,Up to 25 Gigabit,0,1,1,true,true,225,1.204,202
+Compute optimized,current,c6i.metal,0,128,Intel Xeon 8375C (Ice Lake),3.5 GHz,C6I Metal,256,50 Gigabit,0,0,,,,,5.44,202
+Memory optimized,previous,r3.4xlarge,52,16,Intel Xeon E5-2670 v2 (Ivy Bridge),2.5 GHz,R3 High-Memory Quadruple Extra Large,122,High,0,0,1,true,false,320,1.33,202
+General purpose,current,m6gd.xlarge,0,4,AWS Graviton2 Processor,2.5 GHz,M6GD Extra Large,16,Up to 10 Gigabit,0,0,1,true,true,237,0.1808,202
+Memory optimized,current,r7g.medium,0,1,AWS Graviton3 Processor,2.5 GHz,R7G Medium,8,Up to 12.5 Gigabit,0,0,,,,,0.0536,202
+Storage optimized,current,i4g.4xlarge,0,16,AWS Graviton2 Processor,2.5 GHz,I4G Quadruple Extra Large,128,Up to 25 Gigabit,0,0,1,true,true,3750,1.23552,202
+Storage optimized,current,i3.8xlarge,97,32,Intel Xeon E5-2686 v4 (Broadwell),2.3 GHz,I3 High I/O Eight Extra Large,244,10 Gigabit,0,0,4,true,true,1900,2.496,202
+General purpose,current,m5n.8xlarge,0,32,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,M5N Eight Extra Large,128,25 Gigabit,0,0,,,,,1.904,202
+Compute optimized,current,c5ad.large,0,2,AMD EPYC 7R32,3.3 GHz,C5AD Large,4,Up to 10 Gigabit,0,0,1,true,true,75,0.086,202
+GPU instance,current,p4de.24xlarge,345,96,Intel Xeon Platinum 8275L,3 GHz,P4DE 24xlarge,1152,400 Gigabit,0,8,8,true,true,1000,40.96575,202
+Storage optimized,current,im4gn.4xlarge,0,16,AWS Graviton2 Processor,2.5 GHz,IM4GN Quadruple Extra Large,64,25 Gigabit,0,0,1,true,true,7500,1.45517,202
+Storage optimized,current,im4gn.large,0,2,AWS Graviton2 Processor,2.5 GHz,IM4GN Large,8,Up to 25 Gigabit,0,0,1,true,true,937,0.1819,202
+Memory optimized,current,r5d.12xlarge,168,48,Intel Xeon Platinum 8175,3.1 GHz,R5D 12xlarge,384,12 Gigabit,0,0,2,true,true,900,3.456,202
+Storage optimized,current,i3.2xlarge,31,8,Intel Xeon E5-2686 v4 (Broadwell),2.3 GHz,I3 High I/O Double Extra Large,61,Up to 10 Gigabit,0,0,1,true,true,1900,0.624,202
+Compute optimized,current,c6g.medium,0,1,AWS Graviton2 Processor,2.5 GHz,C6G Medium,2,Up to 10 Gigabit,0,0,,,,,0.034,202
+General purpose,current,t4g.medium,0,2,AWS Graviton2 Processor,2.5 GHz,T4G Medium,4,Up to 5 Gigabit,0,0,,,,,0.0336,202
+Memory optimized,current,r6in.2xlarge,0,8,Intel Xeon 8375C (Ice Lake),3.5 GHz,R6IN Double Extra Large,64,Up to 40 Gigabit,0,0,,,,,0.69732,202
+Compute optimized,current,c7g.4xlarge,0,16,AWS Graviton3 Processor,2.5 GHz,C7G Quadruple Extra Large,32,Up to 15 Gigabit,0,0,,,,,0.58,202
+Compute optimized,current,c5ad.2xlarge,0,8,AMD EPYC 7R32,3.3 GHz,C5AD Double Extra Large,16,Up to 10 Gigabit,0,0,1,true,true,300,0.344,202
+General purpose,current,m7i.4xlarge,0,16,Intel Xeon Scalable (Sapphire Rapids),3.2 GHz,M7I Quadruple Extra Large,64,Up to 12.5 Gigabit,0,0,,,,,0.8064,202
+Compute optimized,current,hpc7g.4xlarge,0,16,AWS Graviton3 Processor,2.6 GHz,HPC7G Quadruple Extra Large,128,200 Gigabit,0,0,,,,,1.6832,202
+Memory optimized,current,r7gd.xlarge,0,4,AWS Graviton3 Processor,2.5 GHz,R7GD Extra Large,32,Up to 12.5 Gigabit,0,0,1,true,true,237,0.2722,202
+Compute optimized,current,c5a.large,0,2,AMD EPYC 7R32,3.3 GHz,C5A Large,4,Up to 10 Gigabit,0,0,,,,,0.077,202
+Storage optimized,current,im4gn.xlarge,0,4,AWS Graviton2 Processor,2.5 GHz,IM4GN Extra Large,16,Up to 25 Gigabit,0,0,1,true,true,1875,0.36379,202
+Memory optimized,current,x2gd.large,0,2,AWS Graviton2 Processor,2.5 GHz,X2GD Large,32,Up to 10 Gigabit,0,0,1,true,true,118,0.167,202
+Memory optimized,current,r5dn.24xlarge,0,96,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,R5DN 24xlarge,768,100 Gigabit,0,0,4,true,true,900,8.016,202
+Memory optimized,current,r7gd.2xlarge,0,8,AWS Graviton3 Processor,2.5 GHz,R7GD Double Extra Large,64,Up to 15 Gigabit,0,0,1,true,true,474,0.5443,202
+Compute optimized,current,c7g.8xlarge,0,32,AWS Graviton3 Processor,2.5 GHz,C7G Eight Extra Large,64,15 Gigabit,0,0,,,,,1.16,202
+Compute optimized,current,c6gn.4xlarge,0,16,AWS Graviton2 Processor,2.5 GHz,C6GN Quadruple Extra Large,32,25 Gigabit,0,0,,,,,0.6912,202
+GPU instance,previous,g2.8xlarge,104,32,Intel Xeon E5-2670 (Sandy Bridge),2.6 GHz,G2 Eight Extra Large,60,High,0,4,2,true,false,120,2.6,202
+GPU instance,current,g5.2xlarge,0,8,AMD EPYC 7R32,2.8 GHz,G5 Graphics and Machine Learning GPU Double Extra Large,32,Up to 10 Gigabit,0,1,1,true,true,450,1.212,202
+Storage optimized,current,is4gen.medium,0,1,AWS Graviton2 Processor,2.5 GHz,IS4GEN Medium,6,Up to 25 Gigabit,0,0,1,true,true,937,0.14408,202
+Machine Learning ASIC Instances,current,trn1n.32xlarge,0,128,Intel Xeon Scalable (Icelake),3.5 GHz,TRN1N 32xlarge,512,16x 100 Gigabit,0,16,4,true,true,1900,24.78,202
+General purpose,current,m7g.12xlarge,0,48,AWS Graviton3 Processor,2.5 GHz,M7G 12xlarge,192,22.5 Gigabit,0,0,,,,,1.9584,202
+Compute optimized,current,c6gd.4xlarge,0,16,AWS Graviton2 Processor,2.5 GHz,C6GD Quadruple Extra Large,32,Up to 10 Gigabit,0,0,1,true,true,950,0.6144,202
+Compute optimized,current,c7g.12xlarge,0,48,AWS Graviton3 Processor,2.5 GHz,C7G 12xlarge,96,22.5 Gigabit,0,0,,,,,1.74,202
+Memory optimized,previous,r3.8xlarge,104,32,Intel Xeon E5-2670 v2 (Ivy Bridge),2.5 GHz,R3 High-Memory Eight Extra Large,244,10 Gigabit,0,0,2,true,false,320,2.66,202
+Memory optimized,current,r6g.4xlarge,0,16,AWS Graviton2 Processor,2.5 GHz,R6G Quadruple Extra Large,128,Up to 10 Gigabit,0,0,,,,,0.8064,202
+General purpose,current,t3a.small,variable,2,AMD EPYC 7571,2.5 GHz,T3A Small,2,Up to 5 Gigabit,0,0,,,,,0.0188,202
+General purpose,previous,m1.large,4,2,Intel Xeon Family,,M1 General Purpose Large,7.5,Moderate,0,0,2,false,false,420,0.175,202
+General purpose,current,t3.small,variable,2,Intel Skylake E5 2686 v5,3.1 GHz,T3 Small,2,Up to 5 Gigabit,0,0,,,,,0.0208,202
+Memory optimized,previous,m2.4xlarge,26,8,Intel Xeon Family,,M2 High Memory Quadruple Extra Large,68.4,High,0,0,2,false,false,840,0.98,202
+General purpose,current,m7gd.12xlarge,0,48,AWS Graviton3 Processor,2.5 GHz,M7GD 12xlarge,192,22.5 Gigabit,0,0,2,true,true,1425,2.5628,202
+GPU instance,current,g5g.16xlarge,0,64,AWS Graviton2 Processor,2.5 GHz,G5G 16xlarge,128,25 Gigabit,0,2,,,,,2.744,202
+GPU instance,current,p3.8xlarge,97,32,Intel Xeon E5-2686 v4 (Broadwell),2.3 GHz,P3 High Performance GPU Eight Extra Large,244,10 Gigabit,0,4,,,,,12.24,202
+General purpose,current,m6gd.metal,0,64,AWS Graviton2 Processor,2.5 GHz,M6GD Metal,256,25 Gigabit,0,0,2,true,true,1900,2.8928,202
+Compute optimized,current,c6id.xlarge,0,4,Intel Xeon 8375C (Ice Lake),3.5 GHz,C6ID Extra Large,8,Up to 12.5 Gigabit,0,0,1,true,true,237,0.2016,202
+Memory optimized,previous,m2.xlarge,6.5,2,Intel Xeon Family,,M2 High Memory Extra Large,17.1,Moderate,0,0,1,false,false,420,0.245,202
+Compute optimized,previous,c1.medium,5,2,Intel Xeon Family,,C1 High-CPU Medium,1.7,Moderate,0,0,1,false,false,350,0.13,202
+Compute optimized,current,c6gn.medium,0,1,AWS Graviton2 Processor,2.5 GHz,C6GN Medium,2,Up to 16 Gigabit,0,0,,,,,0.0432,202
+Compute optimized,current,c7gd.4xlarge,0,16,AWS Graviton3 Processor,2.5 GHz,C7GD Quadruple Extra Large,32,Up to 15 Gigabit,0,0,1,true,true,950,0.7258,202
+Memory optimized,current,r6gd.metal,0,64,AWS Graviton2 Processor,2.5 GHz,R6GD Metal,512,25 Gigabit,0,0,2,true,true,1900,3.6864,202
+General purpose,current,m6gd.8xlarge,0,32,AWS Graviton2 Processor,2.5 GHz,M6GD Eight Extra Large,128,12 Gigabit,0,0,1,true,true,1900,1.4464,202
+Memory optimized,current,r6g.large,0,2,AWS Graviton2 Processor,2.5 GHz,R6G Large,16,Up to 10 Gigabit,0,0,,,,,0.1008,202
+Compute optimized,current,c7gd.8xlarge,0,32,AWS Graviton3 Processor,2.5 GHz,C7GD Eight Extra Large,64,15 Gigabit,0,0,1,true,true,1900,1.4515,202
+Storage optimized,current,is4gen.large,0,2,AWS Graviton2 Processor,2.5 GHz,IS4GEN Large,12,Up to 25 Gigabit,0,0,1,true,true,1875,0.28815,202
+Compute optimized,previous,c1.xlarge,20,8,Intel Xeon Family,,C1 High-CPU Extra Large,7,High,0,0,4,false,false,420,0.52,202
+Compute optimized,current,c5ad.12xlarge,0,48,AMD EPYC 7R32,3.3 GHz,C5AD 12xlarge,96,12 Gigabit,0,0,2,true,true,900,2.064,202
+Compute optimized,current,c7g.medium,0,1,AWS Graviton3 Processor,2.5 GHz,C7G Medium,2,Up to 12.5 Gigabit,0,0,,,,,0.0363,202
+General purpose,current,t3a.xlarge,variable,4,AMD EPYC 7571,2.5 GHz,T3A Extra Large,16,Up to 5 Gigabit,0,0,,,,,0.1504,202
+Compute optimized,current,c7gd.12xlarge,0,48,AWS Graviton3 Processor,2.5 GHz,C7GD 12xlarge,96,22.5 Gigabit,0,0,2,true,true,1425,2.1773,202
+Memory optimized,current,r5d.16xlarge,256,64,Intel Xeon Platinum 8175,3.1 GHz,R5D 16xlarge,512,20 Gigabit,0,0,4,true,true,600,4.608,202
+Storage optimized,current,i4g.2xlarge,0,8,AWS Graviton2 Processor,2.5 GHz,I4G Double Extra Large,64,Up to 12 Gigabit,0,0,1,true,true,1875,0.61776,202
+GPU instance,current,g5g.2xlarge,0,8,AWS Graviton2 Processor,2.5 GHz,G5G Double Extra Large,16,Up to 10 Gigabit,0,1,,,,,0.556,202
+Memory optimized,current,r7g.12xlarge,0,48,AWS Graviton3 Processor,2.5 GHz,R7G 12xlarge,384,22.5 Gigabit,0,0,,,,,2.5704,202
+General purpose,previous,a1.medium,0,1,AWS Graviton Processor,2.3 GHz,A1 Medium,2,Up to 10 Gigabit,0,0,,,,,0.0255,202
+Memory optimized,previous,m2.2xlarge,13,4,Intel Xeon Family,,M2 High Memory Double Extra Large,34.2,Moderate,0,0,1,false,false,850,0.49,202
+Memory optimized,current,x2gd.16xlarge,0,64,AWS Graviton2 Processor,2.5 GHz,X2GD 16xlarge,1024,25 Gigabit,0,0,2,true,true,1900,5.344,202
+Memory optimized,current,r5ad.4xlarge,0,16,AMD EPYC 7571,2.5 GHz,R5AD Quadruple Extra Large,128,Up to 10 Gigabit,0,0,2,true,true,300,1.048,202
+Compute optimized,current,c6g.large,0,2,AWS Graviton2 Processor,2.5 GHz,C6G Large,4,Up to 10 Gigabit,0,0,,,,,0.068,202
+Memory optimized,current,r6g.xlarge,0,4,AWS Graviton2 Processor,2.5 GHz,R6G Extra Large,32,Up to 10 Gigabit,0,0,,,,,0.2016,202
+Storage optimized,current,i4g.xlarge,0,4,AWS Graviton2 Processor,2.5 GHz,I4G Extra Large,32,Up to 10 Gigabit,0,0,1,true,true,937,0.30888,202
+GPU instance,current,g5g.4xlarge,0,16,AWS Graviton2 Processor,2.5 GHz,G5G Quadruple Extra Large,32,Up to 10 Gigabit,0,1,,,,,0.828,202
+General purpose,current,m7a.48xlarge,0,192,AMD EPYC 9R14 Processor,3.7 GHz,M7A 48xlarge,768,50 Gigabit,0,0,,,,,11.12832,202
+Memory optimized,previous,cr1.8xlarge,88,32,Intel Xeon E5-2670,,High Memory Cluster Eight Extra Large,244,10 Gigabit,0,0,,,,,3.5,202
+Memory optimized,current,r6gd.medium,0,1,AWS Graviton2 Processor,2.5 GHz,R6GD Medium,8,Up to 10 Gigabit,0,0,1,true,true,59,0.0576,202
+General purpose,previous,a1.large,0,2,AWS Graviton Processor,2.3 GHz,A1 Large,4,Up to 10 Gigabit,0,0,,,,,0.051,202
+Storage optimized,current,i4i.xlarge,0,4,Intel Xeon 8375C (Ice Lake),3.5 GHz,I4I Extra Large,32,Up to 10 Gigabit,0,0,1,true,true,937,0.343,202
+Memory optimized,current,r7gd.16xlarge,0,64,AWS Graviton3 Processor,2.5 GHz,R7GD 16xlarge,512,30 Gigabit,0,0,2,true,true,1900,4.3546,202
+General purpose,current,t3.nano,variable,2,Intel Skylake E5 2686 v5,3.1 GHz,T3 Nano,0.5,Up to 5 Gigabit,0,0,,,,,0.0052,202
+Storage optimized,current,d3.xlarge,0,4,Intel Xeon Platinum 8259 (Cascade Lake),3.1 GHz,D3 Extra Large,32,Up to 15 Gigabit,0,0,3,false,true,1980,0.499,202
+Compute optimized,current,c7gd.16xlarge,0,64,AWS Graviton3 Processor,2.5 GHz,C7GD 16xlarge,128,30 Gigabit,0,0,2,true,true,1900,2.903,202
+General purpose,current,m7gd.xlarge,0,4,AWS Graviton3 Processor,2.5 GHz,M7GD Extra Large,16,Up to 12.5 Gigabit,0,0,1,true,true,237,0.2136,202
+Compute optimized,current,c6gd.xlarge,0,4,AWS Graviton2 Processor,2.5 GHz,C6GD Extra Large,8,Up to 10 Gigabit,0,0,1,true,true,237,0.1536,202
+GPU instance,current,g4dn.2xlarge,0,8,Intel Xeon Family,2.5 GHz,G4DN Double Extra Large,32,Up to 25 Gigabit,0,1,1,true,true,225,0.752,202
+Compute optimized,current,c6g.8xlarge,0,32,AWS Graviton2 Processor,2.5 GHz,C6G Eight Extra Large,64,12 Gigabit,0,0,,,,,1.088,202
+General purpose,current,m7g.4xlarge,0,16,AWS Graviton3 Processor,2.5 GHz,M7G Quadruple Extra Large,64,Up to 15 Gigabit,0,0,,,,,0.6528,202
+Compute optimized,current,c6gn.16xlarge,0,64,AWS Graviton2 Processor,2.5 GHz,C6GN 16xlarge,128,100 Gigabit,0,0,,,,,2.7648,202
+General purpose,current,t3a.micro,variable,2,AMD EPYC 7571,2.5 GHz,T3A Micro,1,Up to 5 Gigabit,0,0,,,,,0.0094,202
+Memory optimized,current,r7gd.large,0,2,AWS Graviton3 Processor,2.5 GHz,R7GD Large,16,Up to 12.5 Gigabit,0,0,1,true,true,118,0.1361,202
+General purpose,current,t3.micro,variable,2,Intel Skylake E5 2686 v5,3.1 GHz,T3 Micro,1,Up to 5 Gigabit,0,0,,,,,0.0104,202
+Storage optimized,current,i4g.large,0,2,AWS Graviton2 Processor,2.5 GHz,I4G Large,16,Up to 10 Gigabit,0,0,1,true,true,468,0.15444,202
+FPGA Instances,current,f1.16xlarge,201,64,Intel Xeon E5-2686 v4 (Broadwell),2.3 GHz,F1 16xlarge,976,25 Gigabit,8,0,4,true,true,940,13.2,202
+General purpose,current,m7g.medium,0,1,AWS Graviton3 Processor,2.5 GHz,M7G Medium,4,Up to 12.5 Gigabit,0,0,,,,,0.0408,202
+Compute optimized,current,c7gd.medium,0,1,AWS Graviton3 Processor,2.5 GHz,C7GD Medium,2,Up to 12.5 Gigabit,0,0,1,true,true,59,0.0454,202
+GPU instance,current,g5g.xlarge,0,4,AWS Graviton2 Processor,2.5 GHz,G5G Extra Large,8,Up to 10 Gigabit,0,1,,,,,0.42,202
+Compute optimized,current,c7g.metal,0,64,AWS Graviton3 Processor,2.5 GHz,C7G Metal,128,30 Gigabit,0,0,,,,,2.32,202
+GPU instance,current,p4d.24xlarge,345,96,Intel Xeon Platinum 8275L,3 GHz,P4D Highest Performance GPU 24xlarge,1152,4x 100 Gigabit,0,8,8,true,true,1000,32.7726,202
+General purpose,current,m6g.12xlarge,0,48,AWS Graviton2 Processor,,M6G 12xlarge,192,20 Gigabit,0,0,,,,,1.848,202
+General purpose,current,t3.large,variable,2,Intel Skylake E5 2686 v5,3.1 GHz,T3 Large,8,Up to 5 Gigabit,0,0,,,,,0.0832,202
+Media Accelerator Instances,current,vt1.6xlarge,0,24,Intel Xeon Platinum 8259CL,2.5 GHz,VT1 6xlarge,48,6.25 Gigabit,0,0,,,,,1.3,202
+Compute optimized,current,c6gn.large,0,2,AWS Graviton2 Processor,2.5 GHz,C6GN Large,4,Up to 25 Gigabit,0,0,,,,,0.0864,202
+General purpose,current,m7g.metal,0,64,AWS Graviton3 Processor,2.5 GHz,M7G Metal,256,30 Gigabit,0,0,,,,,2.6112,202
+Compute optimized,current,c7gn.xlarge,0,4,AWS Graviton3 Processor,2.6 GHz,C7GN Extra Large,8,Up to 40 Gigabit,0,0,,,,,0.2496,202
+General purpose,current,t3a.large,variable,2,AMD EPYC 7571,2.5 GHz,T3A Large,8,Up to 5 Gigabit,0,0,,,,,0.0752,202
+GPU instance,current,g4dn.12xlarge,0,48,Intel Xeon Family,2.5 GHz,G4DN 12xlarge,192,50 Gigabit,0,4,1,true,true,900,3.912,202
+GPU instance,current,g5.48xlarge,0,192,AMD EPYC 7R32,2.8 GHz,G5 Graphics and Machine Learning GPU 48xlarge,768,100 Gigabit,0,8,2,true,true,3800,16.288,202
+General purpose,previous,a1.4xlarge,0,16,AWS Graviton Processor,2.3 GHz,A1 Quadruple Extra Large,32,Up to 10 Gigabit,0,0,,,,,0.408,202
+General purpose,current,t2.medium,variable,2,Intel Xeon Family,Up to 3.3 GHz,T2 Medium,4,Low to Moderate,0,0,,,,,0.0464,202
+General purpose,current,t4g.2xlarge,0,8,AWS Graviton2 Processor,2.5 GHz,T4G Double Extra Large,32,Up to 5 Gigabit,0,0,,,,,0.2688,202
+Machine Learning ASIC Instances,current,inf2.48xlarge,0,192,AMD EPYC 7R13 Processor,2.95 GHz,INF2 48xlarge,768,100 Gigabit,0,12,,,,,12.98127,202
+GPU instance,current,g5g.8xlarge,0,32,AWS Graviton2 Processor,2.5 GHz,G5G Eight Extra Large,64,12 Gigabit,0,1,,,,,1.372,202
+Machine Learning ASIC Instances,current,inf2.xlarge,0,4,AMD EPYC 7R13 Processor,2.95 GHz,INF2 Extra Large,16,Up to 15 Gigabit,0,1,,,,,0.7582,202
+General purpose,current,t4g.nano,0,2,AWS Graviton2 Processor,2.5 GHz,T4G Nano,0.5,Up to 5 Gigabit,0,0,,,,,0.0042,202
+Micro instances,previous,t1.micro,variable,1,Variable,,T1 Micro,0.613,Very Low,0,0,,,,,0.02,202
+Memory optimized,current,r6gd.large,0,2,AWS Graviton2 Processor,2.5 GHz,R6GD Large,16,Up to 10 Gigabit,0,0,1,true,true,118,0.1152,202
+General purpose,current,t4g.xlarge,0,4,AWS Graviton2 Processor,2.5 GHz,T4G Extra Large,16,Up to 5 Gigabit,0,0,,,,,0.1344,202
+Storage optimized,current,is4gen.xlarge,0,4,AWS Graviton2 Processor,2.5 GHz,IS4GEN Extra Large,24,Up to 25 Gigabit,0,0,1,true,true,3750,0.5763,202
+General purpose,current,t2.nano,variable,1,Intel Xeon Family,Up to 3.3 GHz,T2 Nano,0.5,Low to Moderate,0,0,,,,,0.0058,202

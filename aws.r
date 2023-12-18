@@ -32,8 +32,16 @@ aws.data.historical.load <- function() {
     aws.data.historical <<- aws.data.load(filename = "historical-data.csv")
 }
 
+fractional.year.to.date <- function(date) {
+  ## convert date number 'year.yeardate', e.g. 2023.250
+  ## to an actual fraction of the year, e.g. 2023.(250/365)
+  year <- paste(substring(date, 1, 4), "-01-01", sep="")
+  daysofyear <- substring(date, 6)
+  as.Date(year) + days(daysofyear) - days(1)
+}
+
 aws.data.historical.new.load <- function() {
-  dates <- read.csv(paste(aws.data.folder, 'historical-data-times.csv', sep="/"))
+  dates <- read.csv(paste(aws.data.folder, 'historical-data-times.csv', sep="/"), colClasses = c("numeric", "Date"))
   data <- read.csv(paste(aws.data.folder, 'historical-data-raw.csv', sep="/"))
   data <- sqldf("
     select *,
